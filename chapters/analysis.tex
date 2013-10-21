@@ -1,0 +1,157 @@
+\chapter{Analysis}
+\label{cha:analysis}
+In the following chapter the migrated BaseX database will be analysed.
+The focus at this part lies on the evaluation and the performance of the library.
+First the specification of the test devices is outlined.
+An estimation is made to show how the performance of the devices differ.
+Therefore different benchmarks has been executed to approximate the different hardware properties and their execution times.
+In the next chapter is shown that the migrated database works without errors and failures on the Android platform.
+For this purpose different unittest has been also migrated to test the functionility.
+After evaluation the functionality the performance has been investigated.
+To get an overview of the performance an XML benchmark set has been used.
+\section{Evaluation of the test devices}
+\label{sec:evaluation-of-the-test-devices}
+For the measurement of the performance two devices are being used. 
+First a notebook, Thinkpad X300 and a Tablet PC Samsung Galaxy Tab 2 10.1.
+The notebook runs an Arch Linux(build) and the Tablet runs Android 4.0.3(API-Level 15).
+While both have a flash storage, a Linux kernel and the same filesystem they are very different.%Tablet 3.0.8
+There are two different factors that are interesting to identify a systems speed that are intresting for the given purpose.
+These are the CPU speed and the IO speed, where IO speed is a headline for different operations.
+Broadly speaking it can be said that the IO speed can be divided into read and write operations.\\
+To measure this values the benchmark tool Bonnie++\footnote{\url{http://www.coker.com.au/Bonnie++/}} is used.
+This tool executes different operations and measures how many of these operations can be executed in one second.
+It tests sequential output, sequential input, random seeks, sequential create and random create.\\
+The sequential output represents the write speed of the system, Bonnie++ uses three different methods to measure this value.
+First it writes one character after another by using the putc() systemcall. 
+After this operation it writes whole blocks with the size of 8192 bytes by using the write() systemcall and than call the close() systemcall.
+The last test in this category is the rewrite test and differs from the write test, that the file is not closed after writing.
+Therefore one block write comply with 8192 putc calls and is way more effective and faster than writing single characters.
+The next test is to measure the random seek operations per seconds, which means how often the read/write position can be changed.
+It also measures the latency which represents the rotation speed of the disk, but this is obsolete because both systems have flash storage and so there is no revolution per minute to measure.
+Bonny is written in C++ and is available on most linux distributions, but to use it on Android it is necessary to build it from its sources by using the Android Native Development Kit(NDK).
+This provides a cross compiler which makes it possible to build C++ code for Android.
+For the execution of the benchmarks the version 1.96 from Bonnie++ has been used.
+The results of these test executions can be seen in table~\ref{tab:bonnie-results-out}.
+\input{chapters/tables/bonnie-out}
+Bonnie++ also measures the sequential and random create of a file.
+Therefore it creates, queries its status and deletes a file by using the posix systemcalls creat(), stat() and unlink().
+The results of this test can be seen in table~\ref{tab:bonnie-results-create}
+\input{chapters/tables/bonnie-create}
+By analyzing these values it can be said that the laptop is overall faster than the tablet pc.
+It is well known that IO operations are the most expensive on Android, so the achieved result is no surprise. 
+But with these values it can be said that there are factors which can tell how much faster it is in specific operations.
+This factors are impossible to optimize, because they are a hardware constraint and only changing the hardware can improve them, but they are still important to identify the bottlenecks of the mobile BaseX version.\\
+Analyzing table~\ref{tab:bonnie-results-create} there is one value which is very high.
+The sequential write per character is 40 times faster on the laptop than on the tablet, considering this it is clear to avoid writing by character instead by block.
+Writing by using the block mechanism is just three times slower on the tablet.
+The sequential reading of a single character is at the tablet just 1.52 times slower than the at the notebook.
+Though the factor of the block reading is quite higher than the character reading factor it is sure to use the block reading because it is much faster than character reading.
+But by using block reading the factor need also be considered in the BaseX benchmarks later in chapter~\ref{sec:analysing-the-execution-performance}.
+\\
+Looking at table~\ref{tab:bonnie-results-create} it can be seen that the sequential/random creation, reading and deleting is very slow on the Android devices compared to the laptop.
+considering this it should be avoided to often create files, because this is very slow.\\
+Bonnie++ gives a good overview about how fast the two system handle their IO operations and how they differ in this aspect.
+But there is also the another factor which affects the speed of the execution of a program.
+This is the CPU speed, it is obvious that this also differs on both test devices.
+To evaluate the CPU times a Java program has been written which executes four different CPU intensive operations.
+First it does the naive factorial of 5000, where naive means that it just iterates till 5000 and multiplies every step to the result.
+The second test is a recursive calculation of the 100th Fibonacci number.
+The third does a sorts a ascending ordered array of 10000 items using the bubble-sort algorithm.
+This is done because this is the worst case for the bubble-sort algorithm and has a complexity of $\mathcal O(n^2)$.
+The last test makes a naive test if the number 666667 is prime or not.
+All these test are very CPU intensive, because they only use arithmetic operations.
+The results of these test can be seen in table~\ref{tab:cpu-results}.
+\input{chapters/tables/cpu-benchmark}
+Except the Fibonacci test it can be said that the CPU of the laptop is about five times faster than the one of the laptop.
+This is like the different IO parameters a factor which could not be improved and has to be considered in the BaseX benchmarks as well.
+These evaluation is for measuring the performance of the two BaseX versions and how to cope with the results achieved by two different platforms on two different devices.
+In the next section the functionilty of the mobile BaseX version is been evaluated.
+%Looking at the results of the executed benchmarks it can be said that the results achied in chapter~\ref{sec:analysing-the-execution-performance} are going to be 
+
+
+
+\section{Evaluating the working BaseX Android port}
+\label{sec:evaluating-the-working-basex-android-port}
+In this section will be shown that the created BaseX Android port works and fit all requirements.
+For this purpose the given JUnit tests were been migrated to Android too.
+This shows that all functions work like they work on the standard Java version.
+
+
+\section{Analysing the execution performance}
+\label{sec:analysing-the-execution-performance}
+To investigate the performance of the Android version of BaseX the benchmark suite XMark has been used.
+XMark creates random xml files and has a set of 20 predefined queries that can be used to measure the performance of an XQuery implementation.
+It offers the possibility to choose the size of the random XML files, so that the test queries can be executed on different file sizes.
+Therefore it is also being used to find the maximum size of a BaseX database on Android.
+
+\subsection{The XMark benchmark suite}
+\label{subsec:the-xmark-benchmark-suite}
+The queries are separated into ten different categories.
+All categories are normal database operations how they can happen in the every day usage.
+The different queries are targeting to bring the used database to its edge.
+
+\begin{enumerate}
+	\item Return the name of the person with ID 'person0'.
+	\item Return the initial increase of all open auctions.
+	\item Return the first and current increase of all open auctions whose current increase is at least twice as high as the initial increase.
+	\item List the reserves of those open auctions where a cerain person issued a bid before another person.
+	\item How many sold items cost more than 40.
+	\item How many items are listed on all continents?
+	\item How many pieces of prose are in our database?
+	\item List the names of persons and the number of items they bought. (Joins person, closed$\backslash$\_ auction) 
+	\item List the names of persons and the names of items they bought in Europe. (Joins person$\backslash$\_auction, item)
+	\item List all persons according to their interest; use French markup in the result.
+	\item For each person, list the number of items currently on sale whose price does not exceed 0.02\% of the person's income.
+	\item For each richer-than-average person, list the number of items currently on sale whose price does not exceed 0.02\% of the person's income.
+	\item List the names of items registered in Australia along with their description.
+	\item Return the names of all items whose description contains the word 'gold'.
+	\item Print the keywords in emphasis in annotations of closed auctions.
+	\item Return the IDs of those auctions that have one or more keywords in emphasis.
+	\item Which persons don't have a homepage?
+	\item Convert the currency of the reserve of all open auctions to another currency.
+	\item Give an alphabetically ordered list of all items along with their location.
+	\item Group customers by their income and output the cardinality of each group.
+\end{enumerate}
+
+
+
+%The structure of the XML files can be seen in listing BLA.
+\input{listings/xmark-xml-file}
+The content of the generated XML files is randomly generated by using the 17000 most frequently used words~\footnote{ignoring stop words} in the plays of Shakespeare~\cite{schmidtxmark}.
+
+%\begin{figure}[!ht]
+%  \input{plot1}
+%  \begin{gnuplot}[terminal=pdf, terminaloptions=color, scale=0.9]
+%	set title 'Color graphs with gnuplottex'
+%	set key left
+%	plot [0:3*pi][-2:2] sin(x), cos(x)
+%          set title 'Laptop Steps'
+%	  set datafile separator ','
+%	  set xlabel 'Query'
+%	  set ylabel 'Average time in ms(100 executions)'
+%	  set xrange [0:21]
+%	  set xtics 1,1,20
+%	  set logscale y
+%	  set grid ytics lt 0 lw 1 lc rgb '#bbbbbb'
+%	  set grid xtics lt 0 lw 1 lc rgb '#bbbbbb'
+%	  set key samplen 2 spacing .5 font ',8'
+%	  show grid
+%	  set style fill solid 0.8 border -1
+%	  set boxwidth 0.5 relative
+%	  plot for [i=1:14] 'benchmarks/basex-steps-laptop-transposed.csv' u (\$0+1):i title ''.i.'00kb' with linespoints
+%	\end{gnuplot}              
+  \begin{gnuplot}[terminal=pdf, terminaloptions={font "`Arial"'}]
+    plot sin(x), cos(x)
+  \end{gnuplot}
+%\end{figure}
+
+\subsection{Analysing the test devices}
+The two devices that has been used to benchmark BaseX are totally different.
+The only thing they have in common is the file system which is of the type of Fourth Extended File System(ext4).
+ 
+
+\section{Analysing the resources consumptions}
+
+\section{Improving the shown }
+\label{sec:improving}
+In this section is shown how the found bottlenecks can be improved and the time consumption of some functionalities are made better.

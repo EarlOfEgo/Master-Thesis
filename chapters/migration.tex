@@ -1,0 +1,155 @@
+\chapter{Porting BaseX to the Android platform}
+\label{sec:migration:porting-basex-to-android}
+In this chapter it is shown how the BaseX database has been migrated to the Android platform.
+To achieve this goal the source and target platforms are analyzed and all requirements are determined.
+In chapter BLA it is illustrated which parts of the BaseX version has been changed and how.
+The last chapter describes the problems which are occured during the migration.
+
+
+\section{Analyzing the source and target platforms} 
+\label{sec:migration:analysing-the-source-and-target-platform}
+In this section the two different platforms are analyzed.
+The main part of it is the software part, because both platforms are running on a huge amount of hardware devices.
+The source platform is the Java Virtual Machine(JVM) and the target platform is the Dalvik Virtual Machine(Dalvik VM, or DVM).
+Both are virtual machines, but they vary in different ways.
+One of the main difference is that the JVM is a stack based and the DVM is a register based virtual machine.
+Also the DVM is optimized to be executed on mobile devices, which means that it is designed to use less memory and CPU usage than the JVM.
+
+
+\subsection{Comparison of the two virtual machines}
+\label{sec:migration:comparison-of-the-two-virtual-machines}
+Like in the chapter before mentioned both source and target platforms are using Java as a programming language.
+Compared to other general purpose programming languages, like C++, Java isn't being compiled into machine code.
+To execute Java code a virtual machine is required, which translates the compiled Java code into machine code.
+However, like in Section~\ref{sec:migration:analysing-the-source-and-target-platform} mentioned both platforms have different virtual machines.
+They differ in many kinds that the application developer not sees but need to consider.
+\\
+On of the most important difference is that the JVM is stack and the DVM is a register based virtual machine.
+This difference helps the DVM to execute the same code in lesser operations than the JVM.
+This means that the DVM need lesser CPU cycles than the JVM, which is an improvement that is necessary because of the lack of much CPU resources in mobile devices.
+For example the code from listing bla, which is one function that adds two integers.
+In picture blub is the execution of the function outlined how it is performed with a stack based register and in figure blob is shown how it is done in a register based machine.
+Comparing both pictures it can be seen that the DVM need 6 fewer instructions.
+This is just for a method which adds two integers, so it can be imagined how many instructions are being saved when using the DVM instead of the JVM.
+\\
+Another difference is that the JVM uses class files which are storing every bla blub...
+The Dalvik Executable (dex) file is the file which the DVM uses,it is binary code that is being interpreted by the DVM. 
+All libraries and additional stuff is compiled into one dex file.
+The main difference between a jar and a dex file is, that if there are classes in a dex file that are using the same additional data they share it.
+In a jar file every class has its own additional data, nevertheless if another class uses the same or not.
+This improves the dex file in the view of the size, it is usually smaller than a jar containing the same code.
+
+
+\section{Requirements of the target platform}
+\label{sec:migration:requirmenets-of.the-target-platform}
+However, like the source platform the target platform uses also Java as programming language there are some differences which need to be considered.
+To get an executable BaseX Android Version some adjustments need to be done.
+It need to be considered that the Dalvik VM runs on mobile devices which are using Android as operating system.
+
+\subsection{Comparison of the two byte code formats}
+\label{sec:comparison-of-the-two-byte-code-formats}
+Both virtual machines differ also in their format of the compiled program.
+The JVM executes JAR(Java Archieve) files, which includes all the byte code and the DVM executes DEX(Davlik Executables) files.
+Like the Dalvik virtual machine the DEX format is also optimized for the mobile context.
+Depending on the architecture of the compiled program, the size of the DEX file could be smaller than the aquivalent JAR file.
+The reason for this is that the DEX file has a shared pool for all constant values.
+In opposite to this every constant in a JAR file is stored in their own class which uses it.
+\cite{bornstein2008dalvik}
+%\cite{ehringer2010dalvik}
+
+
+
+\section{Requirements of the target platform}
+\label{sec:migration:requirmenets-of.the-target-platform}
+However, like the source platform the target platform uses also Java as programming language there are some differences which need to be considered.
+To get an executable BaseX Android Version some adjustments need to be done.
+It need to be considered that the Dalvik VM runs on mobile devices which are using Android as operating system.
+Android is a Linux fork, but differs in some ways to the normal Linux operating system.
+Android is optimized for mobile devices, which means that it does not require many hardware resources.
+Also the process management differs in some ways. 
+Android uses the Linux user management system to organize its applications and their privileges.
+Every application is a own user and has its own sandbox, with every needed resources.
+Although there are some ways it is usually not possible to access the sandbox of another application.
+These interprocess communications (IPC) are provided by the Android operating system and are restricted in some ways.
+They are usually used to provide information or notify other applications.
+Like in Linux, where every user gets its own home directory, in Android every application gets its own directory in the /data/data/application directory.
+In this directory the application stores all its data and this directory is only accessible by the application.
+For this reason it is necessary that all files which were created and used by Basex are stored in this directory.
+It would be also possible to store the data on an external storage, like a SD-Card, and limit the file rights.
+By using this way, the problem is, that the IO operations on an external storage device are very expensive and slow.
+Another constraint is the available Java libraries, depending on the API-Level Android does not offer so many like the standard Java version.
+Some additional libraries can be added, if they only use the normal Java libraries.
+
+\section{Changes of the source platform}
+\label{sec:migration:changes-of-the-source-platform}
+For the migration an Android project has been created, this provides all needed files.
+To create an Android project the Android Software Development Kit(SDK) is necessary.
+This can be downloaded on the official homepage of Android\footnote{\url{developer.android.com/sdk/index.html}}
+The Android SDK, which is also called Android Developer Tools(ADT), provides many useful tools and also a plugin for the Eclipse IDE.
+To create the BaseX library project the Eclipse create new project wizard has been used.
+It is possible to mark the project as a library, this implies that the compiler creates a jar file out of the project.
+The purpose of this is that the BaseX library can be used in every Android project by just including it.
+All private data is stored in the /data/data/packagename directory.
+So the method not just only creates an instance or returns the existing, it also checks if the private folder of the application is available and creates it if not.
+If this folder has been created there is also a subfolder created which is called BaseXData.
+This subfolder stores all databases created by the application and no other application can neither read nor write on this folder.
+The next necessary change is to adjust the path on the Prop.java file.
+This contains a static class that holds every property of the BaseX database, hence also the path to the database.
+This has to be done before anything can read the filepath, so it is part of the constructor call.
+BaseX provides methods that can be used to access, create, modify or delete the database.
+For every of these operations a method inside the class has been created and can be called from outside.
+Every method checks if a BaseX context is available, which should usualy be the case, and then executes the wanted operation.
+Therefore the BaseX context is necessary and is used to make the specific operation on the database.
+Every method in the class throws an IOException when something goes wrong, this exception comes from BaseX and need to be handled by the application which uses the library.
+The reason why the directory name of the application has to be used at the constructor call is that it is not possible to get the name of the application inside the library.
+There are methods provided by Android to receive the project package name, but this is the name of the package of the library.
+And the library is not an application and therefore has no own data directory in the /data/data folder.
+And it is not possible to create a own folder in this directory, because Android is doing it when the Application is being installed.
+It would be also always the same folder, because 
+
+
+
+%Android uses a different kind for generating UI objects than the standard Java version.
+%This uses AWT and Swing, but these API aren't available on Android, so this can not be used on Android.
+%Another difference between Android and the standard BaseX version is that Android has no user directory.
+%Every application has its own directory which is located in /data/data/packagename.
+%Therefore all files need to be stored there. 
+%BaseX Android should be a library which means that every developer can use it.
+%Therefore it is not known how the absolute path name is, because it is the package name of the executing activity.
+%And this name differs from project to project.
+%Therefore there is just one entry point for the library which is the class BaseXAndroid.
+%The constructor of this class has a string argument, this parameter should be the absolute path to data directory of the application.
+%To get this needed information the function getApplicationInfo().dataDir, which is inherited from the activity class, can be used in every activity of the application.
+
+
+
+
+\section{Problems during the migration}
+\label{sec:migration:problems-during-the-migration}
+There occurred several problems during the migration.
+The first problem which was discovered, was that some included libraries are not available on Android.
+The following library couldn't be migrated because it is included in the JavaSE and is not available for Android.
+\textit{crypto javax.xml.crypto}
+BaseX identifies the operating system as Linux and then tries to save all BaseX related data into the home directory, which doesn't exist on Android.
+This need to be, like in Section~\ref{sec:migration:requirmenets-of.the-target-platform} described the /data/data/application directory.
+The problem hereby is that the goal of the migration is that the database is a library, but the directory name depends from the application name.
+The only way to get the application way, except for hard coding, is to get the application context and extract the name there.
+This bears another problem, though only applications have a context, libraries not. 
+A possible way, could be to pass the context to the library, but then the library holds the context and just need to application name.
+Holding a context massively slows down an Android application, so this is not the way how it was solved.
+The alternative is to pass a string holding the application name to the library constructor and the library uses it to generate the needed directories.
+This is also the way how it is done in the BaseX library.
+To create a library object it is necessary to pass a string as an argument to the constructor.
+Is this the first time an object of BaseX was created it tries to create the needed directory, /data/data/application-name/BaseXData.
+In this directory all created databases and their depending files are stored.
+\\
+Another problem which occurred, was that BaseX uses a lot of the String function isEmpty(), which is not available at API-Level lower than 9.
+The same applies for the copyOf() method in the java.util.Arrays package.
+This was solved by not supporting API-level lower than 9 with BaseX library. 
+The reason for this is that only 4\% of the used Android devices are using API-level lower than 9.
+\\
+After this adjustments it is possible to create a BaseX object on Android.
+To get a library which supports all needed operations some more work was done.
+
+
+
