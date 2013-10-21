@@ -1,0 +1,20 @@
+\begin{table}
+\begin{tabular}{|r|r|r|r|r|r|r|r|r|r|r|r|r|}
+\hline
+&\multicolumn{3}{|c|}{Sequential}&\multicolumn{2}{|c|}{Sequential}&Random&\multicolumn{3}{|c|}{Sequential}&\multicolumn{3}{|c|}{Random}\\
+&\multicolumn{3}{|c|}{Output}&\multicolumn{2}{|c|}{Input}&Seeks&\multicolumn{3}{|c|}{Create}&\multicolumn{3}{|c|}{Create}\\
+\hline
+&K/sec&K/sec&K/sec&K/sec&/sec&/sec&/sec&/sec&/sec&/sec&/sec&/sec\\
+\hline
+Laptop&201&62180&23850&907&98239&1161&17134&137752&13032&19442&170028&11774\\
+\hline
+Tablet&5&20828&8756&596&23768&475.6&39&361&167&42&391&238\\
+\hline
+\hline
+Factors&40.20&2.99&2.72&1.52&4.13&2.44&439.33&381.58&78.04&462.90&434.85&49.47\\
+\hline
+\end{tabular}
+\caption{Results of the Bonnie++ benchmarks.}
+\label{tab:<+label+>}
+\end{table}
+	    
