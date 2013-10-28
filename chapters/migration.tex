@@ -2,64 +2,105 @@
 \label{sec:migration:porting-basex-to-android}
 In this chapter it is shown how the BaseX database has been migrated to the Android platform.
 To achieve this goal the source and target platforms are analyzed and all requirements are determined.
-In chapter BLA it is illustrated which parts of the BaseX version has been changed and how.
-The last chapter describes the problems which are occured during the migration.
+This includes the different software platforms and not the hardware specific aspects. 
+In chapter~\ref{sec:migration:problems-during-the-migration} it is illustrated which parts of the BaseX version has been changed and how.
+The last chapter describes the problems which are occurred during the migration.
 
 
 \section{Analyzing the source and target platforms} 
 \label{sec:migration:analysing-the-source-and-target-platform}
 In this section the two different platforms are analyzed.
 The main part of it is the software part, because both platforms are running on a huge amount of hardware devices.
-The source platform is the Java Virtual Machine(JVM) and the target platform is the Dalvik Virtual Machine(Dalvik VM, or DVM).
-Both are virtual machines, but they vary in different ways.
+The source platform is the Java Virtual Machine(JVM) and the target platform is the Dalvik Virtual Machine(Dalvik VM, or DVM) in the Android environment.
+The JVM and the DVM are both virtual machines, but they vary in different ways.
 One of the main difference is that the JVM is a stack based and the DVM is a register based virtual machine.
 Also the DVM is optimized to be executed on mobile devices, which means that it is designed to use less memory and CPU usage than the JVM.
+Lesser hardware usage implies also lesser battery usage, which is also a factor which should be considered in the field of mobile development.
+Another difference which need to be considered is the host system, which is in the DVM case Android.
+And for the JVM it could be Windows, Mac OS, or any Linux/Unix derivate. 
+This need to be considered if external sources will be used, like writing or reading a file.
 
 
 \subsection{Comparison of the two virtual machines}
 \label{sec:migration:comparison-of-the-two-virtual-machines}
 Like in the chapter before mentioned both source and target platforms are using Java as a programming language.
-Compared to other general purpose programming languages, like C++, Java isn't being compiled into machine code.
-To execute Java code a virtual machine is required, which translates the compiled Java code into machine code.
+Compared to other general purpose programming languages, like C++, Java is not being compiled into machine code.
+To execute Java code a virtual machine is required, which runs the compiled Java code.
 However, like in Section~\ref{sec:migration:analysing-the-source-and-target-platform} mentioned both platforms have different virtual machines.
 They differ in many kinds that the application developer not sees but need to consider.
 \\
 On of the most important difference is that the JVM is stack and the DVM is a register based virtual machine.
 This difference helps the DVM to execute the same code in lesser operations than the JVM.
-This means that the DVM need lesser CPU cycles than the JVM, which is an improvement that is necessary because of the lack of much CPU resources in mobile devices.
-For example the code from listing bla, which is one function that adds two integers.
-In picture blub is the execution of the function outlined how it is performed with a stack based register and in figure blob is shown how it is done in a register based machine.
-Comparing both pictures it can be seen that the DVM need 6 fewer instructions.
-This is just for a method which adds two integers, so it can be imagined how many instructions are being saved when using the DVM instead of the JVM.
-\\
-Another difference is that the JVM uses class files which are storing every bla blub...
-The Dalvik Executable (dex) file is the file which the DVM uses,it is binary code that is being interpreted by the DVM. 
-All libraries and additional stuff is compiled into one dex file.
-The main difference between a jar and a dex file is, that if there are classes in a dex file that are using the same additional data they share it.
-In a jar file every class has its own additional data, nevertheless if another class uses the same or not.
-This improves the dex file in the view of the size, it is usually smaller than a jar containing the same code.
-
-
-\section{Requirements of the target platform}
-\label{sec:migration:requirmenets-of.the-target-platform}
-However, like the source platform the target platform uses also Java as programming language there are some differences which need to be considered.
-To get an executable BaseX Android Version some adjustments need to be done.
-It need to be considered that the Dalvik VM runs on mobile devices which are using Android as operating system.
+This means that the DVM need lesser CPU cycles than the JVM, which is an improvement that is necessary because of the lack of CPU resources in mobile devices and the aspect of the battery usage.
+This can be demonstrated by looking at the instructions done by adding two integers.
+The stack based virtual machine has to do four machine instructions, while the register based VM can do the operation in one instruction.
+The reason for this is that the stack based VM needs to pop the two values first before it can add them and store them on the stack.
+Figure~\ref{fig:stack-based-addition} illustrates the executed instructions of a addition with a stack based VM.
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.6]{images/stack-based-addition.png} 
+\caption{The addition of two integers on a stack based virtual machine.}
+\label{fig:stack-based-addition}
+\end{center}
+\end{figure}
+Compared to this, the register based virtual machine just need one  machine instruction to complete the addition of two numbers.
+The needed instruction is \textit{ADD R1, R2, R3}, which can be translated into add content of register 1 and register 2 and store it in register 3.
+Figure~\ref{fig:register-based-addition} illustrates this by showing the add operation of the numbers one and two.
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.6]{images/register-based-addition.png} 
+\caption{The addition of two integers on a register based virtual machine.}
+\label{fig:register-based-addition}
+\end{center}
+\end{figure}
+This minimal example shows how the register based virtual machine uses lesser machine instructions compared to the stack based.
+The disadvantage in this is that register based machine has to store the addresses, the registers, of the operands.
+Which is not necessary at a stack based machine, because of the stack pointer that always directs to the actual operand using the Last In First Out (LIFO) principal.
+This leads to the result, that stack based code is smaller than the corresponding register based code.
+Although the Dalvik VM is a register based virtual machine, the executed byte code is not bigger than the equivalent JVM code.~\cite{shi2008virtual}\\
+This is the result of the different format of the executable virtual machine code, which is illustrated in Chapter~\ref{sec:comparison-of-the-two-byte-code-formats}.
+%In general it could not be said which type of virtual machine is the best.
+%It depends how the target hardware platform is specified, this could be reason why the JVM is a stack based virtual machine.
+%One advantage of stack based machines is that those machines do not need many information about the hardware they are using.
+%Which makes it easer to execute on many different hardware environments, which is one of the main goals the JVM has.~\cite{lindholm2013java}\\
 
 \subsection{Comparison of the two byte code formats}
 \label{sec:comparison-of-the-two-byte-code-formats}
-Both virtual machines differ also in their format of the compiled program.
-The JVM executes JAR(Java Archieve) files, which includes all the byte code and the DVM executes DEX(Davlik Executables) files.
-Like the Dalvik virtual machine the DEX format is also optimized for the mobile context.
-Depending on the architecture of the compiled program, the size of the DEX file could be smaller than the aquivalent JAR file.
-The reason for this is that the DEX file has a shared pool for all constant values.
-In opposite to this every constant in a JAR file is stored in their own class which uses it.
-\cite{bornstein2008dalvik}
+Both virtual machines differ in their format of the executable files.
+This is on one side the Java Archive File (JAR) for the JVM and the Android Application package file (APK) on the other side.
+A JAR file is an archive which includes the compressed class files, this class files are being build out of the Java source code by using the javac compiler.~\cite{pugh1999compressing} 
+An APK file is also an archive file, but it not only includes the executable program, it also includes the meta information and resource files.
+The executable which includes an APK is called DEX file, which is short for Dalvik Executable.
+A DEX file is created by using a tool which compiles Java class files into DEX files.
+Picture~\ref{fig:create-apk} illustrates the flow of an APK creation, which differs to the creation of a JAR file by creating dex files out of the class files.\\
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.55]{images/create-apk.png} 
+\caption{The creation flow of an APK file.}
+\label{fig:create-apk}
+\end{center}
+\end{figure}
+
+Having a closer look at the DEX files and comparing them to the JAR files shows that they differ in various ways.
+The first thing that comes in mind is that a JAR file contains a class file for every class.
+And a DEX file combines all specific information into one field.
+For example it just has one constant pool, where all constant values of all classes are stored.
+This includes integers, strings, method- and class references, for example.
+Thinking about an interface which is used very often in a project can display what an advantage of one shared constant pool gives.
+Looking at Image~\ref{fig:jar-dex} demonstrates that every class which uses this interface needs has its own reference in its own constant pool.
+In general it can be said that DEX files are smaller than their equivalent JAR files.~\cite{bornstein2008dalvik}\\
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.41]{images/jar-dex.png} 
+\caption{The difference between a jar and a dex file. Source:~\cite{enck2011study}}
+\label{fig:jar-dex}
+\end{center}
+\end{figure}
+
 %\cite{ehringer2010dalvik}
 
 
-
-\section{Requirements of the target platform}
+\subsection{Requirements of the target platform}
 \label{sec:migration:requirmenets-of.the-target-platform}
 However, like the source platform the target platform uses also Java as programming language there are some differences which need to be considered.
 To get an executable BaseX Android Version some adjustments need to be done.
