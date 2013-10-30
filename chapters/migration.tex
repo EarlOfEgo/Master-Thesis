@@ -24,7 +24,7 @@ This need to be considered if external sources will be used, like writing or rea
 \subsection{Comparison of the two virtual machines}
 \label{sec:migration:comparison-of-the-two-virtual-machines}
 Like in the chapter before mentioned both source and target platforms are using Java as a programming language.
-Compared to other general purpose programming languages, like C++, Java is not being compiled into machine code.
+Compared to other general purpose programming languages, for example C++, Java is not being compiled into machine code.
 To execute Java code a virtual machine is required, which runs the compiled Java code.
 However, like in Section~\ref{sec:migration:analysing-the-source-and-target-platform} mentioned both platforms have different virtual machines.
 They differ in many kinds that the application developer not sees but need to consider.
@@ -34,8 +34,9 @@ This difference helps the DVM to execute the same code in lesser operations than
 This means that the DVM need lesser CPU cycles than the JVM, which is an improvement that is necessary because of the lack of CPU resources in mobile devices and the aspect of the battery usage.
 This can be demonstrated by looking at the instructions done by adding two integers.
 The stack based virtual machine has to do four machine instructions, while the register based VM can do the operation in one instruction.
-The reason for this is that the stack based VM needs to pop the two values first before it can add them and store them on the stack.
-Figure~\ref{fig:stack-based-addition} illustrates the executed instructions of a addition with a stack based VM.
+The reason for this is that the stack based VM needs to pop the two values first before it can add them and store them back on the stack.
+The instructions are \textit{pop 1, pop 2, add 1 2, push result}.
+Figure~\ref{fig:stack-based-addition} illustrates the executed instructions of a addition with a stack based virtual machine.
 \begin{figure}[h]
 \begin{center}
 \includegraphics[scale=0.65]{images/stack-based-addition.png} 
@@ -43,7 +44,7 @@ Figure~\ref{fig:stack-based-addition} illustrates the executed instructions of a
 \label{fig:stack-based-addition}
 \end{center}
 \end{figure}
-Compared to this, the register based virtual machine just need one  machine instruction to complete the addition of two numbers.
+Compared to this, the register based virtual machine just need one machine instruction to complete the addition of two numbers.
 The needed instruction is \textit{ADD R1, R2, R3}, which can be translated into add content of register 1 and register 2 and store it in register 3.
 Figure~\ref{fig:register-based-addition} illustrates this by showing the add operation of the numbers one and two.
 \begin{figure}[h]
@@ -62,22 +63,35 @@ This is the result of the different format of the executable virtual machine cod
 \\
 The performed instructions which are executed on Dalvik VM are called bytecode.
 To execute this instructions the DVM has an interpreter which interprets all instructions and performs them.
-This is an usual way how a virtual machine is implemented, but interpreters are slower than normal compiled machine code.
+The difference to normal interpreted languages is, that the JVM interpreter do not need to check the syntax of the program.
+This has been already done by the Java compiler which compiles the Java source code into class files.
+Even if it is faster than other interpreted languages, it is still slower than compiled code which is executed directly on the hardware.
+This so called machine code is faster because there is no layer between the executions and the hardware, which could slow down the execution.~\cite{aycock2003brief}
 There is a technique which can improve a virtual machine in performance aspects by adding a Just In Time (JIT) compiler to it.
-Generally it can be said, that a JIT compiler, used by a virtual machine, compiles heavy used code segments or very expensive calculations into machine code.
+Generally it can be said, that a JIT compiler, used by a virtual machine, compiles heavy used code segments or very expensive calculations into the faster machine code.
 There are two types of JIT functioning:
 \begin{itemize}
 \item method-based
 \item trace-based
 \end{itemize}
-The trace-based method works by looking at the most executed code fragments, especially loops, and compiles them into native machine code.
-The method-based JIT mechanism is to compile whole methods, that are generally used and expensive in execution time.
+The trace-based method works by looking at the most executed code fragments, especially loops, and compiles them into native machine code.\\
+The method-based JIT mechanism is to compile whole methods, which are often used and expensive in execution time.
 Since the release of the Android version 2.2, codename Froyo, the Dalvik VM has received a JIT compiler additionally to the interpreter mechanism.
 According to \cite{cheng2010jit} the implemented Dalivk JIT compiler can speed up the execution of intensive operations up to five times.
 The Dalvik VM uses the above mentioned mechanism of a trace-based JIT compiler mixed with the usual DVM interpreter.
+The given advantage of the trace-based method is that not whole methods are being compiled into machine code.
+Instead only the parts which are often executed are being compiled.
+This reduces the size of the code which needs to be compiled by the JIT and also omits the not so often executed methods parts like exception handling.
+It is needles to compile such parts in machine code to speed them up, because most of the execution time of the program they were not called.
+It should also reduce the compile time for the JIT because of the selective compilation into machine code.\\
 To realize this the DVM has received an additional thread, which is responsible for the JIT compilation.
-This thread just compiles instructions from the trace queue, which gets generated by the main thread that counts the executions of the bytecode statements.\cite{oh2012evaluation}
-Picture~\ref{fig:dvm-threads} illustrates the principle of the two threads in the DVM.
+Beneath this new thread there is the main thread, that includes the interpreter.
+This interpreter interprets the bytecode and records the traces and their occurrence.
+If the amount of the occurrence higher than a predefined number, the trace is being stored into the trace queue.
+The new added thread, the JIT thread, compiles the traces from the queue and writes the machine code into the code cache.
+The main thread now is doing a lookup if the bytecode that needs to be executed is now available in the code cache.
+Is this condition met, it uses the machine code from the code cache instead interpreting the bytecode.\cite{oh2012evaluation}
+Picture~\ref{fig:dvm-threads} illustrates the principle of the two threads in the DVM.\\
 \begin{figure}[h]
 \begin{center}
 \includegraphics[scale=0.5]{images/dvm-threads.png} 
@@ -86,7 +100,16 @@ Picture~\ref{fig:dvm-threads} illustrates the principle of the two threads in th
 \end{center}
 \end{figure}
 
-The JVM has also a JIT compiler, but instead of a trace-based, like in the DVM, it uses method-based one.~\cite{kotzmann2008design}
+Depending on the different implementation of a JVM, it differs which type of JIT compiler mechanism is used.
+For this thesis the Oracle JVM HotSpot is used, which has a method-based JIT compiler as default.
+It is also possible to use another JIT mechanism in the HotSpot JVM triggered by parameters during the VM start.
+The method-based JIT works like above mentioned, it compiles the most called methods into machine code.~\cite{kotzmann2008design}
+Those methods are called hot spots, which are also named the virtual machine.
+\cite{paleczny2001java}
+\\
+A general statement about the both virtual machines could not be made, because they differ in a lot of aspects.
+Especially that the DVM has been created for the mobile context and can only be ran on Android devices\footnote{There exist some community projects which are aiming to port the Dalvik VM to other platforms like Linux x86 for example\url{http://www.android-x86.org/}}.
+Looking at the minimal requirements of the both virtual machine, seen in Table BLA, underlines also the aspect that Davlik is made for less available resources.
 
 
 
