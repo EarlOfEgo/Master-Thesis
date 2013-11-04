@@ -2,22 +2,29 @@
 \label{sec:migration:porting-basex-to-android}
 In this chapter it is shown how the BaseX database has been migrated to the Android platform.
 To achieve this goal the source and target platforms are analyzed and all requirements are determined.
-This includes the different software platforms and not the hardware specific aspects. 
-In chapter~\ref{sec:migration:problems-during-the-migration} it is illustrated which parts of the BaseX version has been changed and how.
-The last chapter describes the problems which are occurred during the migration.
+The main focus here is on the different software platforms and not the hardware specific aspects because of the big variety of systems. 
+In Section~\ref{sec:migration:problems-during-the-migration} it is illustrated which parts of the BaseX version has been changed and how to receive a working BaseX Android version.
+The last section describes the problems which are occurred during the migration of the database to Android.
 
 
 \section{Analyzing the source and target platforms} 
 \label{sec:migration:analysing-the-source-and-target-platform}
 In this section the two different platforms are analyzed.
 The main part of it is the software part, because both platforms are running on a huge amount of hardware devices.
-The source platform is the Java Virtual Machine(JVM) and the target platform is the Dalvik Virtual Machine(Dalvik VM, or DVM) in the Android environment.
-The JVM and the DVM are both virtual machines, but they vary in different ways.
+The source platform is the Java Virtual Machine (JVM) and the target platform is the Dalvik Virtual Machine (Dalvik VM, or DVM) in the Android environment.
+The JVM and the DVM are both virtual machines (VM), but they vary in different ways.
+A virtual machine is a simulated computer, which can be a whole system with all parts a computer provides.
+Or it is an abstraction layer which provides the functionality to execute a program on every system that runs the virtual machine.
+Unlike compiled machine code a program for a virtual machine is platform independent, because it does not matter on which operating system it is executed, as long as the virtual machine is available.
+A disadvantage of this is the loss of speed, which is a result of the execution of the virtual machine and not only the program in general.~\cite{craig2006virtual}
+\\
+For both virtual machines the programming language Java is used, which is being compiled into code that the VMs understand and are able to execute.
+Although both platforms are virtual machines they differ in some crucial ways.
 One of the main difference is that the JVM is a stack based and the DVM is a register based virtual machine.
 Also the DVM is optimized to be executed on mobile devices, which means that it is designed to use less memory and CPU usage than the JVM.
 Lesser hardware usage implies also lesser battery usage, which is also a factor which should be considered in the field of mobile development.
 Another difference which need to be considered is the host system, which is in the DVM case Android.
-And for the JVM it could be Windows, Mac OS, or any Linux/Unix derivate. 
+And on the opposite to this it could be Windows, Mac OS, or any Linux/Unix derivate for the JVM. 
 This need to be considered if external sources will be used, like writing or reading a file.
 
 
@@ -34,8 +41,8 @@ This difference helps the DVM to execute the same code in lesser operations than
 This means that the DVM need lesser CPU cycles than the JVM, which is an improvement that is necessary because of the lack of CPU resources in mobile devices and the aspect of the battery usage.
 This can be demonstrated by looking at the instructions done by adding two integers.
 The stack based virtual machine has to do four machine instructions, while the register based VM can do the operation in one instruction.
-The reason for this is that the stack based VM needs to pop the two values first before it can add them and store them back on the stack.
-The instructions are \textit{pop 1, pop 2, add 1 2, push result}.
+The reason for this is that the stack based VM needs to pop the two values first before it can add and store them back on the stack.
+The instructions are \textit{pop 1, pop 2, add 1 2, push result}.\\
 Figure~\ref{fig:stack-based-addition} illustrates the executed instructions of a addition with a stack based virtual machine.
 \begin{figure}[h]
 \begin{center}
@@ -44,7 +51,8 @@ Figure~\ref{fig:stack-based-addition} illustrates the executed instructions of a
 \label{fig:stack-based-addition}
 \end{center}
 \end{figure}
-Compared to this, the register based virtual machine just need one machine instruction to complete the addition of two numbers.
+
+Compared to this, the register based virtual machine just need one machine instruction to complete the same addition of two numbers.
 The needed instruction is \textit{ADD R1, R2, R3}, which can be translated into add content of register 1 and register 2 and store it in register 3.
 Figure~\ref{fig:register-based-addition} illustrates this by showing the add operation of the numbers one and two.
 \begin{figure}[h]
@@ -69,14 +77,14 @@ Even if it is faster than other interpreted languages, it is still slower than c
 This so called machine code is faster because there is no layer between the executions and the hardware, which could slow down the execution.~\cite{aycock2003brief}
 There is a technique which can improve a virtual machine in performance aspects by adding a Just In Time (JIT) compiler to it.
 Generally it can be said, that a JIT compiler, used by a virtual machine, compiles heavy used code segments or very expensive calculations into the faster machine code.
-There are two types of JIT functioning:
+There is a great number of different types of JIT compilers and how they work, the two used by the JVM and the DVM are:
 \begin{itemize}
 \item method-based
 \item trace-based
 \end{itemize}
 The trace-based method works by looking at the most executed code fragments, especially loops, and compiles them into native machine code.\\
 The method-based JIT mechanism is to compile whole methods, which are often used and expensive in execution time.
-Since the release of the Android version 2.2, codename Froyo, the Dalvik VM has received a JIT compiler additionally to the interpreter mechanism.
+Since the release of the Android version 2.2, release name Froyo, the Dalvik VM has received a JIT compiler additionally to the interpreter mechanism.
 According to \cite{cheng2010jit} the implemented Dalivk JIT compiler can speed up the execution of intensive operations up to five times.
 The Dalvik VM uses the above mentioned mechanism of a trace-based JIT compiler mixed with the usual DVM interpreter.
 The given advantage of the trace-based method is that not whole methods are being compiled into machine code.
@@ -109,18 +117,18 @@ Those methods are called hot spots, which are also named the virtual machine.
 \\
 A general statement about the both virtual machines could not be made, because they differ in a lot of aspects.
 Especially that the DVM has been created for the mobile context and can only be ran on Android devices\footnote{There exist some community projects which are aiming to port the Dalvik VM to other platforms like Linux x86 for example\url{http://www.android-x86.org/}}.
-Looking at the minimal requirements of the both virtual machine, seen in Table BLA, underlines also the aspect that Davlik is made for less available resources.
-
 
 
 \subsection{Comparison of the two byte code formats}
 \label{sec:comparison-of-the-two-bytecode-formats}
 Both virtual machines differ in their format of the executable files.
-This is on one side the Java Archive File (JAR) for the JVM and the Android Application package file (APK) on the other side.
+This is on one side the Java Archive File (JAR) for the JVM and the Davlik Executable (DEX) on the other side.
+This DEX is being packed into an Android Application package file (APK) which can be executed by the Android operating system.
 A JAR file is an archive which includes the compressed class files, this class files are being build out of the Java source code by using the javac compiler.~\cite{pugh1999compressing} 
 An APK file is also an archive file, but it not only includes the executable program, it also includes the meta information and resource files.
 The executable which includes an APK is called DEX file, which is short for Dalvik Executable.
 A DEX file is created by using a tool which compiles Java class files into DEX files.
+This works by a tool which is called dx and is part of the Android software development kit.
 Picture~\ref{fig:create-apk} illustrates the flow of an APK creation, which differs to the creation of a JAR file by creating dex files out of the class files.\\
 \begin{figure}[h]
 \begin{center}
@@ -133,11 +141,17 @@ Picture~\ref{fig:create-apk} illustrates the flow of an APK creation, which diff
 Having a closer look at the DEX files and comparing them to the JAR files shows that they differ in various ways.
 The first thing that comes in mind is that a JAR file contains a class file for every class.
 And a DEX file combines all specific information into one field.
-For example it just has one constant pool, where all constant values of all classes are stored.
-This includes integers, strings, method- and class references, for example.
+Which results in that it just has one constant pool, where all constant values of all classes are stored.
+These constants are:
+\begin{description}
+  \item[string\_ids] Sorted list of all string identifiers
+  \item[type\_ids] Sorted list of all identifiers of classes, arrays or primitive types
+  \item[proto\_ids] Sorted list of all prototypes
+  \item[field\_ids] Sorted list of all identifiers for the used fields
+  \item[methods\_ids] Sorted list of all methods used by the DEX file
+\end{description}
 Thinking about an interface which is used very often in a project can display what an advantage of one shared constant pool gives.
 Looking at Image~\ref{fig:jar-dex} demonstrates that every class which uses this interface needs has its own reference in its own constant pool.
-In general it can be said that DEX files are smaller than their equivalent JAR files.~\cite{bornstein2008dalvik}\\
 \begin{figure}[h]
 \begin{center}
 \includegraphics[scale=0.41]{images/jar-dex.png} 
@@ -146,29 +160,40 @@ In general it can be said that DEX files are smaller than their equivalent JAR f
 \end{center}
 \end{figure}
 
-%\cite{ehringer2010dalvik}
+In general it can be said that DEX files are smaller than their equivalent JAR files, because of the shared constant pool.~\cite{bornstein2008dalvik}
+An advantage of the creation chain of a DEX file is that it is theoretically possible to create a DEX file out of every jar archive.
+The problem hereby is that Android does not support all Java libraries that the JVM supports, but this can be done by using the above mentioned dx-tool. 
+Like mentioned above this DEX file is executed by the Dalvik virtual machine, but it is not the Android application.
+This application is the APK  which includes also UI related information and other resource files, like images or sound.
 
 
-\subsection{Requirements of the target platform}
-\label{sec:migration:requirmenets-of.the-target-platform}
-However, like the source platform the target platform uses also Java as programming language there are some differences which need to be considered.
-To get an executable BaseX Android Version some adjustments need to be done.
-It need to be considered that the Dalvik VM runs on mobile devices which are using Android as operating system.
-Android is a Linux fork, but differs in some ways to the normal Linux operating system.
-Android is optimized for mobile devices, which means that it does not require many hardware resources.
-Also the process management differs in some ways. 
-Android uses the Linux user management system to organize its applications and their privileges.
-Every application is a own user and has its own sandbox, with every needed resources.
-Although there are some ways it is usually not possible to access the sandbox of another application.
-These interprocess communications (IPC) are provided by the Android operating system and are restricted in some ways.
-They are usually used to provide information or notify other applications.
-Like in Linux, where every user gets its own home directory, in Android every application gets its own directory in the /data/data/application directory.
-In this directory the application stores all its data and this directory is only accessible by the application.
-For this reason it is necessary that all files which were created and used by Basex are stored in this directory.
-It would be also possible to store the data on an external storage, like a SD-Card, and limit the file rights.
-By using this way, the problem is, that the IO operations on an external storage device are very expensive and slow.
-Another constraint is the available Java libraries, depending on the API-Level Android does not offer so many like the standard Java version.
-Some additional libraries can be added, if they only use the normal Java libraries.
+\subsection{Android internals}
+\label{sec:android-internals}
+As shown in the Sections~\ref{sec:migration:comparison-of-the-two-virtual-machines} and \ref{sec:comparison-of-the-two-bytecode-formats} the two virtual machines and the bytecode formats differ.
+However, Android has some other specialties about its internal processing.
+The Android operating system is a Linux based operating system aimed to run on mobile devices.
+Therefore it has been created as a Linux fork of the 2.6.*\footnote{Since Android version 4.* a Linux kernel 3.* is used} kernel and 
+It is being especially designed for the mobile context.
+Which includes special focus for the resource consumption, because most mobile devices provide not the same resources as a normal desktop PC or a notebook.
+As shown in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} an Android application is executed on the Dalvik virtual machine.
+Here it need to be said that every application runs its own Dalvik instance, by forking the main Dalvik instance into an own Linux process.
+Here sets the Android policy in, that every application is independent from every other application and is executed in its own process.
+This also is applied for the location of all files the application uses.
+An application can be compared as an user in Linux, every application is its own user and has its own home directory.
+This directory can only be accessed by the owning application and can be found in the /data/data directory.
+This directory also includes an own SQLite3 database when the application has one.
+A reason for this is a security aspect as well as the stability of the application, considering the own Dalvik instance.
+This is called the \textit{principle of least privilege} which specifies that as less as possible privileges are given to the application.
+Therefore an application developer has to specify which privileges its application needs, for example Internet access or the possibility to write on the external SD-card.
+It is possible that applications can communicate with predefined Inter Process Communications (IPC) but it is not possible to manipulate other applications.
+The main Dalivk instance which is the root for all forked virtual machines is called Zygote and is started by the boot up process.
+Zygote is designed to load and initialize the core library classes so that every forked instance not have to do this.
+This is compared to starting a new virtual machine a speed improvement and saves memory, because not every VM instance has its own core libraries loaded.
+This can be done because the core libraries are all read only and shared by all Dalvik instances.\cite{ehringer2010dalvik}
+Another difference to the usual Linux is that Android uses Bionic libc which is a special from Google developed library for Android which has its own pthread implementation.
+This library is especially designed for the mobile context and the Android environment which improves the speed of forking the Dalvik virtual machine too.~\cite{brady2008android}
+
+
 
 \section{Changes of the source platform}
 \label{sec:migration:changes-of-the-source-platform}
