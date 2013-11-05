@@ -115,11 +115,13 @@ The method-based JIT works like above mentioned, it compiles the most called met
 Those methods are called hot spots, which are also named the virtual machine.
 \cite{paleczny2001java}
 \\
+Although both virtual machines are using Java as programming language, Dalvik lacks of some libraries that are available at the JVM and vice versa.
+In Section~\ref{sec:migration:migration-of-basex-to-android} the used libraries of BaseX are analyzed and investigated which of them are supported by the DVM.\\
 A general statement about the both virtual machines could not be made, because they differ in a lot of aspects.
 Especially that the DVM has been created for the mobile context and can only be ran on Android devices\footnote{There exist some community projects which are aiming to port the Dalvik VM to other platforms like Linux x86 for example\url{http://www.android-x86.org/}}.
 
 
-\subsection{Comparison of the two byte code formats}
+\subsection{Comparison of the two bytecode formats}
 \label{sec:comparison-of-the-two-bytecode-formats}
 Both virtual machines differ in their format of the executable files.
 This is on one side the Java Archive File (JAR) for the JVM and the Davlik Executable (DEX) on the other side.
@@ -181,22 +183,64 @@ Here sets the Android policy in, that every application is independent from ever
 This also is applied for the location of all files the application uses.
 An application can be compared as an user in Linux, every application is its own user and has its own home directory.
 This directory can only be accessed by the owning application and can be found in the /data/data directory.
-This directory also includes an own SQLite3 database when the application has one.
+This directory includes an own SQLite3 database, cache directory, shared preferences\footnote{Android framework that provides a mechanism to store primitive data types.} and every type of private data.
 A reason for this is a security aspect as well as the stability of the application, considering the own Dalvik instance.
 This is called the \textit{principle of least privilege} which specifies that as less as possible privileges are given to the application.
 Therefore an application developer has to specify which privileges its application needs, for example Internet access or the possibility to write on the external SD-card.
 It is possible that applications can communicate with predefined Inter Process Communications (IPC) but it is not possible to manipulate other applications.
+This can be omitted by granting an application root privileges, but usually this is not possible on normal devices.
+Hence, confidential data should also be encrypted,because it is theoretically possible to access the data in the private directory.
+It also need to be mentioned that every operation which reads or writes to on of the above mentioned directories or files is an input output (IO) operation.
+This is always expensive in time consumption and should be done as little as possible.
+Image~\ref{fig:zygote-and-app} illustrates the principle that every application works in its own sandbox.\\
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.65]{images/zygote-and-app.png} 
+\caption{Illustration of the Android application architecture}
+\label{fig:zygote-and-app}
+\end{center}
+\end{figure}
 The main Dalivk instance which is the root for all forked virtual machines is called Zygote and is started by the boot up process.
-Zygote is designed to load and initialize the core library classes so that every forked instance not have to do this.
+Zygote is designed to load and initialize the core library classes so that every forked instance do not have to do this.
 This is compared to starting a new virtual machine a speed improvement and saves memory, because not every VM instance has its own core libraries loaded.
 This can be done because the core libraries are all read only and shared by all Dalvik instances.\cite{ehringer2010dalvik}
 Another difference to the usual Linux is that Android uses Bionic libc which is a special from Google developed library for Android which has its own pthread implementation.
 This library is especially designed for the mobile context and the Android environment which improves the speed of forking the Dalvik virtual machine too.~\cite{brady2008android}
+\newpage
+\section{Migration of BaseX to Android}
+\label{sec:migration:migration-of-basex-to-android}
+After analyzing both platforms the BaseX database code need to be examined too.
+Like it has been mentioned in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} the Dalvik virtual machine does not support all class libraries that are supported by the JVM.
+BaseX is written in the Java programming language and aims to be executed on virtual machines that are implemented by using the JVM specifications.
+Therefore it is not possible to transform the BaseX jar file into a DEX file, using the dx-tool, and execute it on an Android device.
+On the other side the DVM offers class libraries that the JVM does not support or knows.
+These libraries do not intent to replace not supported Java class libraries, there purpose is to provide special Android related methods, for example logging or tracing of method calls.
+
+\subsection{Analyzing the libraries used by BaseX}
+\label{sec:migration:analyzing-the-libraries-used-by-basex}
+BaseX is a big project which includes up to 60 packages and more than 1300 classes, interfaces and abstract classes.
+For this reason the examining of the used libraries and the dependencies a tool was used.
+It is called Class Dependency Analyzer (CDA)\footnote{http://www.dependency-analyzer.org/} and offers all needed possibilities for the mentioned task.
+Parsing the whole BaseX project lists the used Java class libraries and external libraries.
+This list gives 54 packages that are part of the Java class library or an external library used by BaseX.
+It has to be supposed that none of them are known to the Dalvik virtual machine.
+Most of them are subpackages of packages and it can be expected that if a main package is not supported by Android the subpackage also not. 
+This assumption reduces the external packages to a number of 16, which is compared to the before mentioned 54 packages an easier to analyze amount.
+Looking at the Android documentation the main packages that are not supported are just the two GUI related packages.
+\begin{itemize}
+  \item java.awt\footnote{except the subpackage java.awt.font that provides two classes: NumericShaper and TextAttribute.}
+  \item javax.swing
+\end{itemize}
+All others are full or partially supported by the Dalvik VM.
+The reason why the packages awt and swing are not supported is that Android uses its own GUI libraries.
+laber something über android ui bla blub
+
+\newpage
 
 
 
-\section{Changes of the source platform}
-\label{sec:migration:changes-of-the-source-platform}
+
+
 For the migration an Android project has been created, this provides all needed files.
 To create an Android project the Android Software Development Kit(SDK) is necessary.
 This can be downloaded on the official homepage of Android\footnote{\url{developer.android.com/sdk/index.html}}
