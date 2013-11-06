@@ -226,28 +226,77 @@ This list gives 54 packages that are part of the Java class library or an extern
 It has to be supposed that none of them are known to the Dalvik virtual machine.
 Most of them are subpackages of packages and it can be expected that if a main package is not supported by Android the subpackage also not. 
 This assumption reduces the external packages to a number of 16, which is compared to the before mentioned 54 packages an easier to analyze amount.
-Looking at the Android documentation the main packages that are not supported are just the two GUI related packages.
+Looking at the Android documentation the main packages that are not supported are just the two graphical user interface GUI related packages:
 \begin{itemize}
   \item java.awt\footnote{except the subpackage java.awt.font that provides two classes: NumericShaper and TextAttribute.}
   \item javax.swing
 \end{itemize}
 All others are full or partially supported by the Dalvik VM.
-The reason why the packages awt and swing are not supported is that Android uses its own GUI libraries.
-laber something über android ui bla blub
+The reason why the packages awt and swing are not supported is that Android uses its own GUI libraries and framework.
+The Android provided GUI elements can either be written as Java code or can be defined in XML layout files.
+The framework offers everything that is needed to build an application with a graphical user interface.\\
+Supporting the main packages does not mean that all subpackages, classes or even methods that are used from other libraries are also known by the DVM.
+Therefore more investigation needs to be done.
+To get a clearer statement the subpackages are also being checked if they are supported by the DVM.
+The result of this investigation is that javax.xml is supported, but not the following subpackages:
+\begin{itemize}
+  \item javax.xml.crypto.dom
+  \item javax.xml.crypto.dsig.dom
+  \item javax.xml.crypto.dsig.keyinfo
+  \item javax.xml.crypto.dsig.spec
+\end{itemize}
+Even if all packages and classes of javax.xml.crypto are part of the Java standard edition they are not available for Android development.
+All classes inside this packages were only used by one BaseX package which is called org.basex.query.util.crypto.
+This package is used to implement the XQuery Cryptographic module that provides functionalities to en- decrypt, sign and validated signed XML data.
+The only class that uses this package is the FNCrypto class which is used to provide the Cryptographic module functionalities.
+These are XQuery functions which are:
+\begin{itemize}
+  \item hmac(string,string,string[,string])
+  \item encrypt(string,string,string,string)
+  \item decrypt(string,string,string,string)
+  \item generate-signature(node,string,string,string,string,string[,item][,item])
+  \item validate-signature(node)
+\end{itemize}
+To provide these five XQuery functions on Android, the javax.xml.crypto package need to be migrated to Android too.
+Or other cryptographic classes need to be used provided by Android.\\
+All other subpackages are supported by the Android platform.
+For clarification not all methods that are provided by every used library are checked if they are available on Android, this would be to much thinking about the amount of available classes.
+Nevertheless this could be figured out in Section~\ref{sec:migration:creating-a-basex-android-library}
 
-\newpage
+\subsection{The Android project structure}
+\label{sec:migration:the-android-project-structure}
+For developing Android applications an Android project need to be set up.
+An Android project is a structure of special folders and predefined files, like code, resource and build files.
+There are three types of Android projects, they differ in their functionalities and purposes.
+The first is the type of project that needs to be created if an executable application is the goal of the development process.
+As a result of this an installable apk file will be created by the build process.
+The seconds type of Android project is the so called Test project.
+This type of projects aims to test executable Android projects by providing an Android testing framework with unit test.
+Both projects have the same structure of folders and files.
+The third project type is the library project which goal it is to be a library that can be used by every other Android project.
+The difference to a normal Android project is that this project is not being build into an apk file, it is being used by other Android projects which pull it in their apk and build it with their code.
+Depending on the Android API level an Android library differs from a usual Java library that it is not compressed into a jar archive.
+This feature has been added in Android versions higher than API level 14, Android 4.0 codename Icecream Sandwich.
+%TODO:explain the Android project structure
 
 
 
 
 
-For the migration an Android project has been created, this provides all needed files.
-To create an Android project the Android Software Development Kit(SDK) is necessary.
+\subsection{Creating a BaseX Android library}
+\label{sec:migration:creating-a-basex-android-library}
+For the migration of BaseX an Android project has been created, this process provides all needed files.
+To create an Android project the Android Software Development Kit (SDK) is necessary.
 This can be downloaded on the official homepage of Android\footnote{\url{developer.android.com/sdk/index.html}}
-The Android SDK, which is also called Android Developer Tools(ADT), provides many useful tools and also a plugin for the Eclipse IDE.
+The Android SDK, which is also called Android Developer Tools (ADT), provides many useful tools and also a plugin for the Eclipse integrated development environment (IDE).
 To create the BaseX library project the Eclipse create new project wizard has been used.
-It is possible to mark the project as a library, this implies that the compiler creates a jar file out of the project.
+It is a step-by-step configuration to create new Android projects with all needed directories and predefined files.
+It is also possible to mark the project as a library, this implies that the compiler creates a jar file out of the project.
 The purpose of this is that the BaseX library can be used in every Android project by just including it.
+
+
+
+
 All private data is stored in the /data/data/packagename directory.
 So the method not just only creates an instance or returns the existing, it also checks if the private folder of the application is available and creates it if not.
 If this folder has been created there is also a subfolder created which is called BaseXData.
