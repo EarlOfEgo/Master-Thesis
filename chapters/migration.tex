@@ -124,25 +124,25 @@ Especially that the DVM has been created for the mobile context and can only be 
 \subsection{Comparison of the two bytecode formats}
 \label{sec:comparison-of-the-two-bytecode-formats}
 Both virtual machines differ in their format of the executable files.
-This is on one side the Java Archive File (JAR) for the JVM and the Davlik Executable (DEX) on the other side.
-This DEX is being packed into an Android Application package file (APK) which can be executed by the Android operating system.
+This is on one side the Java Archive File (JAR) for the JVM and the Davlik Executable (\textit{dex}) on the other side.
+This \textit{dex} is being packed into an Android Application package file (\textit{apk}) which can be executed by the Android operating system.
 A JAR file is an archive which includes the compressed class files, this class files are being build out of the Java source code by using the javac compiler.~\cite{pugh1999compressing} 
-An APK file is also an archive file, but it not only includes the executable program, it also includes the meta information and resource files.
-The executable which includes an APK is called DEX file, which is short for Dalvik Executable.
-A DEX file is created by using a tool which compiles Java class files into DEX files.
+An \textit{apk} file is also an archive file, but it not only includes the executable program, it also includes the meta information and resource files.
+The executable which includes an \textit{apk} is called \textit{dex} file, which is short for Dalvik Executable.
+A \textit{dex} file is created by using a tool which compiles Java class files into \textit{dex} files.
 This works by a tool which is called dx and is part of the Android software development kit.
-Picture~\ref{fig:create-apk} illustrates the flow of an APK creation, which differs to the creation of a JAR file by creating dex files out of the class files.\\
+Picture~\ref{fig:create-apk} illustrates the flow of an \textit{apk} creation, which differs to the creation of a JAR file by creating \textit{dex} files out of the class files.\\
 \begin{figure}[h]
 \begin{center}
 \includegraphics[scale=0.55]{images/create-apk.png} 
-\caption{The creation flow of an APK file.}
+\caption{The creation flow of an \textit{apk} file.}
 \label{fig:create-apk}
 \end{center}
 \end{figure}
 
-Having a closer look at the DEX files and comparing them to the JAR files shows that they differ in various ways.
+Having a closer look at the \textit{dex} files and comparing them to the JAR files shows that they differ in various ways.
 The first thing that comes in mind is that a JAR file contains a class file for every class.
-And a DEX file combines all specific information into one field.
+And a \textit{dex} file combines all specific information into one field.
 Which results in that it just has one constant pool, where all constant values of all classes are stored.
 These constants are:
 \begin{description}
@@ -150,23 +150,23 @@ These constants are:
   \item[type\_ids] Sorted list of all identifiers of classes, arrays or primitive types
   \item[proto\_ids] Sorted list of all prototypes
   \item[field\_ids] Sorted list of all identifiers for the used fields
-  \item[methods\_ids] Sorted list of all methods used by the DEX file
+  \item[methods\_ids] Sorted list of all methods used by the \textit{dex} file
 \end{description}
 Thinking about an interface which is used very often in a project can display what an advantage of one shared constant pool gives.
 Looking at Image~\ref{fig:jar-dex} demonstrates that every class which uses this interface needs has its own reference in its own constant pool.
 \begin{figure}[h]
 \begin{center}
 \includegraphics[scale=0.41]{images/jar-dex.png} 
-\caption{The difference between a jar and a dex file. Source:~\cite{enck2011study}}
+\caption{The difference between a jar and a \textit{dex} file. Source:~\cite{enck2011study}}
 \label{fig:jar-dex}
 \end{center}
 \end{figure}
 
-In general it can be said that DEX files are smaller than their equivalent JAR files, because of the shared constant pool.~\cite{bornstein2008dalvik}
-An advantage of the creation chain of a DEX file is that it is theoretically possible to create a DEX file out of every jar archive.
+In general it can be said that \textit{dex} files are smaller than their equivalent JAR files, because of the shared constant pool.~\cite{bornstein2008dalvik}
+An advantage of the creation chain of a \textit{dex} file is that it is theoretically possible to create a \textit{dex} file out of every jar archive.
 The problem hereby is that Android does not support all Java libraries that the JVM supports, but this can be done by using the above mentioned dx-tool. 
-Like mentioned above this DEX file is executed by the Dalvik virtual machine, but it is not the Android application.
-This application is the APK  which includes also UI related information and other resource files, like images or sound.
+Like mentioned above this \textit{dex} file is executed by the Dalvik virtual machine, but it is not the Android application.
+This application is the \textit{apk}  which includes also UI related information and other resource files, like images or sound.
 
 
 \subsection{Android internals}
@@ -212,7 +212,7 @@ This library is especially designed for the mobile context and the Android envir
 After analyzing both platforms the BaseX database code need to be examined too.
 Like it has been mentioned in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} the Dalvik virtual machine does not support all class libraries that are supported by the JVM.
 BaseX is written in the Java programming language and aims to be executed on virtual machines that are implemented by using the JVM specifications.
-Therefore it is not possible to transform the BaseX jar file into a DEX file, using the dx-tool, and execute it on an Android device.
+Therefore it is not possible to transform the BaseX jar file into a \textit{dex} file, using the dx-tool, and execute it on an Android device.
 On the other side the DVM offers class libraries that the JVM does not support or knows.
 These libraries do not intent to replace not supported Java class libraries, there purpose is to provide special Android related methods, for example logging or tracing of method calls.
 
@@ -269,18 +269,53 @@ For developing Android applications an Android project need to be set up.
 An Android project is a structure of special folders and predefined files, like code, resource and build files.
 There are three types of Android projects, they differ in their functionalities and purposes.
 The first is the type of project that needs to be created if an executable application is the goal of the development process.
-As a result of this an installable apk file will be created by the build process.
+As a result of this an installable \textit{apk} file will be created by the build process.
 The seconds type of Android project is the so called Test project.
 This type of projects aims to test executable Android projects by providing an Android testing framework with unit test.
 Both projects have the same structure of folders and files.
 The third project type is the library project which goal it is to be a library that can be used by every other Android project.
-The difference to a normal Android project is that this project is not being build into an apk file, it is being used by other Android projects which pull it in their apk and build it with their code.
+The difference to a normal Android project is that this project is not being build into an \textit{apk} file, it is being used by other Android projects which pull it in their \textit{apk} and build it with their code.
 Depending on the Android API level an Android library differs from a usual Java library that it is not compressed into a jar archive.
 This feature has been added in Android versions higher than API level 14, Android 4.0 codename Icecream Sandwich.
-%TODO:explain the Android project structure
+For the versions before this API level the library files were pulled into the project and compiled into the corresponding \textit{dex} file.\\
+If a new Android application is developed it is not necessary to setup the right project structure by hand, therefore Android provides a Software Development Kit (SDK).
+This SDK provides tools and utilities to create every type of Android project, it includes build, debug, trace and test tools.
+With this SDK, which is also called Android Developer Tools (ADT), it is possible to create Android applications written in Java.
+Like it was mentioned in Section~\ref{sec:comparison-of-the-two-bytecode-formats} the code that is translated into bytecode for the Dalvik virtual machine is written in the Java programming language.
+Though, it is also possible to write code in C++ and compile it into native code, like it is done by the in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} referred JIT mechanism.
+Therefore Google provides an Android Native Development Kit (NDK), that offers tools and a compiler to translate such native code.
+If a project has been created there are seven given folders, shown in Table~\ref{tab:android-project-folders}.
+\begin {table}[htpb] 
+  \centering
+\begin {tabular} {|l|l|}
+	\hline
+	src/&Contains the Java source code files\\
+	\hline
+	bin/&Contains the compiled output file\\
+	\hline
+	jni/&Contains C++ native code created by using the NDK\\
+	\hline
+	gen/&Contains automatic generated Java files\\
+	\hline
+	assets/&Is used for every kind of file, is packed into the \textit{apk} file as it is\\
+	\hline
+	res/&Contains all resource files\\
+	\hline
+	libs/&Contains private libraries\\
+	\hline
+\end {tabular}
+\caption {Android project folders generated by the SDK.}
+\label {tab:android-project-folders}
+\end {table}
 
-
-
+The files that will be appearing by creating a Android project are four build files that hold information for the build system to create the \textit{dex} files and the \textit{apk} archive.
+Another file that is being created is the \textit{AndroidManifest.xml}.
+This XML file is important for the application and the Android operating system.
+It is used to specify the API level, the name and other specific information of the application.
+In this file it is also possible to grant privileges to the application that are needed for specific functionalities.
+For example accessing the Internet or writing on the external storage card.
+Used libraries are also defined in this file, but if a library need some privileges and defines them into its own mainfest file, they are not granted by Android.
+Therefore it is necessary to grant privileges in the Android project and not in the library project because those are being ignored.
 
 
 \subsection{Creating a BaseX Android library}
