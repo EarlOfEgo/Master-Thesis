@@ -2,7 +2,8 @@
 \label{sec:migration:porting-basex-to-android}
 In this chapter it is shown how the BaseX database has been migrated to the Android platform.
 To achieve this goal the source and target platforms are analyzed and all requirements are determined.
-The main focus here is on the different software platforms and not the hardware specific aspects because of the big variety of systems. 
+The main focus here is on the different software platforms and not the hardware specific aspects because of the big variety of systems and devices that run both platforms. 
+Therefore the two virtual machines and their execution byteformats have been compared and also the specific Android internals.
 In Section~\ref{sec:migration:problems-during-the-migration} it is illustrated which parts of the BaseX version has been changed and how to receive a working BaseX Android version.
 The last section describes the problems which are occurred during the migration of the database to Android.
 
@@ -320,79 +321,78 @@ Therefore it is necessary to grant privileges in the Android project and not in 
 
 \subsection{Creating a BaseX Android library}
 \label{sec:migration:creating-a-basex-android-library}
-For the migration of BaseX an Android project has been created, this process provides all needed files.
-To create an Android project the Android Software Development Kit (SDK) is necessary.
-This can be downloaded on the official homepage of Android\footnote{\url{developer.android.com/sdk/index.html}}
-The Android SDK, which is also called Android Developer Tools (ADT), provides many useful tools and also a plugin for the Eclipse integrated development environment (IDE).
-To create the BaseX library project the Eclipse create new project wizard has been used.
-It is a step-by-step configuration to create new Android projects with all needed directories and predefined files.
-It is also possible to mark the project as a library, this implies that the compiler creates a jar file out of the project.
-The purpose of this is that the BaseX library can be used in every Android project by just including it.
-
-
-
-
-All private data is stored in the /data/data/packagename directory.
-So the method not just only creates an instance or returns the existing, it also checks if the private folder of the application is available and creates it if not.
-If this folder has been created there is also a subfolder created which is called BaseXData.
-This subfolder stores all databases created by the application and no other application can neither read nor write on this folder.
-The next necessary change is to adjust the path on the Prop.java file.
-This contains a static class that holds every property of the BaseX database, hence also the path to the database.
-This has to be done before anything can read the filepath, so it is part of the constructor call.
-BaseX provides methods that can be used to access, create, modify or delete the database.
-For every of these operations a method inside the class has been created and can be called from outside.
-Every method checks if a BaseX context is available, which should usualy be the case, and then executes the wanted operation.
-Therefore the BaseX context is necessary and is used to make the specific operation on the database.
-Every method in the class throws an IOException when something goes wrong, this exception comes from BaseX and need to be handled by the application which uses the library.
-The reason why the directory name of the application has to be used at the constructor call is that it is not possible to get the name of the application inside the library.
-There are methods provided by Android to receive the project package name, but this is the name of the package of the library.
-And the library is not an application and therefore has no own data directory in the /data/data folder.
-And it is not possible to create a own folder in this directory, because Android is doing it when the Application is being installed.
-It would be also always the same folder, because 
-
-
-
-%Android uses a different kind for generating UI objects than the standard Java version.
-%This uses AWT and Swing, but these API aren't available on Android, so this can not be used on Android.
-%Another difference between Android and the standard BaseX version is that Android has no user directory.
-%Every application has its own directory which is located in /data/data/packagename.
-%Therefore all files need to be stored there. 
-%BaseX Android should be a library which means that every developer can use it.
-%Therefore it is not known how the absolute path name is, because it is the package name of the executing activity.
-%And this name differs from project to project.
-%Therefore there is just one entry point for the library which is the class BaseXAndroid.
-%The constructor of this class has a string argument, this parameter should be the absolute path to data directory of the application.
-%To get this needed information the function getApplicationInfo().dataDir, which is inherited from the activity class, can be used in every activity of the application.
-
+For the migration of BaseX to the Android operating system a library project has been created.
+The reason to make BaseX as library, like in Section~\ref{sec:migration:the-android-project-structure} explained, is that Android libraries can be used by many other projects.
+After creating the library project all BaseX files has been copied to this project.
+After this operation the GUI packages has been removed, those packages are \textit{basex.gui} and all subpackages.
+As a result of this the depending classes of the GUI has also been removed, those are also not necessary because the BaseX library should not provide a graphical user interface.
+Afterwards the not supported \textit{javax.xml.crypto} packages and the dependent class \textit{FNCrypto} have been removed.
+Therefore it not possible to use the cryptological XQuery function in this BaseX Android version.\\
+The result of removing all not supported packages, classes and libraries is that it is now possible to compile BaseX to an Android dex file.
+Although it is not possible at this moment to execute BaseX, because of some constraints mentioned in Section~\ref{sec:android-internals}.
+In a usual Linux environment BaseX stores all its database files in a directory in the normal user directory.
+This means executing BaseX on Android without adjusting the directory to store the databases, would not work.
+BaseX receives the name and location of the home directory of the user by calling the Java function \textit{System.getProperty(``user.home'')}, which works well with the JVM.
+Using this function on Android gives an empty string and results in BaseX trying to save the database in the root directory, what is impossible because of the Android right system explained in Section~\ref{sec:android-internals}.
+To avoid this behavior the above mentioned function need to be replaced.
+The problem here is that BaseX should be a library project and it should be usable by every other Android project.
+So it is impossible to say how the directory is named and located where the databases need to be stored.
+An Android application receives its directory by the name of its main package and not by the name of the library main package.
+Hence, it is necessary to tell the library this location and use this instead of its own package name.
+To implement this an class has been created which is an entry point for the library and is the first instance when the BaseX Android library is used.
+This class creates an object of the library and needs the package name as an argument for the method that returns an instance of its object.
+To create the object the Singleton pattern has been used~\cite{gamma2010entwurfsmuster}.
+The reason for this is that only one instance of the database can be created and used.
+This class is called \textit{BaseXDatabase} and creates a BaseX Context object by calling a constructor that has been added to the Context class.
+The newly created Context constructor checks if the given directory is available and if it is possible to read and write to this directory.
+Is it the first time the constructor of the class is used, it creates an directory which is called \textit{BaseXData}.
+All databases created and used by this Android application are stored inside this directory.
+This directory is only accessible from this application.
+At this moment it is possible to use BaseX as an Android library and it would create the needed BaseX directory.\\
+To provide the BaseX operations the above mentioned class has been extended by additional methods which can be used for this purpose.
+All are implemented by using the above mentioned Context object, which means every operation is executed on this object.\\
+After this migration it is possible to use BaseX like it can be done on every usual PC.
+Except the cryptographic XQuery function, the BaseX Android library offers all functionalities like the normal BaseX version offers.
+The Android principle that every application works in its own sandbox is also being kept.
+With this solution every application has its own BaseX database in its own directory, an advantage could be that the database does not need to synchronize a query.
+The advantages and disadvantages of this solution are outlined and investigated in Chapter~\ref{cha:analysis}.
+There also the validation of the BaseX Android library is shown and the performance analyzed.
 
 
 
 \section{Problems during the migration}
 \label{sec:migration:problems-during-the-migration}
-There occurred several problems during the migration.
-The first problem which was discovered, was that some included libraries are not available on Android.
-The following library couldn't be migrated because it is included in the JavaSE and is not available for Android.
-\textit{crypto javax.xml.crypto}
-BaseX identifies the operating system as Linux and then tries to save all BaseX related data into the home directory, which doesn't exist on Android.
-This need to be, like in Section~\ref{sec:migration:requirmenets-of.the-target-platform} described the /data/data/application directory.
-The problem hereby is that the goal of the migration is that the database is a library, but the directory name depends from the application name.
+There occurred several problems during the migration of BaseX to the Android operating system.
+The first problem which was discovered, was the in Section~\ref{sec:migration:analyzing-the-libraries-used-by-basex} mentioned lack of some included libraries, that are not supported by Android.
+To solve this problem they have been removed and their functionality has been deprecated.
+This has been done, because this specific functionalities are not required for a first BaseX Android version.
+This also applies for all graphical user interface components.\\
+Another problem was the location of the BaseX database directory.
+This need to be, like in Section~\ref{sec:android-internals} described, the \textit{/data/data/application-package-name} directory.
+The problem hereby is that one of the goals of the migration is that the database is a library, but the directory name depends from the application name and not from the library name.
 The only way to get the application way, except for hard coding, is to get the application context and extract the name there.
 This bears another problem, though only applications have a context, libraries not. 
-A possible way, could be to pass the context to the library, but then the library holds the context and just need to application name.
+A possible way, could be to pass the context to the library, but then the library holds the context which it does not need.
+It just needs the context to receive the application name and nothing more.
 Holding a context massively slows down an Android application, so this is not the way how it was solved.
-The alternative is to pass a string holding the application name to the library constructor and the library uses it to generate the needed directories.
-This is also the way how it is done in the BaseX library.
-To create a library object it is necessary to pass a string as an argument to the constructor.
-Is this the first time an object of BaseX was created it tries to create the needed directory, /data/data/application-name/BaseXData.
-In this directory all created databases and their depending files are stored.
-\\
-Another problem which occurred, was that BaseX uses a lot of the String function isEmpty(), which is not available at API-Level lower than 9.
-The same applies for the copyOf() method in the java.util.Arrays package.
-This was solved by not supporting API-level lower than 9 with BaseX library. 
-The reason for this is that only 4\% of the used Android devices are using API-level lower than 9.
-\\
-After this adjustments it is possible to create a BaseX object on Android.
-To get a library which supports all needed operations some more work was done.
+The alternative is to pass a string holding the application name to the library constructor.
+And the library uses it to generate the needed directories.
+Therefore the context has been used before creating a library instance to receive the needed directory name and this is passed to the library during the constructor.
+This is also the way how it is done in the BaseX library, like it was described in Section~\ref{sec:migration:creating-a-basex-android-library}.\\
+A problem at this solution is that the user directory which is used in BaseX is a static value initialized by the start of BaseX.
+All static values used by BaseX are initialized at start-up in the static class \textit{Prop}.
+And right after the start BaseX uses this value from this class in several places in the code.
+Which means that it need to be changed before it is used anywhere in the code.
+For this reason a trick has been used to initialize value before the constructor calls another constructor.
+In the BaseX \textit{Context} class the constructor which calls the actual constructor has been changed to initialize this value as a parameter.
+This results in the cycle of constructor calls, that the constructor which is called initializes the static values before calling the next constructor in the chain.
+The corresponding Java code can be seen in Listing~\ref{lst:context-constructor}.
+\input{listings/context-constructor}
 
+Another problem which occurred during the migration, was that BaseX uses a lot of the String function \textit{isEmpty()}, which is not available at an Android API-level lower than 9.
+The same applies for the \textit{copyOf()} method in the \textit{java.util.Arrays} package.
+This was solved by not supporting API-level lower than 9 with BaseX library.
+According to the official Android homepage only 1.7\% of the devices that are currently in circulation have an API-level lower than 9.\footnote{\url{http://developer.android.com/about/dashboards/index.html}}
+The consequence of this would be that developers can only create applications that are executable on Android devices using an API-level higher than 9, when using the BaseX library.
 
 
