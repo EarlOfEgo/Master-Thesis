@@ -1,10 +1,10 @@
-\chapter{Porting BaseX to the Android platform}
+\chapter{Porting \textsc{BaseX} to the Android platform}
 \label{sec:migration:porting-basex-to-android}
-In this chapter it is shown how the BaseX database has been migrated to the Android platform.
+In this chapter it is shown how the \textsc{BaseX} database has been migrated to the Android platform.
 To achieve this goal the source and target platforms are analyzed and all requirements are determined.
 The main focus here is on the different software platforms and not the hardware specific aspects because of the big variety of systems and devices that run both platforms. 
 Therefore the two virtual machines and their execution byteformats have been compared and also the specific Android internals.
-In Section~\ref{sec:migration:problems-during-the-migration} it is illustrated which parts of the BaseX version has been changed and how to receive a working BaseX Android version.
+In Section~\ref{sec:migration:problems-during-the-migration} it is illustrated which parts of the \textsc{BaseX} version has been changed and how to receive a working \textsc{BaseX} Android version.
 The last section describes the problems which are occurred during the migration of the database to Android.
 
 
@@ -117,7 +117,7 @@ Those methods are called hot spots, which are also named the virtual machine.
 \cite{paleczny2001java}
 \\
 Although both virtual machines are using Java as programming language, Dalvik lacks of some libraries that are available at the JVM and vice versa.
-In Section~\ref{sec:migration:migration-of-basex-to-android} the used libraries of BaseX are analyzed and investigated which of them are supported by the DVM.\\
+In Section~\ref{sec:migration:migration-of-basex-to-android} the used libraries of \textsc{BaseX} are analyzed and investigated which of them are supported by the DVM.\\
 A general statement about the both virtual machines could not be made, because they differ in a lot of aspects.
 Especially that the DVM has been created for the mobile context and can only be ran on Android devices\footnote{There exist some community projects which are aiming to port the Dalvik VM to other platforms like Linux x86 for example\url{http://www.android-x86.org/}}.
 
@@ -169,6 +169,19 @@ The problem hereby is that Android does not support all Java libraries that the 
 Like mentioned above this \textit{dex} file is executed by the Dalvik virtual machine, but it is not the Android application.
 This application is the \textit{apk}  which includes also UI related information and other resource files, like images or sound.
 
+\subsection{\textsc{BaseX} internals}
+\label{sec:migration:basex-internals}
+Although \textsc{BaseX} can be executed on every system that offers an implementation of the Java virtual machine, it has its specialties depending on the operating system that is used.
+This is the case if there is something about storing files on the file system.
+\textsc{BaseX} stores its databases and configuration files in a folder in the home directory of the user.
+This folder is created by the database if it is not there yet.\\
+Hence, \textsc{BaseX} has to figure out on which operating system it is running.
+After \textsc{BaseX} knows the operating system it stores some operating system related values in a static class which is called \textit{Prop}, which need to be adjusted during the migration.
+One value in this class is used to know if the path name is case sensitive, which is only the case for a Linux or Unix operating system and not for Windows or Mac.
+That \textsc{BaseX} can stores its databases inside the folder in the directory of the home directory of the current user it needs the absolute path to this folder.
+Therefore the Java system method \textit{System.getProperty(``user.home'')} which returns the absolute path to the users directory on a normal JVM.\\
+Another difference between Windows and other Unix based operating system is that Windows uses a backslash ``\textit{$\backslash$}'' as path separator instead of a usual slash.
+This information is also stored in the above mentioned \textit{Prop} class by using the Java system method \textit{System.getProperty(``line.separator'')}.
 
 \subsection{Android internals}
 \label{sec:android-internals}
@@ -208,22 +221,22 @@ This can be done because the core libraries are all read only and shared by all 
 Another difference to the usual Linux is that Android uses Bionic libc which is a special from Google developed library for Android which has its own pthread implementation.
 This library is especially designed for the mobile context and the Android environment which improves the speed of forking the Dalvik virtual machine too.~\cite{brady2008android}
 \newpage
-\section{Migration of BaseX to Android}
+\section{Migration of \textsc{BaseX} to Android}
 \label{sec:migration:migration-of-basex-to-android}
-After analyzing both platforms the BaseX database code need to be examined too.
+After analyzing both platforms the \textsc{BaseX} database code need to be examined too.
 Like it has been mentioned in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} the Dalvik virtual machine does not support all class libraries that are supported by the JVM.
-BaseX is written in the Java programming language and aims to be executed on virtual machines that are implemented by using the JVM specifications.
-Therefore it is not possible to transform the BaseX jar file into a \textit{dex} file, using the dx-tool, and execute it on an Android device.
+\textsc{BaseX} is written in the Java programming language and aims to be executed on virtual machines that are implemented by using the JVM specifications.
+Therefore it is not possible to transform the \textsc{BaseX} jar file into a \textit{dex} file, using the dx-tool, and execute it on an Android device.
 On the other side the DVM offers class libraries that the JVM does not support or knows.
 These libraries do not intent to replace not supported Java class libraries, there purpose is to provide special Android related methods, for example logging or tracing of method calls.
 
-\subsection{Analyzing the libraries used by BaseX}
+\subsection{Analyzing the libraries used by \textsc{BaseX}}
 \label{sec:migration:analyzing-the-libraries-used-by-basex}
-BaseX is a big project which includes up to 60 packages and more than 1300 classes, interfaces and abstract classes.
+\textsc{BaseX} is a big project which includes up to 60 packages and more than 1300 classes, interfaces and abstract classes.
 For this reason the examining of the used libraries and the dependencies a tool was used.
 It is called Class Dependency Analyzer (CDA)\footnote{http://www.dependency-analyzer.org/} and offers all needed possibilities for the mentioned task.
-Parsing the whole BaseX project lists the used Java class libraries and external libraries.
-This list gives 54 packages that are part of the Java class library or an external library used by BaseX.
+Parsing the whole \textsc{BaseX} project lists the used Java class libraries and external libraries.
+This list gives 54 packages that are part of the Java class library or an external library used by \textsc{BaseX}.
 It has to be supposed that none of them are known to the Dalvik virtual machine.
 Most of them are subpackages of packages and it can be expected that if a main package is not supported by Android the subpackage also not. 
 This assumption reduces the external packages to a number of 16, which is compared to the before mentioned 54 packages an easier to analyze amount.
@@ -247,7 +260,7 @@ The result of this investigation is that javax.xml is supported, but not the fol
   \item javax.xml.crypto.dsig.spec
 \end{itemize}
 Even if all packages and classes of javax.xml.crypto are part of the Java standard edition they are not available for Android development.
-All classes inside this packages were only used by one BaseX package which is called org.basex.query.util.crypto.
+All classes inside this packages were only used by one \textsc{BaseX} package which is called org.basex.query.util.crypto.
 This package is used to implement the XQuery Cryptographic module that provides functionalities to en- decrypt, sign and validated signed XML data.
 The only class that uses this package is the FNCrypto class which is used to provide the Cryptographic module functionalities.
 These are XQuery functions which are:
@@ -259,10 +272,10 @@ These are XQuery functions which are:
   \item validate-signature(node)
 \end{itemize}
 To provide these five XQuery functions on Android, the javax.xml.crypto package need to be migrated to Android too.
-Or other cryptographic classes need to be used provided by Android.\\
+Another possebility to support those functions would be using other cryptographic classes which are provided by Android.\\
 All other subpackages are supported by the Android platform.
 For clarification not all methods that are provided by every used library are checked if they are available on Android, this would be to much thinking about the amount of available classes.
-Nevertheless this could be figured out in Section~\ref{sec:migration:creating-a-basex-android-library}
+Nevertheless this could be figured out in Section~\ref{sec:migration:creating-a-basex-android-library} and Section~\ref{sec:migration:problems-during-the-migration} outlines the methods which are not supported by some Android versions.
 
 \subsection{The Android project structure}
 \label{sec:migration:the-android-project-structure}
@@ -319,80 +332,82 @@ Used libraries are also defined in this file, but if a library need some privile
 Therefore it is necessary to grant privileges in the Android project and not in the library project because those are being ignored.
 
 
-\subsection{Creating a BaseX Android library}
+\subsection{Creating a \textsc{BaseX} Android library}
 \label{sec:migration:creating-a-basex-android-library}
-For the migration of BaseX to the Android operating system a library project has been created.
-The reason to make BaseX as library, like in Section~\ref{sec:migration:the-android-project-structure} explained, is that Android libraries can be used by many other projects.
-After creating the library project all BaseX files has been copied to this project.
+For the migration of \textsc{BaseX} to the Android operating system a library project has been created.
+The reason to make \textsc{BaseX} as library, like in Section~\ref{sec:migration:the-android-project-structure} explained, is that Android libraries can be used by many other projects.
+After creating the library project all \textsc{BaseX} files has been copied to this project.
 After this operation the GUI packages has been removed, those packages are \textit{basex.gui} and all subpackages.
-As a result of this the depending classes of the GUI has also been removed, those are also not necessary because the BaseX library should not provide a graphical user interface.
+As a result of this the depending classes of the GUI has also been removed, those are also not necessary because the \textsc{BaseX} library should not provide a graphical user interface.
 Afterwards the not supported \textit{javax.xml.crypto} packages and the dependent class \textit{FNCrypto} have been removed.
-Therefore it not possible to use the cryptological XQuery function in this BaseX Android version.\\
-The result of removing all not supported packages, classes and libraries is that it is now possible to compile BaseX to an Android dex file.
-Although it is not possible at this moment to execute BaseX, because of some constraints mentioned in Section~\ref{sec:android-internals}.
-In a usual Linux environment BaseX stores all its database files in a directory in the normal user directory.
-This means executing BaseX on Android without adjusting the directory to store the databases, would not work.
-BaseX receives the name and location of the home directory of the user by calling the Java function \textit{System.getProperty(``user.home'')}, which works well with the JVM.
-Using this function on Android gives an empty string and results in BaseX trying to save the database in the root directory, what is impossible because of the Android right system explained in Section~\ref{sec:android-internals}.
+Therefore it not possible to use the cryptological XQuery function in this \textsc{BaseX} Android version.\\
+The result of removing all not supported packages, classes and libraries is that it is now possible to compile \textsc{BaseX} to an Android dex file.
+Although it is not possible at this moment to execute \textsc{BaseX}, because of some constraints mentioned in Section~\ref{sec:android-internals}.
+In a usual Linux environment \textsc{BaseX} stores all its database files in a directory in the normal user directory.
+This means executing \textsc{BaseX} on Android without adjusting the directory to store the databases, would not work.
+\textsc{BaseX} receives the name and location of the home directory of the user by calling the Java function \textit{System.getProperty(``user.home'')}, which works well with the JVM.
+Using this function on Android gives an empty string and results in \textsc{BaseX} trying to save the database in the root directory, what is impossible because of the Android right system explained in Section~\ref{sec:android-internals}.
 To avoid this behavior the above mentioned function need to be replaced.
-The problem here is that BaseX should be a library project and it should be usable by every other Android project.
+The problem here is that \textsc{BaseX} should be a library project and it should be usable by every other Android project.
 So it is impossible to say how the directory is named and located where the databases need to be stored.
 An Android application receives its directory by the name of its main package and not by the name of the library main package.
 Hence, it is necessary to tell the library this location and use this instead of its own package name.
-To implement this an class has been created which is an entry point for the library and is the first instance when the BaseX Android library is used.
+To implement this an class has been created which is an entry point for the library and is the first instance when the \textsc{BaseX} Android library is used.
 This class creates an object of the library and needs the package name as an argument for the method that returns an instance of its object.
 To create the object the Singleton pattern has been used~\cite{gamma2010entwurfsmuster}.
 The reason for this is that only one instance of the database can be created and used.
-This class is called \textit{BaseXDatabase} and creates a BaseX Context object by calling a constructor that has been added to the Context class.
+This class is called \textit{\textsc{BaseX}Database} and creates a \textsc{BaseX} Context object by calling a constructor that has been added to the Context class.
 The newly created Context constructor checks if the given directory is available and if it is possible to read and write to this directory.
-Is it the first time the constructor of the class is used, it creates an directory which is called \textit{BaseXData}.
+Is it the first time the constructor of the class is used, it creates an directory which is called \textit{\textsc{BaseX}Data}.
 All databases created and used by this Android application are stored inside this directory.
 This directory is only accessible from this application.
-At this moment it is possible to use BaseX as an Android library and it would create the needed BaseX directory.\\
-To provide the BaseX operations the above mentioned class has been extended by additional methods which can be used for this purpose.
+At this moment it is possible to use \textsc{BaseX} as an Android library and it would create the needed \textsc{BaseX} directory.\\
+To provide the \textsc{BaseX} operations the above mentioned class has been extended by additional methods which can be used for this purpose.
 All are implemented by using the above mentioned Context object, which means every operation is executed on this object.\\
-After this migration it is possible to use BaseX like it can be done on every usual PC.
-Except the cryptographic XQuery function, the BaseX Android library offers all functionalities like the normal BaseX version offers.
+After this migration it is possible to use \textsc{BaseX} like it can be done on every usual PC.
+Except the cryptographic XQuery function, the \textsc{BaseX} Android library offers all functionalities like the normal \textsc{BaseX} version offers.
 The Android principle that every application works in its own sandbox is also being kept.
-With this solution every application has its own BaseX database in its own directory, an advantage could be that the database does not need to synchronize a query.
+With this solution every application has its own \textsc{BaseX} database in its own directory, an advantage could be that the database does not need to synchronize a query.
 The advantages and disadvantages of this solution are outlined and investigated in Chapter~\ref{cha:analysis}.
-There also the validation of the BaseX Android library is shown and the performance analyzed.
+There also the validation of the \textsc{BaseX} Android library is shown and the performance analyzed.
 
 
 
 \section{Problems during the migration}
 \label{sec:migration:problems-during-the-migration}
-There occurred several problems during the migration of BaseX to the Android operating system.
+There occurred several problems during the migration of \textsc{BaseX} to the Android operating system.
 The first problem which was discovered, was the in Section~\ref{sec:migration:analyzing-the-libraries-used-by-basex} mentioned lack of some included libraries, that are not supported by Android.
 To solve this problem they have been removed and their functionality has been deprecated.
-This has been done, because this specific functionalities are not required for a first BaseX Android version.
+This has been done, because this specific functionalities are not required for a first \textsc{BaseX} Android version.
 This also applies for all graphical user interface components.\\
-Another problem was the location of the BaseX database directory.
+Another problem was the location of the \textsc{BaseX} database directory.
 This need to be, like in Section~\ref{sec:android-internals} described, the \textit{/data/data/application-package-name} directory.
 The problem hereby is that one of the goals of the migration is that the database is a library, but the directory name depends from the application name and not from the library name.
-The only way to get the application way, except for hard coding, is to get the application context and extract the name there.
+The only way to get the application package name, except for hard coding, is to get the application context and extract the name there.
 This bears another problem, though only applications have a context, libraries not. 
 A possible way, could be to pass the context to the library, but then the library holds the context which it does not need.
-It just needs the context to receive the application name and nothing more.
+It just needs the application context to receive the application name and nothing more.
 Holding a context massively slows down an Android application, so this is not the way how it was solved.
 The alternative is to pass a string holding the application name to the library constructor.
 And the library uses it to generate the needed directories.
 Therefore the context has been used before creating a library instance to receive the needed directory name and this is passed to the library during the constructor.
-This is also the way how it is done in the BaseX library, like it was described in Section~\ref{sec:migration:creating-a-basex-android-library}.\\
-A problem at this solution is that the user directory which is used in BaseX is a static value initialized by the start of BaseX.
-All static values used by BaseX are initialized at start-up in the static class \textit{Prop}.
-And right after the start BaseX uses this value from this class in several places in the code.
+This is also the way how it is done in the \textsc{BaseX} library, like it was described in Section~\ref{sec:migration:creating-a-basex-android-library}.\\
+A problem at this solution is that the user directory which is used in \textsc{BaseX} is a static string value initialized by the start of \textsc{BaseX}.
+All static values used by \textsc{BaseX} are initialized at start-up in the static class \textit{Prop}.
+And right after the start \textsc{BaseX} uses this value from this class in several places in the code.
 Which means that it need to be changed before it is used anywhere in the code.
-For this reason a trick has been used to initialize value before the constructor calls another constructor.
-In the BaseX \textit{Context} class the constructor which calls the actual constructor has been changed to initialize this value as a parameter.
+For this reason a trick has been used to initialize the value before the constructor calls another constructor.
+In the \textsc{BaseX} \textit{Context}\footnote{This is the \textit{BaseX} Context class, and not the above mentioned Context class provided by Android.} class the constructor which calls the actual constructor has been changed to initialize this value as a parameter.
 This results in the cycle of constructor calls, that the constructor which is called initializes the static values before calling the next constructor in the chain.
 The corresponding Java code can be seen in Listing~\ref{lst:context-constructor}.
 \input{listings/context-constructor}
 
-Another problem which occurred during the migration, was that BaseX uses a lot of the String function \textit{isEmpty()}, which is not available at an Android API-level lower than 9.
+Another problem which occurred during the migration, was that \textsc{BaseX} uses a lot of the String function \textit{isEmpty()}, which is not available at an Android API-level lower than 9.
 The same applies for the \textit{copyOf()} method in the \textit{java.util.Arrays} package.
-This was solved by not supporting API-level lower than 9 with BaseX library.
+This was solved by not supporting API-level lower than 9 with \textsc{BaseX} library.
 According to the official Android homepage only 1.7\% of the devices that are currently in circulation have an API-level lower than 9.\footnote{\url{http://developer.android.com/about/dashboards/index.html}}
-The consequence of this would be that developers can only create applications that are executable on Android devices using an API-level higher than 9, when using the BaseX library.
-
+The consequence of this would be that developers can only create applications that are executable on Android devices using an API-level higher than 9, when using the \textsc{BaseX} library.
+To assure that no application which is build on Android version lower than 9 uses the \textsc{BaseX} library the Manifest file of the library has been adjusted.
+This is one of the cases where the Manifest file of a library is used to determine the minimum Android version.
+Other constraints like permissions are being ignored, like it was mentioned in Section~\ref{sec:migration:the-android-project-structure}.
 

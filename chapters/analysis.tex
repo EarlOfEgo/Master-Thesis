@@ -1,6 +1,6 @@
-\chapter{Analysis}
+\chapter{Analysis of the ported \textsc{BaseX} Android version}
 \label{cha:analysis}
-In the following chapter the migrated BaseX database will be analysed.
+In the following chapter the migrated \textsc{BaseX} database will be analysed.
 The focus at this part lies on the evaluation and the performance of the library.
 First the specification of the test devices is outlined.
 An estimation is made to show how the performance of the devices differ.
@@ -40,13 +40,13 @@ The results of this test can be seen in table~\ref{tab:bonnie-results-create}
 By analyzing these values it can be said that the laptop is overall faster than the tablet pc.
 It is well known that IO operations are the most expensive on Android, so the achieved result is no surprise. 
 But with these values it can be said that there are factors which can tell how much faster it is in specific operations.
-This factors are impossible to optimize, because they are a hardware constraint and only changing the hardware can improve them, but they are still important to identify the bottlenecks of the mobile BaseX version.\\
+This factors are impossible to optimize, because they are a hardware constraint and only changing the hardware can improve them, but they are still important to identify the bottlenecks of the mobile \textsc{BaseX} version.\\
 Analyzing table~\ref{tab:bonnie-results-create} there is one value which is very high.
 The sequential write per character is 40 times faster on the laptop than on the tablet, considering this it is clear to avoid writing by character instead by block.
 Writing by using the block mechanism is just three times slower on the tablet.
 The sequential reading of a single character is at the tablet just 1.52 times slower than the at the notebook.
 Though the factor of the block reading is quite higher than the character reading factor it is sure to use the block reading because it is much faster than character reading.
-But by using block reading the factor need also be considered in the BaseX benchmarks later in chapter~\ref{sec:analysing-the-execution-performance}.
+But by using block reading the factor need also be considered in the \textsc{BaseX} benchmarks later in chapter~\ref{sec:analysing-the-execution-performance}.
 \\
 Looking at table~\ref{tab:bonnie-results-create} it can be seen that the sequential/random creation, reading and deleting is very slow on the Android devices compared to the laptop.
 considering this it should be avoided to often create files, because this is very slow.\\
@@ -63,26 +63,26 @@ All these test are very CPU intensive, because they only use arithmetic operatio
 The results of these test can be seen in table~\ref{tab:cpu-results}.
 \input{chapters/tables/cpu-benchmark}
 Except the Fibonacci test it can be said that the CPU of the laptop is about five times faster than the one of the laptop.
-This is like the different IO parameters a factor which could not be improved and has to be considered in the BaseX benchmarks as well.
-These evaluation is for measuring the performance of the two BaseX versions and how to cope with the results achieved by two different platforms on two different devices.
-In the next section the functionilty of the mobile BaseX version is been evaluated.
+This is like the different IO parameters a factor which could not be improved and has to be considered in the \textsc{BaseX} benchmarks as well.
+These evaluation is for measuring the performance of the two \textsc{BaseX} versions and how to cope with the results achieved by two different platforms on two different devices.
+In the next section the functionilty of the mobile \textsc{BaseX} version is been evaluated.
 %Looking at the results of the executed benchmarks it can be said that the results achied in chapter~\ref{sec:analysing-the-execution-performance} are going to be 
 
 
 
-\section{Evaluating the working BaseX Android port}
+\section{Evaluating the working \textsc{BaseX} Android port}
 \label{sec:evaluating-the-working-basex-android-port}
-In this section will be shown that the created BaseX Android port works and fit all requirements.
+In this section will be shown that the created \textsc{BaseX} Android port works and fit all requirements.
 For this purpose the given JUnit tests were been migrated to Android too.
 This shows that all functions work like they work on the standard Java version.
 
 
 \section{Analysing the execution performance}
 \label{sec:analysing-the-execution-performance}
-To investigate the performance of the Android version of BaseX the benchmark suite XMark has been used.
+To investigate the performance of the Android version of \textsc{BaseX} the benchmark suite XMark has been used.
 XMark creates random xml files and has a set of 20 predefined queries that can be used to measure the performance of an XQuery implementation.
 It offers the possibility to choose the size of the random XML files, so that the test queries can be executed on different file sizes.
-Therefore it is also being used to find the maximum size of a BaseX database on Android.
+Therefore it is also being used to find the maximum size of a \textsc{BaseX} database on Android.
 
 \subsection{The XMark benchmark suite}
 \label{subsec:the-xmark-benchmark-suite}
@@ -146,7 +146,7 @@ The content of the generated XML files is randomly generated by using the 17000 
 %\end{figure}
 
 \subsection{Analysing the test devices}
-The two devices that has been used to benchmark BaseX are totally different.
+The two devices that has been used to benchmark \textsc{BaseX} are totally different.
 The only thing they have in common is the file system which is of the type of Fourth Extended File System(ext4).
  
 
