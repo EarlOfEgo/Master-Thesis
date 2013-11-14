@@ -12,14 +12,14 @@
    backgroundcolor=\color{blue!3},
 }
 \begin{lstlisting}	[captionpos=b, captionpos=b, caption={The constructor of the BaseX context class.}, label=lst:context-constructor] 		        	   
-  public Context(String data_dir) {
-    this(true, (Prop.HOME = data_dir + ``/''), (Prop.USERHOME = data_dir + ``/''));
-	  	
-    File dir = new File(Prop.HOME + ``BaseXData'');
-    if(!dir.exists()) {
-      if(!dir.mkdir()) {
-	android.util.Log.i(``BASEX'', ``CREATING BASEX DIRECTORIES'');
-      }  
-    }
+public Context(String data_dir) {
+  this(true, (Prop.HOME = data_dir + ``/''), (Prop.USERHOME = data_dir + ``/''));
+        	
+  File dir = new File(Prop.HOME + ``BaseXData'');
+  if(!dir.exists()) {
+    if(!dir.mkdir()) {
+     android.util.Log.i(``BASEX'', ``CREATING BASEX DIRECTORIES'');
+    }  
   }
+}
 \end{lstlisting} 

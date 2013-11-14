@@ -3,7 +3,7 @@
 In this chapter it is shown how the \textsc{BaseX} database has been migrated to the Android platform.
 To achieve this goal the source and target platforms are analyzed and all requirements are determined.
 The main focus here is on the different software platforms and not the hardware specific aspects because of the big variety of systems and devices that run both platforms. 
-Therefore the two virtual machines and their execution byteformats have been compared and also the specific Android internals.
+Therefore the two virtual machines and their execution byte formats have been compared and also the specific Android internals.
 In Section~\ref{sec:migration:problems-during-the-migration} it is illustrated which parts of the \textsc{BaseX} version has been changed and how to receive a working \textsc{BaseX} Android version.
 The last section describes the problems which are occurred during the migration of the database to Android.
 
@@ -26,7 +26,7 @@ Also the DVM is optimized to be executed on mobile devices, which means that it 
 Lesser hardware usage implies also lesser battery usage, which is also a factor which should be considered in the field of mobile development.
 Another difference which need to be considered is the host system, which is in the DVM case Android.
 And on the opposite to this it could be Windows, Mac OS, or any Linux/Unix derivate for the JVM. 
-This need to be considered if external sources will be used, like writing or reading a file.
+This need to be considered if external sources will be used, like writing or reading a file, which is different in every operating system.
 
 
 \subsection{Comparison of the two virtual machines}
@@ -39,7 +39,7 @@ They differ in many kinds that the application developer not sees but need to co
 \\
 On of the most important difference is that the JVM is stack and the DVM is a register based virtual machine.
 This difference helps the DVM to execute the same code in lesser operations than the JVM.
-This means that the DVM need lesser CPU cycles than the JVM, which is an improvement that is necessary because of the lack of CPU resources in mobile devices and the aspect of the battery usage.
+This means that the DVM need lesser CPU cycles than the JVM, which is an improvement that is necessary because of the lack of CPU and memory resources in mobile devices and the aspect of the battery usage.
 This can be demonstrated by looking at the instructions done by adding two integers.
 The stack based virtual machine has to do four machine instructions, while the register based VM can do the operation in one instruction.
 The reason for this is that the stack based VM needs to pop the two values first before it can add and store them back on the stack.
@@ -53,8 +53,8 @@ Figure~\ref{fig:stack-based-addition} illustrates the executed instructions of a
 \end{center}
 \end{figure}
 
-Compared to this, the register based virtual machine just need one machine instruction to complete the same addition of two numbers.
-The needed instruction is \textit{ADD R1, R2, R3}, which can be translated into add content of register 1 and register 2 and store it in register 3.
+Compared to this, the register based virtual machine just needs one machine instruction to complete the same addition of two numbers.
+The required instruction is \textit{ADD R1, R2, R3}, which can be translated into add content of register 1 and register 2 and store it in register 3.
 Figure~\ref{fig:register-based-addition} illustrates this by showing the add operation of the numbers one and two.
 \begin{figure}[h]
 \begin{center}
@@ -64,17 +64,17 @@ Figure~\ref{fig:register-based-addition} illustrates this by showing the add ope
 \end{center}
 \end{figure}
 This minimal example shows how the register based virtual machine uses lesser machine instructions compared to the stack based.
-The disadvantage in this is that register based machine has to store the addresses, the registers, of the operands.
+The disadvantage in this is that register based machine has to store the addresses, meaning the corresponding registers, of the operands.
 Which is not necessary at a stack based machine, because of the stack pointer that always directs to the actual operand using the Last In First Out (LIFO) principal.
-This leads to the result, that stack based code is smaller than the corresponding register based code.
+This leads to the result, that stack based code is smaller than the equivalent register based code.
 Although the Dalvik VM is a register based virtual machine, the executed byte code is not bigger than the equivalent JVM code.~\cite{shi2008virtual}\\
-This is the result of the different format of the executable virtual machine code, which is illustrated in Chapter~\ref{sec:comparison-of-the-two-bytecode-formats}.
+This is the result of the different formats of the executable virtual machine code, which is optimized in the case of the Davlik virtual machine and is illustrated in Chapter~\ref{sec:comparison-of-the-two-bytecode-formats}.
 \\
-The performed instructions which are executed on Dalvik VM are called bytecode.
-To execute this instructions the DVM has an interpreter which interprets all instructions and performs them.
-The difference to normal interpreted languages is, that the JVM interpreter do not need to check the syntax of the program.
+The performed instructions which are executed on Dalvik VM or the JVM are called bytecode.
+To execute this instructions virtual machines having an interpreter which interprets all instructions and performs them.
+The difference to normal interpreted languages is, that the JVM or DVM interpreter do not need to check the syntax of the program.
 This has been already done by the Java compiler which compiles the Java source code into class files.
-Even if it is faster than other interpreted languages, it is still slower than compiled code which is executed directly on the hardware.
+Even if it is faster than other interpreted languages, it is still slower than into machine language compiled code which is executed directly on the hardware.
 This so called machine code is faster because there is no layer between the executions and the hardware, which could slow down the execution.~\cite{aycock2003brief}
 There is a technique which can improve a virtual machine in performance aspects by adding a Just In Time (JIT) compiler to it.
 Generally it can be said, that a JIT compiler, used by a virtual machine, compiles heavy used code segments or very expensive calculations into the faster machine code.
@@ -84,19 +84,19 @@ There is a great number of different types of JIT compilers and how they work, t
 \item trace-based
 \end{itemize}
 The trace-based method works by looking at the most executed code fragments, especially loops, and compiles them into native machine code.\\
-The method-based JIT mechanism is to compile whole methods, which are often used and expensive in execution time.
+The method-based JIT mechanism is to compile whole methods, which are often used and expensive in execution time, into native machine code.
 Since the release of the Android version 2.2, release name Froyo, the Dalvik VM has received a JIT compiler additionally to the interpreter mechanism.
 According to \cite{cheng2010jit} the implemented Dalivk JIT compiler can speed up the execution of intensive operations up to five times.
 The Dalvik VM uses the above mentioned mechanism of a trace-based JIT compiler mixed with the usual DVM interpreter.
 The given advantage of the trace-based method is that not whole methods are being compiled into machine code.
 Instead only the parts which are often executed are being compiled.
 This reduces the size of the code which needs to be compiled by the JIT and also omits the not so often executed methods parts like exception handling.
-It is needles to compile such parts in machine code to speed them up, because most of the execution time of the program they were not called.
+It is needles to compile such parts in machine code to speed them up, because most of the execution time of the program they are not being called.
 It should also reduce the compile time for the JIT because of the selective compilation into machine code.\\
 To realize this the DVM has received an additional thread, which is responsible for the JIT compilation.
 Beneath this new thread there is the main thread, that includes the interpreter.
 This interpreter interprets the bytecode and records the traces and their occurrence.
-If the amount of the occurrence higher than a predefined number, the trace is being stored into the trace queue.
+If the amount of the occurrence is higher than a predefined number, the trace is being stored into the trace queue.
 The new added thread, the JIT thread, compiles the traces from the queue and writes the machine code into the code cache.
 The main thread now is doing a lookup if the bytecode that needs to be executed is now available in the code cache.
 Is this condition met, it uses the machine code from the code cache instead interpreting the bytecode.\cite{oh2012evaluation}
@@ -113,13 +113,14 @@ Depending on the different implementation of a JVM, it differs which type of JIT
 For this thesis the Oracle JVM HotSpot is used, which has a method-based JIT compiler as default.
 It is also possible to use another JIT mechanism in the HotSpot JVM triggered by parameters during the VM start.
 The method-based JIT works like above mentioned, it compiles the most called methods into machine code.~\cite{kotzmann2008design}
-Those methods are called hot spots, which are also named the virtual machine.
+Those methods are called hot spots, which are also responsible for the name of the virtual machine.
 \cite{paleczny2001java}
 \\
 Although both virtual machines are using Java as programming language, Dalvik lacks of some libraries that are available at the JVM and vice versa.
 In Section~\ref{sec:migration:migration-of-basex-to-android} the used libraries of \textsc{BaseX} are analyzed and investigated which of them are supported by the DVM.\\
 A general statement about the both virtual machines could not be made, because they differ in a lot of aspects.
-Especially that the DVM has been created for the mobile context and can only be ran on Android devices\footnote{There exist some community projects which are aiming to port the Dalvik VM to other platforms like Linux x86 for example\url{http://www.android-x86.org/}}.
+Especially that the DVM has been created for the mobile context and can only be ran on Android devices\footnote{There exist some community projects which are aiming to port the Dalvik VM to other platforms like Linux x86 for example: \url{http://www.android-x86.org/}}.
+
 
 
 \subsection{Comparison of the two bytecode formats}
@@ -174,12 +175,12 @@ This application is the \textit{apk}  which includes also UI related information
 Although \textsc{BaseX} can be executed on every system that offers an implementation of the Java virtual machine, it has its specialties depending on the operating system that is used.
 This is the case if there is something about storing files on the file system.
 \textsc{BaseX} stores its databases and configuration files in a folder in the home directory of the user.
-This folder is created by the database if it is not there yet.\\
+This folder is created by the database if it does not exist yet.\\
 Hence, \textsc{BaseX} has to figure out on which operating system it is running.
-After \textsc{BaseX} knows the operating system it stores some operating system related values in a static class which is called \textit{Prop}, which need to be adjusted during the migration.
+After \textsc{BaseX} knows the operating system it stores some operating system related values in a static class which is called \textit{Prop}, this class needs to be adjusted during the migration.
 One value in this class is used to know if the path name is case sensitive, which is only the case for a Linux or Unix operating system and not for Windows or Mac.
-That \textsc{BaseX} can stores its databases inside the folder in the directory of the home directory of the current user it needs the absolute path to this folder.
-Therefore the Java system method \textit{System.getProperty(``user.home'')} which returns the absolute path to the users directory on a normal JVM.\\
+To store its databases inside the folder in the directory of the home directory of the current user \textsc{BaseX} needs the absolute path to this specific folder.
+Therefore the Java system method \textit{System.getProperty(``user.home'')}, which returns the absolute path to the users directory on a normal JVM, is used.\\
 Another difference between Windows and other Unix based operating system is that Windows uses a backslash ``\textit{$\backslash$}'' as path separator instead of a usual slash.
 This information is also stored in the above mentioned \textit{Prop} class by using the Java system method \textit{System.getProperty(``line.separator'')}.
 
@@ -193,7 +194,7 @@ It is being especially designed for the mobile context.
 Which includes special focus for the resource consumption, because most mobile devices provide not the same resources as a normal desktop PC or a notebook.
 As shown in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} an Android application is executed on the Dalvik virtual machine.
 Here it need to be said that every application runs its own Dalvik instance, by forking the main Dalvik instance into an own Linux process.
-Here sets the Android policy in, that every application is independent from every other application and is executed in its own process.
+Here sets the Android policy in, that every application is independent from every other application and is executed in its own process, which is called sandbox.
 This also is applied for the location of all files the application uses.
 An application can be compared as an user in Linux, every application is its own user and has its own home directory.
 This directory can only be accessed by the owning application and can be found in the /data/data directory.
@@ -203,8 +204,8 @@ This is called the \textit{principle of least privilege} which specifies that as
 Therefore an application developer has to specify which privileges its application needs, for example Internet access or the possibility to write on the external SD-card.
 It is possible that applications can communicate with predefined Inter Process Communications (IPC) but it is not possible to manipulate other applications.
 This can be omitted by granting an application root privileges, but usually this is not possible on normal devices.
-Hence, confidential data should also be encrypted,because it is theoretically possible to access the data in the private directory.
-It also need to be mentioned that every operation which reads or writes to on of the above mentioned directories or files is an input output (IO) operation.
+Hence, confidential data should also be encrypted, because it is theoretically possible to access the data in the private directory.
+It also need to be mentioned that every operation which reads or writes to one of the above mentioned directories or files is an input output (IO) operation.
 This is always expensive in time consumption and should be done as little as possible.
 Image~\ref{fig:zygote-and-app} illustrates the principle that every application works in its own sandbox.\\
 \begin{figure}[h]
@@ -218,9 +219,9 @@ The main Dalivk instance which is the root for all forked virtual machines is ca
 Zygote is designed to load and initialize the core library classes so that every forked instance do not have to do this.
 This is compared to starting a new virtual machine a speed improvement and saves memory, because not every VM instance has its own core libraries loaded.
 This can be done because the core libraries are all read only and shared by all Dalvik instances.\cite{ehringer2010dalvik}
-Another difference to the usual Linux is that Android uses Bionic libc which is a special from Google developed library for Android which has its own pthread implementation.
+Another difference to the usual Linux is that Android uses the Bionic libc which is a special from Google developed library for Android that has its own pthread implementation.
 This library is especially designed for the mobile context and the Android environment which improves the speed of forking the Dalvik virtual machine too.~\cite{brady2008android}
-\newpage
+
 \section{Migration of \textsc{BaseX} to Android}
 \label{sec:migration:migration-of-basex-to-android}
 After analyzing both platforms the \textsc{BaseX} database code need to be examined too.
@@ -228,7 +229,7 @@ Like it has been mentioned in Section~\ref{sec:migration:comparison-of-the-two-v
 \textsc{BaseX} is written in the Java programming language and aims to be executed on virtual machines that are implemented by using the JVM specifications.
 Therefore it is not possible to transform the \textsc{BaseX} jar file into a \textit{dex} file, using the dx-tool, and execute it on an Android device.
 On the other side the DVM offers class libraries that the JVM does not support or knows.
-These libraries do not intent to replace not supported Java class libraries, there purpose is to provide special Android related methods, for example logging or tracing of method calls.
+These libraries do not intent to replace not supported Java class libraries, there purpose is to provide special Android related methods, for example logging or tracing of method calls as well as accessing hardware components, like sensors. 
 
 \subsection{Analyzing the libraries used by \textsc{BaseX}}
 \label{sec:migration:analyzing-the-libraries-used-by-basex}
@@ -237,10 +238,10 @@ For this reason the examining of the used libraries and the dependencies a tool 
 It is called Class Dependency Analyzer (CDA)\footnote{http://www.dependency-analyzer.org/} and offers all needed possibilities for the mentioned task.
 Parsing the whole \textsc{BaseX} project lists the used Java class libraries and external libraries.
 This list gives 54 packages that are part of the Java class library or an external library used by \textsc{BaseX}.
-It has to be supposed that none of them are known to the Dalvik virtual machine.
-Most of them are subpackages of packages and it can be expected that if a main package is not supported by Android the subpackage also not. 
+It has to be supposed that none of them are known to the Dalvik virtual machine.\\
+Most of them are subpackages of packages and it can be expected that if a main package is not supported by Android the subpackage is also not. 
 This assumption reduces the external packages to a number of 16, which is compared to the before mentioned 54 packages an easier to analyze amount.
-Looking at the Android documentation the main packages that are not supported are just the two graphical user interface GUI related packages:
+Looking at the Android documentation the main packages that are not supported are just the two graphical user interface (GUI) related packages:
 \begin{itemize}
   \item java.awt\footnote{except the subpackage java.awt.font that provides two classes: NumericShaper and TextAttribute.}
   \item javax.swing
@@ -250,8 +251,8 @@ The reason why the packages awt and swing are not supported is that Android uses
 The Android provided GUI elements can either be written as Java code or can be defined in XML layout files.
 The framework offers everything that is needed to build an application with a graphical user interface.\\
 Supporting the main packages does not mean that all subpackages, classes or even methods that are used from other libraries are also known by the DVM.
-Therefore more investigation needs to be done.
-To get a clearer statement the subpackages are also being checked if they are supported by the DVM.
+Therefore more investigation needs to be done in order to get a better overview of the supported packages.
+To get a clearer statement about the situation, the subpackages are also being checked if they are supported by the DVM or not.
 The result of this investigation is that javax.xml is supported, but not the following subpackages:
 \begin{itemize}
   \item javax.xml.crypto.dom
@@ -259,10 +260,10 @@ The result of this investigation is that javax.xml is supported, but not the fol
   \item javax.xml.crypto.dsig.keyinfo
   \item javax.xml.crypto.dsig.spec
 \end{itemize}
-Even if all packages and classes of javax.xml.crypto are part of the Java standard edition they are not available for Android development.
-All classes inside this packages were only used by one \textsc{BaseX} package which is called org.basex.query.util.crypto.
-This package is used to implement the XQuery Cryptographic module that provides functionalities to en- decrypt, sign and validated signed XML data.
-The only class that uses this package is the FNCrypto class which is used to provide the Cryptographic module functionalities.
+Even if all packages and classes of \textit{javax.xml.crypto} are part of the Java standard edition they are not available for Android development.
+All classes inside this packages were only used by one \textsc{BaseX} package which is called \textit{org.basex.query.\-util.crypto}.
+This package is used to implement the XQuery cryptographic module that provides functionalities to en- decrypt, sign and validated signed XML data.
+The only class that uses this package is the FNCrypto class which is used to provide the cryptographic module functionalities in XQuery.
 These are XQuery functions which are:
 \begin{itemize}
   \item hmac(string,string,string[,string])
@@ -271,22 +272,22 @@ These are XQuery functions which are:
   \item generate-signature(node,string,string,string,string,string[,item][,item])
   \item validate-signature(node)
 \end{itemize}
-To provide these five XQuery functions on Android, the javax.xml.crypto package need to be migrated to Android too.
-Another possebility to support those functions would be using other cryptographic classes which are provided by Android.\\
+To provide these five XQuery functions on Android, the \textit{javax.xml.crypto} package need to be migrated to Android too.
+Another possibility to support those functions would be using other cryptographic classes which are provided by Android.\\
 All other subpackages are supported by the Android platform.
-For clarification not all methods that are provided by every used library are checked if they are available on Android, this would be to much thinking about the amount of available classes.
+For clarification not all methods that are provided by every used library are checked if they are available on Android, this would be to much effort, thinking about the amount of available classes.
 Nevertheless this could be figured out in Section~\ref{sec:migration:creating-a-basex-android-library} and Section~\ref{sec:migration:problems-during-the-migration} outlines the methods which are not supported by some Android versions.
 
 \subsection{The Android project structure}
 \label{sec:migration:the-android-project-structure}
 For developing Android applications an Android project need to be set up.
 An Android project is a structure of special folders and predefined files, like code, resource and build files.
-There are three types of Android projects, they differ in their functionalities and purposes.
+There are three types of Android projects, they differ in their functionalities and intentions.\\
 The first is the type of project that needs to be created if an executable application is the goal of the development process.
-As a result of this an installable \textit{apk} file will be created by the build process.
+As a result of this an installable \textit{apk} file will be created by the build process.\\
 The seconds type of Android project is the so called Test project.
-This type of projects aims to test executable Android projects by providing an Android testing framework with unit test.
-Both projects have the same structure of folders and files.
+This type of projects aims to test executable Android projects by providing an Android testing framework with unit test, using the unit test framework Junit.
+Both projects have the same structure of folders and files.\\
 The third project type is the library project which goal it is to be a library that can be used by every other Android project.
 The difference to a normal Android project is that this project is not being build into an \textit{apk} file, it is being used by other Android projects which pull it in their \textit{apk} and build it with their code.
 Depending on the Android API level an Android library differs from a usual Java library that it is not compressed into a jar archive.
@@ -296,7 +297,7 @@ If a new Android application is developed it is not necessary to setup the right
 This SDK provides tools and utilities to create every type of Android project, it includes build, debug, trace and test tools.
 With this SDK, which is also called Android Developer Tools (ADT), it is possible to create Android applications written in Java.
 Like it was mentioned in Section~\ref{sec:comparison-of-the-two-bytecode-formats} the code that is translated into bytecode for the Dalvik virtual machine is written in the Java programming language.
-Though, it is also possible to write code in C++ and compile it into native code, like it is done by the in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} referred JIT mechanism.
+Though, it is also possible to write code in C++ and compile it into native code, like it is done by the, in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} referred, JIT mechanism.
 Therefore Google provides an Android Native Development Kit (NDK), that offers tools and a compiler to translate such native code.
 If a project has been created there are seven given folders, shown in Table~\ref{tab:android-project-folders}.
 \begin {table}[htpb] 
@@ -322,7 +323,7 @@ If a project has been created there are seven given folders, shown in Table~\ref
 \label {tab:android-project-folders}
 \end {table}
 
-The files that will be appearing by creating a Android project are four build files that hold information for the build system to create the \textit{dex} files and the \textit{apk} archive.
+The files that will be appearing by creating an Android project are four build files that hold information for the build system to create the \textit{dex} files and the \textit{apk} archive.
 Another file that is being created is the \textit{AndroidManifest.xml}.
 This XML file is important for the application and the Android operating system.
 It is used to specify the API level, the name and other specific information of the application.
@@ -338,7 +339,7 @@ For the migration of \textsc{BaseX} to the Android operating system a library pr
 The reason to make \textsc{BaseX} as library, like in Section~\ref{sec:migration:the-android-project-structure} explained, is that Android libraries can be used by many other projects.
 After creating the library project all \textsc{BaseX} files has been copied to this project.
 After this operation the GUI packages has been removed, those packages are \textit{basex.gui} and all subpackages.
-As a result of this the depending classes of the GUI has also been removed, those are also not necessary because the \textsc{BaseX} library should not provide a graphical user interface.
+As a result of this the depending classes of the GUI has also been removed, those are also not necessary because the \textsc{BaseX} Android library should not provide a graphical user interface.
 Afterwards the not supported \textit{javax.xml.crypto} packages and the dependent class \textit{FNCrypto} have been removed.
 Therefore it not possible to use the cryptological XQuery function in this \textsc{BaseX} Android version.\\
 The result of removing all not supported packages, classes and libraries is that it is now possible to compile \textsc{BaseX} to an Android dex file.
@@ -346,7 +347,7 @@ Although it is not possible at this moment to execute \textsc{BaseX}, because of
 In a usual Linux environment \textsc{BaseX} stores all its database files in a directory in the normal user directory.
 This means executing \textsc{BaseX} on Android without adjusting the directory to store the databases, would not work.
 \textsc{BaseX} receives the name and location of the home directory of the user by calling the Java function \textit{System.getProperty(``user.home'')}, which works well with the JVM.
-Using this function on Android gives an empty string and results in \textsc{BaseX} trying to save the database in the root directory, what is impossible because of the Android right system explained in Section~\ref{sec:android-internals}.
+Using this function on Android gives an empty string and results in \textsc{BaseX} trying to save the database in the root directory, what is impossible, because of the Android right system explained in Section~\ref{sec:android-internals}.
 To avoid this behavior the above mentioned function need to be replaced.
 The problem here is that \textsc{BaseX} should be a library project and it should be usable by every other Android project.
 So it is impossible to say how the directory is named and located where the databases need to be stored.
@@ -355,10 +356,10 @@ Hence, it is necessary to tell the library this location and use this instead of
 To implement this an class has been created which is an entry point for the library and is the first instance when the \textsc{BaseX} Android library is used.
 This class creates an object of the library and needs the package name as an argument for the method that returns an instance of its object.
 To create the object the Singleton pattern has been used~\cite{gamma2010entwurfsmuster}.
-The reason for this is that only one instance of the database can be created and used.
+The reason for this is that only one instance of the database can be created and used.\\
 This class is called \textit{\textsc{BaseX}Database} and creates a \textsc{BaseX} Context object by calling a constructor that has been added to the Context class.
 The newly created Context constructor checks if the given directory is available and if it is possible to read and write to this directory.
-Is it the first time the constructor of the class is used, it creates an directory which is called \textit{\textsc{BaseX}Data}.
+Is it the first time the constructor of the class is used, it creates a directory which is called \textit{BaseXData}.
 All databases created and used by this Android application are stored inside this directory.
 This directory is only accessible from this application.
 At this moment it is possible to use \textsc{BaseX} as an Android library and it would create the needed \textsc{BaseX} directory.\\
@@ -383,14 +384,14 @@ This also applies for all graphical user interface components.\\
 Another problem was the location of the \textsc{BaseX} database directory.
 This need to be, like in Section~\ref{sec:android-internals} described, the \textit{/data/data/application-package-name} directory.
 The problem hereby is that one of the goals of the migration is that the database is a library, but the directory name depends from the application name and not from the library name.
-The only way to get the application package name, except for hard coding, is to get the application context and extract the name there.
+The only way to get the package name of the application, except for hard coding, is to get the application context and extract the name there.
 This bears another problem, though only applications have a context, libraries not. 
 A possible way, could be to pass the context to the library, but then the library holds the context which it does not need.
 It just needs the application context to receive the application name and nothing more.
-Holding a context massively slows down an Android application, so this is not the way how it was solved.
-The alternative is to pass a string holding the application name to the library constructor.
+Holding an Android context massively slows down an Android application, so this is not the way how it was solved.
+The alternative is to pass a string holding the application name to the constructor of the library.
 And the library uses it to generate the needed directories.
-Therefore the context has been used before creating a library instance to receive the needed directory name and this is passed to the library during the constructor.
+Therefore the context has been used before creating a library instance to receive the needed directory name and this is passed to the library through the constructor.
 This is also the way how it is done in the \textsc{BaseX} library, like it was described in Section~\ref{sec:migration:creating-a-basex-android-library}.\\
 A problem at this solution is that the user directory which is used in \textsc{BaseX} is a static string value initialized by the start of \textsc{BaseX}.
 All static values used by \textsc{BaseX} are initialized at start-up in the static class \textit{Prop}.
@@ -400,14 +401,16 @@ For this reason a trick has been used to initialize the value before the constru
 In the \textsc{BaseX} \textit{Context}\footnote{This is the \textit{BaseX} Context class, and not the above mentioned Context class provided by Android.} class the constructor which calls the actual constructor has been changed to initialize this value as a parameter.
 This results in the cycle of constructor calls, that the constructor which is called initializes the static values before calling the next constructor in the chain.
 The corresponding Java code can be seen in Listing~\ref{lst:context-constructor}.
+The reason that the file separator is not determined by using the available system method \textit{System.getProperty(``line.separator'')} is that the separator is the same as in Linux.
+Which is the normal slash and not a backslash like in Windows operating systems.
 \input{listings/context-constructor}
 
-Another problem which occurred during the migration, was that \textsc{BaseX} uses a lot of the String function \textit{isEmpty()}, which is not available at an Android API-level lower than 9.
-The same applies for the \textit{copyOf()} method in the \textit{java.util.Arrays} package.
-This was solved by not supporting API-level lower than 9 with \textsc{BaseX} library.
+Another problem which occurred during the migration, was that \textsc{BaseX} uses a lot of the Java string function \textit{isEmpty()}, which is not available at an Android API-level lower than 9.
+The same applies for the \textit{copyOf()} method in the \textit{java.util.Arrays} Java package.
+This was solved by not supporting API-level lower than 9 with the created \textsc{BaseX} library.
 According to the official Android homepage only 1.7\% of the devices that are currently in circulation have an API-level lower than 9.\footnote{\url{http://developer.android.com/about/dashboards/index.html}}
 The consequence of this would be that developers can only create applications that are executable on Android devices using an API-level higher than 9, when using the \textsc{BaseX} library.
-To assure that no application which is build on Android version lower than 9 uses the \textsc{BaseX} library the Manifest file of the library has been adjusted.
+To assure that no application, that is build on Android version lower than 9, uses the \textsc{BaseX} library the Manifest file of the library has been adjusted.
 This is one of the cases where the Manifest file of a library is used to determine the minimum Android version.
-Other constraints like permissions are being ignored, like it was mentioned in Section~\ref{sec:migration:the-android-project-structure}.
+Other constraints specified inside this manifest file, like permissions for example, are being ignored, like it was mentioned in Section~\ref{sec:migration:the-android-project-structure}.
 
