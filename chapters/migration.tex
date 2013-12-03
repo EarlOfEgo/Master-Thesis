@@ -1,6 +1,6 @@
 \chapter{Porting \textsc{BaseX} to the Android platform}
 \label{sec:migration:porting-basex-to-android}
-In this chapter it is shown how the \textsc{BaseX} database has been migrated to the Android platform.
+In present chapter it is shown how the \textsc{BaseX} database has been migrated to the Android platform.
 To achieve this goal the source and target platforms are analyzed and all requirements are determined.
 The main focus here is on the different software platforms and not the hardware specific aspects because of the big variety of systems and devices that run both platforms. 
 Therefore the two virtual machines and their execution byte formats have been compared and also the specific Android internals.
@@ -99,7 +99,7 @@ This interpreter interprets the bytecode and records the traces and their occurr
 If the amount of the occurrence is higher than a predefined number, the trace is being stored into the trace queue.
 The new added thread, the JIT thread, compiles the traces from the queue and writes the machine code into the code cache.
 The main thread now is doing a lookup if the bytecode that needs to be executed is now available in the code cache.
-Is this condition met, it uses the machine code from the code cache instead interpreting the bytecode.\cite{oh2012evaluation}
+If this condition is met, it uses the machine code from the code cache instead interpreting the bytecode.\cite{oh2012evaluation}
 Picture~\ref{fig:dvm-threads} illustrates the principle of the two threads in the DVM.\\
 \begin{figure}[h]
 \begin{center}

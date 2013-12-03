@@ -1,6 +1,6 @@
 set terminal pdf color
-set output 'thesis-gnuplottex-fig1.pdf'
-          set title 'Laptop Steps'
+set output 'thesis-gnuplottex-fig2.pdf'
+          set title 'Tablet Steps'
   set datafile separator ','
   set xlabel 'Query'
   set ylabel 'Average time in ms(100 executions)'
@@ -13,4 +13,4 @@ set output 'thesis-gnuplottex-fig1.pdf'
   show grid
   set style fill solid 0.8 border -1
   set boxwidth 0.5 relative
-  plot for [i=1:14] 'benchmarks/basex-steps-laptop-transposed.csv' u ($0+1):i title ''.i.'00kb' with linespoints
+  plot for [i=1:14] 'benchmarks/xmark-tablet-steps-transposed.csv' u ($0+1):i title ''.i.'00kb' with linespoints

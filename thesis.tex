@@ -14,6 +14,7 @@
 \usepackage{breakcites}
 
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%ABKÜRZUNGEN
 \usepackage{nomencl}
 \let\abbrev\nomenclature
@@ -86,9 +87,15 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%GNUPLOT
 \usepackage{gnuplottex}   
-\usepackage{epstopdf}
+%\usepackage{epstopdf}
 
 \usepackage{amsmath}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%QUERTABELLEN
+\usepackage{rotating} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%APPENDIX
+\usepackage[toc,page]{appendix}
 
 
 
@@ -144,6 +151,12 @@ To underline this statement a sample application has been build that shows how t
 \include{chapters/application}
 \include{chapters/conclusion}
 
+%\appendix
+\begin{appendices}
+\include{appendices/xmark-laptop-table}
+\include{appendices/xmark-tablet-table}
+\include{appendices/xmark-factors-table}
+\end{appendices}
 %%%%%%%%%%%%%%%%%%BIBLIOGRAPHY%%%%%%%%%%%%%%%%%%%%%
 %\nocite{*}
 \bibliography{bibliography}{}
