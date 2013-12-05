@@ -42,7 +42,60 @@ Therefore a measurement of the input/output (IO) and CPU speed of booth devices 
 %In this section will be shown that the created \textsc{BaseX} Android port works and fit all requirements.
 %For this purpose the given JUnit tests were been migrated to Android too.
 %This shows that all functions work like they work on the standard Java version.
-
+%\subsection{Analyzing the test devices}
+%\label{sec:analyzing-the-test-devicevs}
+The two devices which have been used to benchmark \textsc{BaseX} are totally different and not just in the fact that one is laptop and the other a tablet PC.
+They differ in many hardware aspects, but there are two different factors, that are interesting to identify a systems speed and are used for the given purpose.
+These are the CPU speed and the input/output (IO) speed, where IO speed is a headline for different operations.
+Broadly speaking it can be said that the IO speed can be divided into read and write operations.\\
+To measure this values the benchmark tool Bonnie++\footnote{\url{http://www.coker.com.au/Bonnie++/}} is used.
+This tool executes different operations and measures how many of these operations can be executed in one second.
+It tests sequential output, sequential input, random seeks, sequential create and random create.\\
+The sequential output represents the write speed of the system, Bonnie++ uses three different methods to measure this value.
+First it writes one character after another by using the \textit{putc()} systemcall. 
+After this operation it writes whole blocks with the size of 8192 bytes by using the write() systemcall and than calling the close() systemcall.
+The last test in this category is the rewrite test and differs from the write test, that the file is not closed after writing.
+Therefore one block write comply with 8192 \textit{putc} calls and is way more effective and faster than writing single characters.
+The next test is to measure the random seek operations per seconds, which means how often the read/write position can be changed.
+It also measures the latency which represents the rotation speed of the disk, but this is obsolete because both systems have flash storage and so there is no revolution per minute to measure.
+Bonny is written in C++ and is available on most Linux distributions, but to use it on Android it is necessary to build it from its sources by using the, in Chapter~\ref{sec:migration:the-android-project structure} mentioned, Android Native Development Kit (NDK).
+This provides a cross compiler which makes it possible to build C++ code for Android.
+For the execution of the benchmarks the version 1.96 from Bonnie++ has been used.
+The results of these test executions can be seen in table~\ref{tab:bonnie-results-out}.
+\input{chapters/tables/bonnie-out}
+Bonnie++ also measures the sequential and random create of a file.
+Therefore it creates, queries its status and deletes a file by using the Posix systemcalls \textit{creat()}, \textit{stat()} and \textit{unlink()}.
+The results of this test can be seen in Table~\ref{tab:bonnie-results-create}
+\input{chapters/tables/bonnie-create}
+By analyzing these values it can be said that the laptop is overall faster than the tablet PC.
+It is well known that IO operations are the most expensive one on Android, so the achieved result is no surprise. 
+But with these values it can be said that there are factors which can tell how much faster it is in specific operations.
+This factors are impossible to optimize, because they are a hardware constraint and only changing the hardware can improve them, but they are still important to identify the bottlenecks of the mobile \textsc{BaseX} version.\\
+Analyzing Table~\ref{tab:bonnie-results-create} and having a look at the factors shows one value which is, compared to the other factors, extremely high.
+The sequential write per character is 40 times faster on the laptop than on the tablet, considering this, it is clear to avoid writing by character instead by block.
+Writing by using the block mechanism is just three times slower on the tablet.
+The sequential reading of a single character is at the tablet just 1.52 times slower than the at the notebook.
+Though the factor of the block reading is quite higher than the character reading factor it is sure to use the block reading because it is much faster than character reading.
+But by using block reading the factor need also be considered in the \textsc{BaseX} benchmarks later in chapter~\ref{sec:analysing-the-execution-performance}.
+\\
+Looking at Table~\ref{tab:bonnie-results-create} it can be seen that the sequential/random creation, reading and deleting is very slow on the Android devices compared to the laptop.
+Considering this it should be avoided to often create files, because this is very slow.\\
+Bonnie++ gives a good overview about how fast the two system handle their IO operations and how they differ in this aspect.
+But there is also another factor which affects the speed of the execution of a program.
+This is the CPU speed, it is obvious that this also differs on both test devices.
+To evaluate the CPU times a Java program has been written which executes four different CPU intensive operations.
+First it does the naive factorial of 5000, where naive means that it just iterates till 5000 and multiplies every step to the result.
+The second test is a recursive calculation of the 100th Fibonacci number.
+The third sorts an ascending ordered array of 10000 items using the bubble-sort algorithm.
+This is done because this is the worst case for the bubble-sort algorithm and has a complexity of $\mathcal O(n^2)$.
+The last test makes a naive test if the number 666667 is prime or not, by testing to divide the number by every candidate step by step till the candidate is the square root of the number.
+All these test are very CPU intensive, because they use only arithmetic operations.
+The results of these test can be seen in Table~\ref{tab:cpu-results}.
+\input{chapters/tables/cpu-benchmark}
+Except the Fibonacci test it can be said that the CPU of the laptop is about five times faster than the one of the laptop.
+This is like the different IO parameters a factor which could not be improved and has to be considered in the \textsc{BaseX} benchmarks as well.
+These evaluation is for measuring the performance of the two \textsc{BaseX} versions and how to cope with the results achieved by two different platforms on two different devices.
+I
 
 \section{Analyzing the execution performance}
 \label{sec:analysing-the-execution-performance}
@@ -207,75 +260,42 @@ The result of the execution of the application using the Laptop can be seen in F
 \end{figure}
 
 Looking at both images it can be seen that with increasing size of the database also the execution time of the test queries rises.
-It is also shown that the curves of both images are similar to each other.
-Although they look very much alike they differ in one important aspect, the fact that the execution time is up to seventy times higher using the Tablet instead of the Laptop.
+This was expected, because all queries have a complexity of at least $\mathcal O(n)$ and with increasing file size the amount of elements also increase.
+It is also shown that the curves of both images are similar to each other, which is a sign that no unpredictable circumstances set in.
+A query which is very fast on one devices and the slowest on the other or vice versa would be an example for this.
+Although the graphics look very much alike they differ in one important aspect, the fact that the execution time is up to seventy times higher using the Tablet instead of the Laptop.
 Even if this factor is just the highest one, the queries which are executed using the Tablet are around thirty times slower, on average, than the one executed on the Laptop.
 \footnote{The complete results of all executed XMark benchmark tests of the Laptop and the Tablet are shown in Appendix~\ref{app:the-xmark-results}. There is also a table given with the factors which are showing how the execution times differing.}
 This results are giving a first overview of the performance of \textsc{Basex} running on Android.
-Looking at them it can be seen that the most time consuming queries are the queries eight to twelve.
-As mentioned in Section~\ref{subsec:the-xmark-benchmark-suite} Query 8 and 9 are both in the same category.
-It aims to measure the performance of queries with one or more join operations.
+The perception that \textsc{BaseX} is faster executed on the Laptop was anticipated, by just considering the lack of hardware resources at the Tablet shown in Section~\ref{sec:evaluation-of-the-test-devices}.
+Remembering the fact that, for example, the CPU speed is circa five times higher on the Laptop than on the Tablet it need some investigation how such factors like the seventy times higher execution time are being achieved.
+Another interesting insight is the fact that the execution time is sometimes faster with a bigger database than a small one.
+This only affects the benchmarks made using the Tablet device.
+In general it can not be said how the above mentioned circumstances occur.
+Hence, more research needs to be done with the \textsc{BaseX} Android version, which is shown in the next section.
 
-
-
-
-
-
-
-\subsection{Analyzing the test devices}
-\label{sec:analyzing-the-test-devicevs}
-The two devices that has been used to benchmark \textsc{BaseX} are totally different and not just in the fact that one is laptop and the other a tablet PC.
-They differ in many hardware aspects, but there are two different factors, that are interesting to identify a systems speed and are used for the given purpose.
-These are the CPU speed and the input/output (IO) speed, where IO speed is a headline for different operations.
-Broadly speaking it can be said that the IO speed can be divided into read and write operations.\\
-To measure this values the benchmark tool Bonnie++\footnote{\url{http://www.coker.com.au/Bonnie++/}} is used.
-This tool executes different operations and measures how many of these operations can be executed in one second.
-It tests sequential output, sequential input, random seeks, sequential create and random create.\\
-The sequential output represents the write speed of the system, Bonnie++ uses three different methods to measure this value.
-First it writes one character after another by using the \textit{putc()} systemcall. 
-After this operation it writes whole blocks with the size of 8192 bytes by using the write() systemcall and than calling the close() systemcall.
-The last test in this category is the rewrite test and differs from the write test, that the file is not closed after writing.
-Therefore one block write comply with 8192 \textit{putc} calls and is way more effective and faster than writing single characters.
-The next test is to measure the random seek operations per seconds, which means how often the read/write position can be changed.
-It also measures the latency which represents the rotation speed of the disk, but this is obsolete because both systems have flash storage and so there is no revolution per minute to measure.
-Bonny is written in C++ and is available on most Linux distributions, but to use it on Android it is necessary to build it from its sources by using the, in Chapter~\ref{sec:migration:the-android-project structure} mentioned, Android Native Development Kit (NDK).
-This provides a cross compiler which makes it possible to build C++ code for Android.
-For the execution of the benchmarks the version 1.96 from Bonnie++ has been used.
-The results of these test executions can be seen in table~\ref{tab:bonnie-results-out}.
-\input{chapters/tables/bonnie-out}
-Bonnie++ also measures the sequential and random create of a file.
-Therefore it creates, queries its status and deletes a file by using the Posix systemcalls \textit{creat()}, \textit{stat()} and \textit{unlink()}.
-The results of this test can be seen in Table~\ref{tab:bonnie-results-create}
-\input{chapters/tables/bonnie-create}
-By analyzing these values it can be said that the laptop is overall faster than the tablet PC.
-It is well known that IO operations are the most expensive one on Android, so the achieved result is no surprise. 
-But with these values it can be said that there are factors which can tell how much faster it is in specific operations.
-This factors are impossible to optimize, because they are a hardware constraint and only changing the hardware can improve them, but they are still important to identify the bottlenecks of the mobile \textsc{BaseX} version.\\
-Analyzing Table~\ref{tab:bonnie-results-create} and having a look at the factors shows one value which is, compared to the other factors, extremely high.
-The sequential write per character is 40 times faster on the laptop than on the tablet, considering this, it is clear to avoid writing by character instead by block.
-Writing by using the block mechanism is just three times slower on the tablet.
-The sequential reading of a single character is at the tablet just 1.52 times slower than the at the notebook.
-Though the factor of the block reading is quite higher than the character reading factor it is sure to use the block reading because it is much faster than character reading.
-But by using block reading the factor need also be considered in the \textsc{BaseX} benchmarks later in chapter~\ref{sec:analysing-the-execution-performance}.
+\subsection{Identifying the Bottlenecks}
+\label{sec:identifying-the-bottlenecks}
+With the Android SDK various developer tools are provided.
+On of them is Traceview, which gives the possibility to record a specific part of an execution of an application.
+Traceview offers a graphical view to analyze this records.
+The content of such record implies every method call and its execution time, as well as the occupation of the CPU in percent and the amount of calls.\\
+Looking at the results in Appendix~\ref{app:the-xmark-results} it can be seen that Query 13 needs nearly the half of the execution time on a database with 1400 Kb compared to the smaller database with 1300 Kb.
+Even if Query 11 is on both devices the most time consuming query, it will be also recorded by using Traceview, because it is also the query with the most time increase between the Laptop and the Tablet.
+%Calculating the increase in percents for all queries with performed on the two biggest databases, it is Query 2 which time consumption increases the most, namely 61\%.
+%As a result of those circumstances these two queries will be recorded by using Traceview, executed on the two biggest databases. 
 \\
-Looking at Table~\ref{tab:bonnie-results-create} it can be seen that the sequential/random creation, reading and deleting is very slow on the Android devices compared to the laptop.
-Considering this it should be avoided to often create files, because this is very slow.\\
-Bonnie++ gives a good overview about how fast the two system handle their IO operations and how they differ in this aspect.
-But there is also another factor which affects the speed of the execution of a program.
-This is the CPU speed, it is obvious that this also differs on both test devices.
-To evaluate the CPU times a Java program has been written which executes four different CPU intensive operations.
-First it does the naive factorial of 5000, where naive means that it just iterates till 5000 and multiplies every step to the result.
-The second test is a recursive calculation of the 100th Fibonacci number.
-The third sorts an ascending ordered array of 10000 items using the bubble-sort algorithm.
-This is done because this is the worst case for the bubble-sort algorithm and has a complexity of $\mathcal O(n^2)$.
-The last test makes a naive test if the number 666667 is prime or not, by testing to divide the number by every candidate step by step till the candidate is the square root of the number.
-All these test are very CPU intensive, because they use only arithmetic operations.
-The results of these test can be seen in Table~\ref{tab:cpu-results}.
-\input{chapters/tables/cpu-benchmark}
-Except the Fibonacci test it can be said that the CPU of the laptop is about five times faster than the one of the laptop.
-This is like the different IO parameters a factor which could not be improved and has to be considered in the \textsc{BaseX} benchmarks as well.
-These evaluation is for measuring the performance of the two \textsc{BaseX} versions and how to cope with the results achieved by two different platforms on two different devices.
-I
+Although Traceview shows the time consumption of every method call the CPU occupation in percent is used to analyze the records, due to the additional time the recording takes.
+
+
+
+
+
+
+
+
+
+
 
 \section{Analyzing the resources consumptions}
 \label{sec:analysis:analyszing-the-resource-consumption}

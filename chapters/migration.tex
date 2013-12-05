@@ -2,15 +2,14 @@
 \label{sec:migration:porting-basex-to-android}
 In present chapter it is shown how the \textsc{BaseX} database has been migrated to the Android platform.
 To achieve this goal the source and target platforms are analyzed and all requirements are determined.
-The main focus here is on the different software platforms and not the hardware specific aspects because of the big variety of systems and devices that run both platforms. 
-Therefore the two virtual machines and their execution byte formats have been compared and also the specific Android internals.
-In Section~\ref{sec:migration:problems-during-the-migration} it is illustrated which parts of the \textsc{BaseX} version has been changed and how to receive a working \textsc{BaseX} Android version.
-The last section describes the problems which are occurred during the migration of the database to Android.
-
+The main focus lies on the different software platforms and not the hardware specific aspects, due to the big variety of systems and devices which are running on both platforms. 
+Therefore the two virtual machines and their execution byte formats have been compared and also the specific Android internals have been explored.
+In Section~\ref{sec:migration:problems-during-the-migration} it is illustrated which parts of the \textsc{BaseX} version have been changed and how to receive a working \textsc{BaseX} Android version.
+The last section describes the problems which occurred during the migration of the database to Android.
 
 \section{Analyzing the source and target platforms} 
 \label{sec:migration:analysing-the-source-and-target-platform}
-In this section the two different platforms are analyzed.
+In the present section the two different platforms are analyzed.
 The main part of it is the software part, because both platforms are running on a huge amount of hardware devices.
 The source platform is the Java Virtual Machine (JVM) and the target platform is the Dalvik Virtual Machine (Dalvik VM, or DVM) in the Android environment.
 The JVM and the DVM are both virtual machines (VM), but they vary in different ways.
