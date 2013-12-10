@@ -277,17 +277,91 @@ Hence, more research needs to be done with the \textsc{BaseX} Android version, w
 \subsection{Identifying the Bottlenecks}
 \label{sec:identifying-the-bottlenecks}
 With the Android SDK various developer tools are provided.
-On of them is Traceview, which gives the possibility to record a specific part of an execution of an application.
-Traceview offers a graphical view to analyze this records.
-The content of such record implies every method call and its execution time, as well as the occupation of the CPU in percent and the amount of calls.\\
-Looking at the results in Appendix~\ref{app:the-xmark-results} it can be seen that Query 13 needs nearly the half of the execution time on a database with 1400 Kb compared to the smaller database with 1300 Kb.
+On of them is Traceview, which offers the possibility to record a specific part as source code of an execution of an application.
+Traceview provides a graphical view to analyze this records or to possibility to translate them into HTML code.
+The content of such record implies every method call and its execution time, as well as the occupation of the CPU in percent and the amount of calls.
+The execution times are given in microseconds which are not representing the real world time, the value represents absolute CPU occupation time.
+This fact makes the recorded trace-views very valuable, because no interrupts are tampering the results.\\
+Most records contain a very long list of method calls, even if they only record a small part of the code.
+Therefore only two queries will being analyzed.
+Both on one side recorded with the database of the size of 1.3 Mb and on the other side the 1.4 Mb size database.
+Query 2 is on of them, the reason to chose this is that the time consumption of this query increases the most executed on the two different databases.
+Even if the size of the database differ just by 100 Kb the time utilization of the query raises 62\%.
+The other query which is being recorded is Query 11, because it needs the most execution time on all databases.
 Even if Query 11 is on both devices the most time consuming query, it will be also recorded by using Traceview, because it is also the query with the most time increase between the Laptop and the Tablet.
-%Calculating the increase in percents for all queries with performed on the two biggest databases, it is Query 2 which time consumption increases the most, namely 61\%.
-%As a result of those circumstances these two queries will be recorded by using Traceview, executed on the two biggest databases. 
+This query is also very interesting, because of the fact that it is one of those queries which are faster executed on a database with 1.4 Mb instead of one with the size of 1.3Mb.
 \\
 Although Traceview shows the time consumption of every method call the CPU occupation in percent is used to analyze the records, due to the additional time the recording takes.
+\\
+Table~\ref{tab:traceview-cycles} gives a first overview of the recorded trace-views and the different amount of execution cycles which both queries perform.
+Looking at the total cycles it can be seen that the amount is higher at Query 11 measured with the smaller database compared to the one with the 1.4 Mb database.
+\begin {table}[htpb] 
+  \centering
+\begin {tabular} {|r|r|r|r|r|}
+  	\hline
+	&\multicolumn{2}{c}{Query 2}&\multicolumn{2}{|c|}{Query 11}\\
+	\hline
+	Database size&1300 Kb&1400 Kb&1300 Kb&1400 Kb\\
+	\hline
+	Total Cycles&899810&945343&1802642&1799194\\
+	\hline
+\end {tabular}
+\caption {The total cycles needed by every query.}
+\label {tab:traceview-cycles}
+\end {table}
+\subsection*{Analyzing the trace-view of Query 2}
+\label{sec:analyzing-the-trace-view-of-query-2}
+The purpose of Query 2 is to benchmark the database with order constraints, therefore it returns all open auctions by their increase.
+To achieve this the query opens the database and iterates over every \textit{open\_auction} using a for loop.
+Thus, the runtime complexity of this query is $\mathcal O(n)$.
+The definition of the complexity $f \in \mathcal O(n)$ describes that the function $f$ grows linear with its input~\cite{knuth1976big}.
+Counting the occurrence of the attribute \textit{open\_auction} in both databases gives an amount of 629 for the 1300 Kb file and 507 for the 1400 Kb.
+The circumstance that the bigger file has less attributes of this type can not be affected, because XMark generates the content of the test files randomly.
+The fact that the bigger database has less attributes of the type \textit{open\_auction} ought to make Query 2 faster in the smaller file, but the opposite is the case.
+It can be said that the for loop has lesser iterations in the bigger file than in the other, so the result of this is that the part which is responsible for the time increase is not the for loop.
+Looking at the result of the query it returns in the 1300 Kb database 144 hits and in the bigger one 155 hits.
+This can be responsible for the rise of the time during the execution of the query on the two different databases.
+\\
+Nevertheless to make an explicit statement the recorded traces need to be examined.
+%let $auction := doc("auction.xml") return
+%for $b in $auction/site/open_auctions/open_auction
+%return <increase>{$b/bidder[1]/increase/text(}</increase>
+Table~\ref{tab:traceview-q2-methods} shows the top five time consuming methods, excluding their time spend in their children.
+It also outlines the number of calls which every of those methods have received.
+On the bigger database the time spend in every method is bigger than the one spend in the smaller database.
+\begin {table}[htpb] 
+  \centering
+\begin {tabular} {|r|r|c|c|r|c|c|}
+  	\hline
+	\multirow{2}{*}{org/basex/}&\multicolumn{3}{c}{1300 Kb}&\multicolumn{3}{|c|}{1400 Kb}\\
+	\cline{2-7}
+	&cycles&calls&${cylce \over calls}$&cycles&calls&${cylce \over calls}$\\
+	\hline
+	\hline
+	query/util/NSGlobal.uri&42792&162&264&48189&173&278\\
+	\hline
+	util/Token.eq&29485&10133&2&33005&10866&3\\
+	\hline
+	query/value/node/DBNode.next&27262&1526&17&29419&1648&17\\
+	\hline
+	util/Atts.name&21050&7290&2&22206&7785&2\\
+	\hline
+	io/random/TableDiskAccess.read1&18987&2181&8&23600&2342&10\\
+	\hline
+\end {tabular}
+\caption {The five most time consuming methods for Query 2.}
+\label {tab:traceview-q2-methods}
+\end {table}
+Looking at the most time consuming method also shows that it has the least amount of calls and therefore the highest average time for a single call.
+The other methods all have a small amount of cycles per call.
+Calculating the average time which every call need to be executed gives 264 microseconds for the smaller database and 278 for the 1400 Kb database.
+For this reason this method is very intressting, because it is, compared to the other top five time consuming methods very slow.
 
 
+
+
+\subsection*{Analyzing the trace-view of Query 11}
+\label{sec:analyzing-the-trace-view-of-query-2}
 
 
 
