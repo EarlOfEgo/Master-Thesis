@@ -1,6 +1,6 @@
 \chapter{Analysis of the ported \textsc{BaseX} Android version}
 \label{cha:analysis}
-In the following chapter the migrated \textsc{BaseX} database will be analyzed.
+In the following chapter outlines the migrated \textsc{BaseX} database will be analyzed.
 The focus at this part lies on the evaluation and the performance of the library.
 First the specification of the test devices is outlined and an estimation is made to show how the performance of the various devices differ.
 Therefore different benchmarks has been executed to approximate the distinctive hardware properties and their execution times.
@@ -329,8 +329,12 @@ Nevertheless to make an explicit statement the recorded traces need to be examin
 Table~\ref{tab:traceview-q2-methods} shows the top five time consuming methods, excluding their time spend in their children.
 It also outlines the number of calls which every of those methods have received.
 On the bigger database the time spend in every method is bigger than the one spend in the smaller database.
+The column \textit{${cylce \over calls}$} shows the average time one call needs to be finished with the method.
+It shows that they are all more or less the same, which is an indicator for the consumption that the increase of time rises with every call.
+Running the query on the bigger database results in more calls for the most methods and therefore more time consumption in all.
 \begin {table}[htpb] 
-  \centering
+  \begin{center}
+\hspace*{-0.5cm}
 \begin {tabular} {|r|r|c|c|r|c|c|}
   	\hline
 	\multirow{2}{*}{org/basex/}&\multicolumn{3}{c}{1300 Kb}&\multicolumn{3}{|c|}{1400 Kb}\\
@@ -351,11 +355,38 @@ On the bigger database the time spend in every method is bigger than the one spe
 \end {tabular}
 \caption {The five most time consuming methods for Query 2.}
 \label {tab:traceview-q2-methods}
+\end{center}
 \end {table}
 Looking at the most time consuming method also shows that it has the least amount of calls and therefore the highest average time for a single call.
 The other methods all have a small amount of cycles per call.
 Calculating the average time which every call need to be executed gives 264 microseconds for the smaller database and 278 for the 1400 Kb database.
-For this reason this method is very intressting, because it is, compared to the other top five time consuming methods very slow.
+For this reason this method is very intressting, because it is, compared to the other top five time consuming methods, very slow.
+Listing~\ref{lis:uri-code} shows the coresponding source code to the \textit{NSGlobal.uri} method.
+\lstset{language=Java,
+   basicstyle=\footnotesize,
+   keywordstyle=\color{blue!80!black!100},
+   identifierstyle=,
+   commentstyle=\color{green!50!black!100},
+   stringstyle=\ttfamily,
+   breaklines=true,
+   numbers=left,
+   tabsize=2,
+   numberstyle=\footnotesize,
+   frame=single,
+   backgroundcolor=\color{blue!3},
+}
+\begin{lstlisting} [captionpos=b, caption={The code for the uri method in the NSGlobal class.}, label=lis:uri-code] 
+public byte[] uri(final byte[] pref) {
+    if(stack != null) {
+      for(int s = stack.size() - 1; s >= 0; s--) {
+        if(eq(stack.name(s), pref)) return stack.value(s);
+      }
+    }
+    final byte[] uri = staticURI(pref);
+    return uri == null ? NSGlobal.uri(pref) : uri.length == 0 ? null : uri;
+  }		
+\end{lstlisting}
+Having a closer look at the source code of the \textit{uri} method and thinking about the fact that the above shown times are exclusive times raises the question where is the long execution time coming from?
 
 
 

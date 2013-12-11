@@ -1,17 +1,19 @@
 \chapter{Porting \textsc{BaseX} to the Android platform}
 \label{sec:migration:porting-basex-to-android}
-In present chapter it is shown how the \textsc{BaseX} database has been migrated to the Android platform.
-To achieve this goal the source and target platforms are analyzed and all requirements are determined.
+In the present chapter it is shown how the \textsc{BaseX} database has been migrated to the Android platform.
+To achieve this goal the source and target platforms have been analyzed and all requirements were been determined.
 The main focus lies on the different software platforms and not the hardware specific aspects, due to the big variety of systems and devices which are running on both platforms. 
 Therefore the two virtual machines and their execution byte formats have been compared and also the specific Android internals have been explored.
-In Section~\ref{sec:migration:problems-during-the-migration} it is illustrated which parts of the \textsc{BaseX} version have been changed and how to receive a working \textsc{BaseX} Android version.
+In Section~\ref{sec:migration:problems-during-the-migration} it is illustrated which parts of the \textsc{BaseX} version have been changed and in which way to receive a working \textsc{BaseX} Android version.
 The last section describes the problems which occurred during the migration of the database to Android.
 
 \section{Analyzing the source and target platforms} 
 \label{sec:migration:analysing-the-source-and-target-platform}
-In the present section the two different platforms are analyzed.
-The main part of it is the software part, because both platforms are running on a huge amount of hardware devices.
-The source platform is the Java Virtual Machine (JVM) and the target platform is the Dalvik Virtual Machine (Dalvik VM, or DVM) in the Android environment.
+This section outlines the two different platforms and their analyzing.
+The main part of it concentrates on the software part, because both platforms are running on a huge amount of hardware devices.
+The term platform is hereby defined as on one side the Java Virtual Machine (JVM) and on the other side the Dalvik Virtual Machine (Dalvik VM, or DVM) in the Android environment.
+For a better identification the JVM is marked as the source and the DVM as the target platform.
+\\
 The JVM and the DVM are both virtual machines (VM), but they vary in different ways.
 A virtual machine is a simulated computer, which can be a whole system with all parts a computer provides.
 Or it is an abstraction layer which provides the functionality to execute a program on every system that runs the virtual machine.
@@ -21,28 +23,28 @@ A disadvantage of this is the loss of speed, which is a result of the execution 
 For both virtual machines the programming language Java is used, which is being compiled into code that the VMs understand and are able to execute.
 Although both platforms are virtual machines they differ in some crucial ways.
 One of the main difference is that the JVM is a stack based and the DVM is a register based virtual machine.
-Also the DVM is optimized to be executed on mobile devices, which means that it is designed to use less memory and CPU usage than the JVM.
+Another distinctness of both machines is that the DVM is optimized to be executed on mobile devices, meaning that it is designed to use less memory and CPU usage than the JVM.
 Lesser hardware usage implies also lesser battery usage, which is also a factor which should be considered in the field of mobile development.
 Another difference which need to be considered is the host system, which is in the DVM case Android.
-And on the opposite to this it could be Windows, Mac OS, or any Linux/Unix derivate for the JVM. 
-This need to be considered if external sources will be used, like writing or reading a file, which is different in every operating system.
+And as opposed to this it could be Windows, Mac OS, or any Linux/Unix derivate as host system running a Java virtual machine. 
+This circumstance has to be considered if external sources will be used, like writing or reading a file, which is different in every operating system.
 
 
 \subsection{Comparison of the two virtual machines}
 \label{sec:migration:comparison-of-the-two-virtual-machines}
-Like in the chapter before mentioned both source and target platforms are using Java as a programming language.
+As mentioned in the chapter before both source and target platforms are using Java as a programming language.
 Compared to other general purpose programming languages, for example C++, Java is not being compiled into machine code.
-To execute Java code a virtual machine is required, which runs the compiled Java code.
-However, like in Section~\ref{sec:migration:analysing-the-source-and-target-platform} mentioned both platforms have different virtual machines.
+To execute Java code a virtual machine is required, which executes the compiled Java code.
+However, as in Section~\ref{sec:migration:analysing-the-source-and-target-platform} explained both platforms have different virtual machines.
 They differ in many kinds that the application developer not sees but need to consider.
 \\
 On of the most important difference is that the JVM is stack and the DVM is a register based virtual machine.
 This difference helps the DVM to execute the same code in lesser operations than the JVM.
 This means that the DVM need lesser CPU cycles than the JVM, which is an improvement that is necessary because of the lack of CPU and memory resources in mobile devices and the aspect of the battery usage.
 This can be demonstrated by looking at the instructions done by adding two integers.
-The stack based virtual machine has to do four machine instructions, while the register based VM can do the operation in one instruction.
+The stack based virtual machine has to execute four machine instructions, while the register based VM can do the same operation in one instruction.
 The reason for this is that the stack based VM needs to pop the two values first before it can add and store them back on the stack.
-The instructions are \textit{pop 1, pop 2, add 1 2, push result}.\\
+The instructions are \textit{'pop 1', 'pop 2', 'add 1 2', 'push result'}.\\
 Figure~\ref{fig:stack-based-addition} illustrates the executed instructions of a addition with a stack based virtual machine.
 \begin{figure}[h]
 \begin{center}
@@ -53,7 +55,7 @@ Figure~\ref{fig:stack-based-addition} illustrates the executed instructions of a
 \end{figure}
 
 Compared to this, the register based virtual machine just needs one machine instruction to complete the same addition of two numbers.
-The required instruction is \textit{ADD R1, R2, R3}, which can be translated into add content of register 1 and register 2 and store it in register 3.
+The required instruction is \textit{'ADD R1, R2, R3'}, which can be translated into add content of register 1 and register 2 and store it in register 3.
 Figure~\ref{fig:register-based-addition} illustrates this by showing the add operation of the numbers one and two.
 \begin{figure}[h]
 \begin{center}
@@ -63,7 +65,7 @@ Figure~\ref{fig:register-based-addition} illustrates this by showing the add ope
 \end{center}
 \end{figure}
 This minimal example shows how the register based virtual machine uses lesser machine instructions compared to the stack based.
-The disadvantage in this is that register based machine has to store the addresses, meaning the corresponding registers, of the operands.
+The disadvantage in this is that the register based machine has to store the addresses, meaning the corresponding registers, of the operands.
 Which is not necessary at a stack based machine, because of the stack pointer that always directs to the actual operand using the Last In First Out (LIFO) principal.
 This leads to the result, that stack based code is smaller than the equivalent register based code.
 Although the Dalvik VM is a register based virtual machine, the executed byte code is not bigger than the equivalent JVM code.~\cite{shi2008virtual}\\
@@ -73,7 +75,7 @@ The performed instructions which are executed on Dalvik VM or the JVM are called
 To execute this instructions virtual machines having an interpreter which interprets all instructions and performs them.
 The difference to normal interpreted languages is, that the JVM or DVM interpreter do not need to check the syntax of the program.
 This has been already done by the Java compiler which compiles the Java source code into class files.
-Even if it is faster than other interpreted languages, it is still slower than into machine language compiled code which is executed directly on the hardware.
+Even if it is faster than other interpreted languages, it is still slower than code that is compiled into a machine language, which is executed directly on the hardware.
 This so called machine code is faster because there is no layer between the executions and the hardware, which could slow down the execution.~\cite{aycock2003brief}
 There is a technique which can improve a virtual machine in performance aspects by adding a Just In Time (JIT) compiler to it.
 Generally it can be said, that a JIT compiler, used by a virtual machine, compiles heavy used code segments or very expensive calculations into the faster machine code.
