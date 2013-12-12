@@ -1,6 +1,6 @@
 \chapter{Analysis of the ported \textsc{BaseX} Android version}
 \label{cha:analysis}
-In the following chapter outlines the migrated \textsc{BaseX} database will be analyzed.
+The following chapter outlines how the migrated \textsc{BaseX} Android database is analyzed.
 The focus at this part lies on the evaluation and the performance of the library.
 First the specification of the test devices is outlined and an estimation is made to show how the performance of the various devices differ.
 Therefore different benchmarks has been executed to approximate the distinctive hardware properties and their execution times.
@@ -384,7 +384,7 @@ public byte[] uri(final byte[] pref) {
     }
     final byte[] uri = staticURI(pref);
     return uri == null ? NSGlobal.uri(pref) : uri.length == 0 ? null : uri;
-  }		
+}		
 \end{lstlisting}
 Having a closer look at the source code of the \textit{uri} method and thinking about the fact that the above shown times are exclusive times raises the question where is the long execution time coming from?
 
