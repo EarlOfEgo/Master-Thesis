@@ -1,0 +1,24 @@
+\lstset{language=Java,
+   basicstyle=\footnotesize,
+   keywordstyle=\color{blue!80!black!100},
+   identifierstyle=,
+   commentstyle=\color{green!50!black!100},
+   stringstyle=\ttfamily,
+   breaklines=true,
+   numbers=left,
+   tabsize=2,
+   numberstyle=\footnotesize,
+   frame=single,
+   backgroundcolor=\color{blue!3},
+}
+\begin{lstlisting} [captionpos=b, caption={The code for the uri method in the NSGlobal class.}, label=lis:uri-code] 
+public byte[] uri(final byte[] pref) {
+    if(stack != null) {
+      for(int s = stack.size() - 1; s >= 0; s--) {
+        if(eq(stack.name(s), pref)) return stack.value(s);
+      }
+    }
+    final byte[] uri = staticURI(pref);
+    return uri == null ? NSGlobal.uri(pref) : uri.length == 0 ? null : uri;
+}
+\end{lstlisting}
