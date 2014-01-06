@@ -62,11 +62,11 @@ Bonny is written in C++ and is available on most Linux distributions, but to use
 This provides a cross compiler which makes it possible to build C++ code for Android.
 For the execution of the benchmarks the version 1.96 from Bonnie++ has been used.
 The results of these test executions can be seen in table~\ref{tab:bonnie-results-out}.
-\input{chapters/tables/bonnie-out}
+\input{Chapters/tables/bonnie-out}
 Bonnie++ also measures the sequential and random create of a file.
 Therefore it creates, queries its status and deletes a file by using the Posix systemcalls \textit{creat()}, \textit{stat()} and \textit{unlink()}.
 The results of this test can be seen in Table~\ref{tab:bonnie-results-create}
-\input{chapters/tables/bonnie-create}
+\input{Chapters/tables/bonnie-create}
 By analyzing these values it can be said that the laptop is overall faster than the tablet PC.
 It is well known that IO operations are the most expensive one on Android, so the achieved result is no surprise. 
 But with these values it can be said that there are factors which can tell how much faster it is in specific operations.
@@ -91,7 +91,7 @@ This is done because this is the worst case for the bubble-sort algorithm and ha
 The last test makes a naive test if the number 666667 is prime or not, by testing to divide the number by every candidate step by step till the candidate is the square root of the number.
 All these test are very CPU intensive, because they use only arithmetic operations.
 The results of these test can be seen in Table~\ref{tab:cpu-results}.
-\input{chapters/tables/cpu-benchmark}
+\input{Chapters/tables/cpu-benchmark}
 Except the Fibonacci test it can be said that the CPU of the laptop is about five times faster than the one of the laptop.
 This is like the different IO parameters a factor which could not be improved and has to be considered in the \textsc{BaseX} benchmarks as well.
 These evaluation is for measuring the performance of the two \textsc{BaseX} versions and how to cope with the results achieved by two different platforms on two different devices.
