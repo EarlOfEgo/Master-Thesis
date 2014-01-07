@@ -12,7 +12,7 @@
    backgroundcolor=\color{blue!3},
 }
 \begin{lstlisting} [captionpos=b, caption={The code for the uri method in the NSGlobal class.}, label=lis:uri-code] 
-public static byte[ uri(final byte[ pref) {
+public static byte[] uri(final byte[] pref) {
   for(int s = NS.size() - 1; s >= 0; s--) {
     if(eq(NS.name(s), pref)) return NS.value(s);
   }

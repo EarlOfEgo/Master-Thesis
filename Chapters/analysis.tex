@@ -33,7 +33,7 @@ Their technical specifications can be seen in Table\ref{tab:test-dev-specs}.
 Looking at this table it can be seen that the only similarity of both systems is that they are using the same filesystem, which is ext4, which is short for fourth extended filesystem.
 The RAM of the laptop is the double amount of the tablet available RAM and both devices have a dual core CPU with around 1 GHz.
 Even if the specifications are not so much differ on the first look, their performance varies in some factors.
-Therefore a measurement of the input/output (IO) and CPU speed of booth devices has been made in Section~\ref{sec:analyzing-the-test-devicevs} to get a clearer look how the devices differ.
+Therefore a measurement of the input/output (IO) and CPU speed of booth devices has been made in Section~\ref{sec:evaluation-of-the-test-devices} to get a clearer look how the devices differ.
 
 
 %\section{Evaluating the working \textsc{BaseX} Android port}
@@ -42,8 +42,6 @@ Therefore a measurement of the input/output (IO) and CPU speed of booth devices 
 %In this section will be shown that the created \textsc{BaseX} Android port works and fit all requirements.
 %For this purpose the given JUnit tests were been migrated to Android too.
 %This shows that all functions work like they work on the standard Java version.
-%\subsection{Analyzing the test devices}
-%\label{sec:analyzing-the-test-devicevs}
 The two devices which have been used to benchmark \textsc{BaseX} are totally different and not just in the fact that one is laptop and the other a tablet PC.
 They differ in many hardware aspects, but there are two different factors, that are interesting to identify a systems speed and are used for the given purpose.
 These are the CPU speed and the input/output (IO) speed, where IO speed is a headline for different operations.
@@ -58,7 +56,7 @@ The last test in this category is the rewrite test and differs from the write te
 Therefore one block write comply with 8192 \textit{putc} calls and is way more effective and faster than writing single characters.
 The next test is to measure the random seek operations per seconds, which means how often the read/write position can be changed.
 It also measures the latency which represents the rotation speed of the disk, but this is obsolete because both systems have flash storage and so there is no revolution per minute to measure.
-Bonny is written in C++ and is available on most Linux distributions, but to use it on Android it is necessary to build it from its sources by using the, in Chapter~\ref{sec:migration:the-android-project structure} mentioned, Android Native Development Kit (NDK).
+Bonny is written in C++ and is available on most Linux distributions, but to use it on Android it is necessary to build it from its sources by using the, in Chapter~\ref{sec:migration:the-android-project-structure} mentioned, Android Native Development Kit (NDK).
 This provides a cross compiler which makes it possible to build C++ code for Android.
 For the execution of the benchmarks the version 1.96 from Bonnie++ has been used.
 The results of these test executions can be seen in table~\ref{tab:bonnie-results-out}.
@@ -95,7 +93,7 @@ The results of these test can be seen in Table~\ref{tab:cpu-results}.
 Except the Fibonacci test it can be said that the CPU of the laptop is about five times faster than the one of the laptop.
 This is like the different IO parameters a factor which could not be improved and has to be considered in the \textsc{BaseX} benchmarks as well.
 These evaluation is for measuring the performance of the two \textsc{BaseX} versions and how to cope with the results achieved by two different platforms on two different devices.
-I
+
 
 \section{Analyzing the execution performance}
 \label{sec:analysing-the-execution-performance}
@@ -358,19 +356,28 @@ Running the query on the bigger database results in more calls for the most meth
 \end{center}
 \end {table}
 Looking at the most time consuming method also shows that it has the least amount of calls and therefore the highest average time for a single call.
-Compared to this the other methods have a small amount of cycles per call.
+Compared to this function, the other top time consuming methods have a small amount of cycles per call.
+The reason why they are expensive methods is that they are being called very often.
 Calculating the average time which every call need to be executed gives 264 microseconds for the smaller database and 278 for the 1400 Kb database.
-For this reason this method is very intressting, because it is, compared to the other top five time consuming methods, very slow.
-Listing~\ref{lis:uri-code} shows the coresponding source code to the \textit{NSGlobal.uri} method.
+For this reason this method is very interesting, because it is, compared to the other top five time consuming methods, very slow.
+Listing~\ref{lis:uri-code} shows the corresponding source code to the \textit{NSGlobal.uri} method.
 \input{listings/uri-code}		
-Having a closer look at the source code of the \textit{uri} method and thinking about the fact that the above shown times are exclusive times, raises the question where is the long execution time coming from?
-
-
-
+%An answer to this question could be that the amount of the iterations of the for loop is the highest value it can be, because nothing more happens in the loop and its complexity is $\mathcal O(n)$.
+Looking at the source code of the \textit{uri} method shows that it only executes a for-loop and checks if the parameter \textsf{pref} is equal to the \textsf{NS.name} byte and if this the case the value is returned.
+The method has a complexity of $\mathcal O(n)$ which results in the assumption that the for-loop is always executed in the worst case.
+This would mean that every time the method is called the loop is fully iterate from the maximum size of the \textsf{NS} object till zero.
+Considering the, in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} mentioned, Just In Time compiler from the Dalvik VM this part of code should be optimized by it.
+Even if this part of the \textsc{BaseX} Android source code is compiled into native machine code it is still very slow.
+Besides the for-loop there are the \textsf{eq} and \textsf{NS.name} methods, which could produce the long execution time of this function.
+%TODO: über die eq methode schreiben. ANALYSIEREN ETC.
+Investigating the \textsf{NS.name} method shows that this function is a simple getter method which returns the name from the index of the parameter.\\
+At this place the differences between the two platforms have an important part, because it is best practices to use getter and setter for the normal Java environment, but it is expensive for the Android platform.~\cite{toninievlautatingandroid} 
+Even if the JIT compiler inlines the getter/setter calls it can be up to 30\% faster if a direct field access is used instead of the getter/setter methods.~\cite{toninianalysis}\\
+In Section~\ref{sec:improving} the getter of the \textit{NSGlobal.uri} method has been replaced by direct field accesses and it is shown if it improves the execution time of Query 2 for the \textsc{BaseX} Android library.
 
 
 \subsection*{Analyzing the trace-view of Query 11}
-\label{sec:analyzing-the-trace-view-of-query-2}
+\label{sec:analyzing-the-trace-view-of-query-11}
 As shown in Section~\ref{sec:the-results-of-the-benchmark-execution} Query 11 is the most time consuming of the benchmark queries.
 It is also one of the queries that are faster executed on the biggest database than on the one with the size of 1300 Kb.\\
 The purpose of this query is to test the ability of the database to deal with queries that are using joins and receive a large dataset.
@@ -388,7 +395,7 @@ The first result that the records show is the amount of total cycle, executed by
   \item[1300 Kb database:] 1802642 cycles
   \item[1400 Kb database:] 1799194 cycles
 \end{description}
-Looking at those results gives a first hint why the execution on the smaller database is faster than on the other one.
+Looking at those results gives a first hint why the execution on the bigger database is faster than on the other one.
 Even if the amount of cycles does not differ much it is higher on the 1300 Kb database.
 Hence the six most time consuming methods will be outline in Table~\ref{tab:traceview-q11-methods}.\\
 \begin {table}[htpb] 
@@ -418,16 +425,19 @@ Hence the six most time consuming methods will be outline in Table~\ref{tab:trac
 \end {table}
 The only interesting value in Table~\ref{tab:traceview-q11-methods} is the \textit{next} method, because it has less calls in the bigger database.
 And even if the calls are less in the 1400 Kb database, the time consumption is still higher than for the smaller database with more calls to the method.
+This method has also the highest cycle call ratio, which makes it to the slowest method in the top five time consuming functions.
+\input{listings/next-code}
+The first thing that is conspicuous is the while-loop which iterates over a linked list of \textsf{ANode} objects and checks them for equality with the local field \textsf{test}.
+%TODO preds untersuchen
+An explanation for the lesser time consumption in the bigger database is that there are not so many \textsf{ANode} objects to iterate than in the one with size of 1300 Kb. 
+The amount of calls of this method indicates that the Dalvik JIT compiler optimizes the method with compiling it into native code.
 
 
 
-
-
-
-\section{Analyzing the resources consumptions}
-\label{sec:analysis:analyszing-the-resource-consumption}
-\subsection{Analyzing the consumed storage size}
-\label{sec:analysis:analyzing-the-consumed-storage-size}
+%\section{Analyzing the resources consumptions}
+%\label{sec:analysis:analyszing-the-resource-consumption}
+%\subsection{Analyzing the consumed storage size}
+%\label{sec:analysis:analyzing-the-consumed-storage-size}
 \section{Improving the shown }
 \label{sec:improving}
 In this section is shown how the found bottlenecks can be improved and the time consumption of some functionalities are made better.

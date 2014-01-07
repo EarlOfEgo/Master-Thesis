@@ -1,0 +1,24 @@
+\lstset{language=Java,
+   basicstyle=\footnotesize,
+   keywordstyle=\color{blue!80!black!100},
+   identifierstyle=,
+   commentstyle=\color{green!50!black!100},
+   stringstyle=\ttfamily,
+   breaklines=true,
+   numbers=left,
+   tabsize=2,
+   numberstyle=\footnotesize,
+   frame=single,
+   backgroundcolor=\color{blue!3},
+}
+\begin{lstlisting} [captionpos=b, caption={The code for the next method in the IterStep class.}, label=lis:next-code] 
+public ANode next() throws QueryException {
+	if(ai ==  null) ai = axis.iter(checkNode(ctx));
+	while(true) {
+		ctx.checkStop();
+		final ANode node = ai.next();
+		if(node == null) return null;
+		if(test.eq(node) && preds(node, ctx)) return node.finish();
+	}
+}
+\end{lstlisting}
