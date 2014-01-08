@@ -332,23 +332,28 @@ It shows that they are all more or less the same, which is an indicator for the 
 Running the query on the bigger database results in more calls for the most methods and therefore more time consumption in all.
 \begin {table}[htpb] 
   \begin{center}
-\hspace*{-0.5cm}
+%\hspace*{-0.5cm}
 \begin {tabular} {|r|r|c|c|r|c|c|}
   	\hline
-	\multirow{2}{*}{org/basex/}&\multicolumn{3}{c}{1300 Kb}&\multicolumn{3}{|c|}{1400 Kb}\\
+	\multirow{2}{*}{Method}&\multicolumn{3}{c}{1300 Kb}&\multicolumn{3}{|c|}{1400 Kb}\\
 	\cline{2-7}
 	&cycles&calls&${cylce \over calls}$&cycles&calls&${cylce \over calls}$\\
 	\hline
 	\hline
-	query/util/NSGlobal.uri&42792&162&264&48189&173&278\\
+%	query/util/
+	NSGlobal.uri&42792&162&264&48189&173&278\\
 	\hline
-	util/Token.eq&29485&10133&2&33005&10866&3\\
+%	util/
+	Token.eq&29485&10133&2&33005&10866&3\\
 	\hline
-	query/value/node/DBNode.next&27262&1526&17&29419&1648&17\\
+%	query/value/node/
+	DBNode.next&27262&1526&17&29419&1648&17\\
 	\hline
-	util/Atts.name&21050&7290&2&22206&7785&2\\
+%	util/
+	Atts.name&21050&7290&2&22206&7785&2\\
 	\hline
-	io/random/TableDiskAccess.read1&18987&2181&8&23600&2342&10\\
+%	io/random/
+	TableDiskAccess.read1&18987&2181&8&23600&2342&10\\
 	\hline
 \end {tabular}
 \caption {The five most time consuming methods for Query 2.}
@@ -367,11 +372,12 @@ Looking at the source code of the \textit{uri} method shows that it only execute
 The method has a complexity of $\mathcal O(n)$ which results in the assumption that the for-loop is always executed in the worst case.
 This would mean that every time the method is called the loop is fully iterate from the maximum size of the \textsf{NS} object till zero.
 Considering the, in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} mentioned, Just In Time compiler from the Dalvik VM this part of code should be optimized by it.
-Even if this part of the \textsc{BaseX} Android source code is compiled into native machine code it is still very slow.
+Even if this part of the \textsc{BaseX} Android source code is compiled into native machine code it is still very slow, compared to the other expensive methods.
 Besides the for-loop there are the \textsf{eq} and \textsf{NS.name} methods, which could produce the long execution time of this function.
-%TODO: über die eq methode schreiben. ANALYSIEREN ETC.
+The \textsf{eq} method compares the two commited byte arrays for equality, implemented by using a for-loop which iterates over the arrays and compares their bytes.
+This for-loop is executed very often and there are no other method calls inside of it, so it is very obvious that this loop is compiled into machine code by the JIT optimization routine.\\
 Investigating the \textsf{NS.name} method shows that this function is a simple getter method which returns the name from the index of the parameter.\\
-At this place the differences between the two platforms have an important part, because it is best practices to use getter and setter for the normal Java environment, but it is expensive for the Android platform.~\cite{toninievlautatingandroid} 
+At this place the differences between the two platforms are playing an important part, because it is best practices to use getter and setter for the normal Java environment, but it is expensive for the Android platform.~\cite{toninievlautatingandroid}
 Even if the JIT compiler inlines the getter/setter calls it can be up to 30\% faster if a direct field access is used instead of the getter/setter methods.~\cite{toninianalysis}\\
 In Section~\ref{sec:improving} the getter of the \textit{NSGlobal.uri} method has been replaced by direct field accesses and it is shown if it improves the execution time of Query 2 for the \textsc{BaseX} Android library.
 
@@ -400,44 +406,82 @@ Even if the amount of cycles does not differ much it is higher on the 1300 Kb da
 Hence the six most time consuming methods will be outline in Table~\ref{tab:traceview-q11-methods}.\\
 \begin {table}[htpb] 
   \begin{center}
-\hspace*{-0.5cm}
+%\hspace*{-0.5cm}
 \begin {tabular} {|r|r|c|c|r|c|c|}
   	\hline
-	\multirow{2}{*}{org/basex/}&\multicolumn{3}{c}{1300 Kb}&\multicolumn{3}{|c|}{1400 Kb}\\
+	\multirow{2}{*}{Method}&\multicolumn{3}{c}{1300 Kb}&\multicolumn{3}{|c|}{1400 Kb}\\
 	\cline{2-7}
 	&cycles&calls&${cylce \over calls}$&cycles&calls&${cylce \over calls}$\\
 	\hline
 	\hline
-	query/value/node/DBNode\$4.next&98732&5270&18&106204&5683&18\\
+%	query/value/node/
+	DBNode\$4.next&98732&5270&18&106204&5683&18\\
 	\hline
-	query/path/NameTest.eq&77086&4640&16&83171&5081&16\\
+%	query/path/
+	NameTest.eq&77086&4640&16&83171&5081&16\\
 	\hline
-	query/path/IterStep\$1.next&64545&1694&38&68301&1457&46\\
+%	query/path/
+	IterStep\$1.next&64545&1694&38&68301&1457&46\\
 	\hline
-	io/random/TableDiskAccess.read1&54695&6324&8&59700&6609&9\\
+%	io/random/
+	TableDiskAccess.read1&54695&6324&8&59700&6609&9\\
 	\hline
-	io/random/TableDiskAccess.cursor&53156&16447&3&53330&17535&3\\
+%	io/random/
+	TableDiskAccess.cursor&53156&16447&3&53330&17535&3\\
 	\hline
 \end {tabular}
 \caption {The five most time consuming methods for Query 11.}
 \label {tab:traceview-q11-methods}
 \end{center}
 \end {table}
+
 The only interesting value in Table~\ref{tab:traceview-q11-methods} is the \textit{next} method, because it has less calls in the bigger database.
 And even if the calls are less in the 1400 Kb database, the time consumption is still higher than for the smaller database with more calls to the method.
 This method has also the highest cycle call ratio, which makes it to the slowest method in the top five time consuming functions.
 \input{listings/next-code}
 The first thing that is conspicuous is the while-loop which iterates over a linked list of \textsf{ANode} objects and checks them for equality with the local field \textsf{test}.
-%TODO preds untersuchen
 An explanation for the lesser time consumption in the bigger database is that there are not so many \textsf{ANode} objects to iterate than in the one with size of 1300 Kb. 
 The amount of calls of this method indicates that the Dalvik JIT compiler optimizes the method with compiling it into native code.
-
+Looking at the body of the while-loop there are four methods that can cause the slow execution.
+First the \textsf{checkStop} method which checks if a boolean value is false which can not be slow.
+According to the traceview record it is the \textsf{preds} method that is responsible for more than 50\% of the time spend in the \textsf{next} function.
 
 
 %\section{Analyzing the resources consumptions}
 %\label{sec:analysis:analyszing-the-resource-consumption}
 %\subsection{Analyzing the consumed storage size}
 %\label{sec:analysis:analyzing-the-consumed-storage-size}
-\section{Improving the shown }
+\section{Improving the identified bottlenecks}
 \label{sec:improving}
-In this section is shown how the found bottlenecks can be improved and the time consumption of some functionalities are made better.
+%In this section is shown how the found bottlenecks can be improved and the time consumption of some functionalities are made better.
+The first issue which was found in by analyzing the execution times and the corresponding traceviews from Section~\ref{sec:identifying-the-bottlenecks} is the getter and setter part.
+As mentioned in Section~\ref{sec:analyzing-the-trace-view-of-query-2} the use of direct field access instead of getter/setter methods improves the runtime by 30\%.
+This value is shown by~\cite{toninianalysis} and is the first improvement which is being done for the \textsc{BaseX} Android library.
+To implement this the byte array which is returned in the getter method has been made public and the coresponding getter has been replaced by a direct access.
+The result of the optimized execution of Query 2 and the recoding of its traceview can be seen in Table~\ref{tab:traceview-q2-optimized}.
+
+\begin {table}[htpb] 
+  \begin{center}
+%\hspace*{-0.5cm}
+\begin {tabular} {|r|r|c|c|r|c|c||c|}
+  	\hline
+	\multirow{2}{*}{database}&\multicolumn{3}{c}{Getter version}&\multicolumn{3}{|c||}{Optimized version}&Improvement\\
+	\cline{2-8}
+	&cycles&calls&${cylce \over calls}$&cycles&calls&${cylce \over calls}$&${cylce \over calls}$\\
+	\hline
+	\hline
+	1300 Kb&42792&162&264&22773&162&140&46\%\\
+	\hline
+	1400 Kb&48189&173&278&23646&173&136&51\%\\
+	\hline
+\end {tabular}
+\caption {Traceview of \textsf{NSGlobal.uri} method recorded by executing Query 2 from the XMark benchmark suite.}
+\label {tab:traceview-q2-optimized}
+\end{center}
+\end {table}
+The table illustrates that the \textsf{NSGlobal.uri} method has been improved by up to 51\% by just using direct access instead of a getter method.
+Executing the XMark Query 2 on the 1300 Kb and 1400 Kb database gives an average time consumption of 65.03 ms for the smaller and 72.49 ms for the bigger database.
+Compared to the achieved values from Section~\ref{sec:the-results-of-the-benchmark-execution} which are 72.72 ms for the 1300 Kb and 117.78 ms for the 1400 Kb database, gives an improvement from 45 ms for the bigger database.
+This results show that replacing one getter call inside a for-loop decreases the average time spend in the \textsf{NSGlobal.uri} method by up to 51\% and improves the execution time  for the whole query by up to 40\%.
+Compared to the achieved results by executing the same query on the Laptop test device the Android version is still slower, but the factor between them was decreased from 60\% to 40\%.\\
+
