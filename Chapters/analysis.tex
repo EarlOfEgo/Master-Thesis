@@ -443,9 +443,8 @@ The first thing that is conspicuous is the while-loop which iterates over a link
 An explanation for the lesser time consumption in the bigger database is that there are not so many \textsf{ANode} objects to iterate than in the one with size of 1300 Kb. 
 The amount of calls of this method indicates that the Dalvik JIT compiler optimizes the method with compiling it into native code.
 Looking at the body of the while-loop there are four methods that can cause the slow execution.
-First the \textsf{checkStop} method which checks if a boolean value is false which can not be slow.
+First the \textsf{checkStop} method which checks if a boolean value is false, it is obvious that this validation is not slow.
 According to the traceview record it is the \textsf{preds} method that is responsible for more than 50\% of the time spend in the \textsf{next} function.
-
 
 %\section{Analyzing the resources consumptions}
 %\label{sec:analysis:analyszing-the-resource-consumption}
@@ -457,7 +456,7 @@ According to the traceview record it is the \textsf{preds} method that is respon
 The first issue which was found in by analyzing the execution times and the corresponding traceviews from Section~\ref{sec:identifying-the-bottlenecks} is the getter and setter part.
 As mentioned in Section~\ref{sec:analyzing-the-trace-view-of-query-2} the use of direct field access instead of getter/setter methods improves the runtime by 30\%.
 This value is shown by~\cite{toninianalysis} and is the first improvement which is being done for the \textsc{BaseX} Android library.
-To implement this the byte array which is returned in the getter method has been made public and the coresponding getter has been replaced by a direct access.
+To implement this the byte array which is returned in the getter method has been made public and the corresponding getter has been replaced by a direct access.
 The result of the optimized execution of Query 2 and the recoding of its traceview can be seen in Table~\ref{tab:traceview-q2-optimized}.
 
 \begin {table}[htpb] 
@@ -482,6 +481,6 @@ The result of the optimized execution of Query 2 and the recoding of its tracevi
 The table illustrates that the \textsf{NSGlobal.uri} method has been improved by up to 51\% by just using direct access instead of a getter method.
 Executing the XMark Query 2 on the 1300 Kb and 1400 Kb database gives an average time consumption of 65.03 ms for the smaller and 72.49 ms for the bigger database.
 Compared to the achieved values from Section~\ref{sec:the-results-of-the-benchmark-execution} which are 72.72 ms for the 1300 Kb and 117.78 ms for the 1400 Kb database, gives an improvement from 45 ms for the bigger database.
-This results show that replacing one getter call inside a for-loop decreases the average time spend in the \textsf{NSGlobal.uri} method by up to 51\% and improves the execution time  for the whole query by up to 40\%.
+Those results show that replacing one getter call inside a for-loop decreases the average time spend in the \textsf{NSGlobal.uri} method by up to 51\% and improves the execution time  for the whole query by up to 40\%.
 Compared to the achieved results by executing the same query on the Laptop test device the Android version is still slower, but the factor between them was decreased from 60\% to 40\%.\\
 

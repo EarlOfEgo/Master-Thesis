@@ -4,3 +4,17 @@
 \label{sec:summery:conclusion}
 \section{Future work}
 \label{sec:summery:future-work}
+During the work of the present thesis Google released the new Android version 4.4, codename KitKat.
+This version offers different improvements in contrast with the previous versions of Android.
+Besides the different features that are made to gain a new user experience Google also claims a performance increase with the release of KitKat and an optimization for devices with lower hardware specifications~\cite{google-kitkat}.
+In addition to the improvements that Google publishes with the new Android version, there has also been added another feature to the new version.
+This is not mentioned in the official Android KitKat website, because it is an early development state.
+It is the Android Runtime (Art) which should replace the Dalvik virtual machine in the near future~\cite{android-art}.
+The difference between Art and the DVM is that ART is not a virtual machine, it is more a compiler that translates the code of an application into native machine language.
+It can be said that it applies the in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} explained Just in Time compiler to the whole application and not just for the most executed code parts.
+This mechanism is called Ahead of Time compiler, which is done after the application has been installed.
+This is also the disadvantage of ART, it can take a lot of time to compile the whole application.
+Nevertheless the speed improvement ART should bring is, compared to the one time consumption the compile step brings, better than executing the application with Dalvik, because there is no additional virtual machine with an interpreter to execute.
+A lot about can not be said, because it is in a very early state and Google has not provided many information about it.
+Future work could be to investigate the improvements ART brings and if there are adjustments in the \textsc{BaseX} Android library can be done to achieve better runtime values using ART.
+
