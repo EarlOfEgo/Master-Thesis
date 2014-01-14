@@ -327,7 +327,7 @@ Nevertheless to make an explicit statement the recorded traces need to be examin
 Table~\ref{tab:traceview-q2-methods} shows the top five time consuming methods, excluding their time spend in their children.
 It also outlines the number of calls which every of those methods have received.
 On the bigger database the time spend in every method is bigger than the one spend in the smaller database.
-The column \textit{${cylce \over calls}$} shows the average time one call needs to be finished with the method.
+The column \textit{${cycle \over calls}$} shows the average time one call needs to be finished with the method.
 It shows that they are all more or less the same, which is an indicator for the consumption that the increase of time rises with every call.
 Running the query on the bigger database results in more calls for the most methods and therefore more time consumption in all.
 \begin {table}[htpb] 
@@ -337,7 +337,7 @@ Running the query on the bigger database results in more calls for the most meth
   	\hline
 	\multirow{2}{*}{Method}&\multicolumn{3}{c}{1300 Kb}&\multicolumn{3}{|c|}{1400 Kb}\\
 	\cline{2-7}
-	&cycles&calls&${cylce \over calls}$&cycles&calls&${cylce \over calls}$\\
+	&cycles&calls&${cycle \over calls}$&cycles&calls&${cycle \over calls}$\\
 	\hline
 	\hline
 %	query/util/
@@ -411,7 +411,7 @@ Hence the six most time consuming methods will be outline in Table~\ref{tab:trac
   	\hline
 	\multirow{2}{*}{Method}&\multicolumn{3}{c}{1300 Kb}&\multicolumn{3}{|c|}{1400 Kb}\\
 	\cline{2-7}
-	&cycles&calls&${cylce \over calls}$&cycles&calls&${cylce \over calls}$\\
+	&cycles&calls&${cycle \over calls}$&cycles&calls&${cycle \over calls}$\\
 	\hline
 	\hline
 %	query/value/node/
@@ -455,7 +455,7 @@ According to the traceview record it is the \textsf{preds} method that is respon
 %In this section is shown how the found bottlenecks can be improved and the time consumption of some functionalities are made better.
 The first issue which was found in by analyzing the execution times and the corresponding traceviews from Section~\ref{sec:identifying-the-bottlenecks} is the getter and setter part.
 As mentioned in Section~\ref{sec:analyzing-the-trace-view-of-query-2} the use of direct field access instead of getter/setter methods improves the runtime by 30\%.
-This value is shown by~\cite{toninianalysis} and is the first improvement which is being done for the \textsc{BaseX} Android library.
+This value is shown by~\cite{toninievlautatingandroid} and is the first improvement which is being done for the \textsc{BaseX} Android library.
 To implement this the byte array which is returned in the getter method has been made public and the corresponding getter has been replaced by a direct access.
 The result of the optimized execution of Query 2 and the recoding of its traceview can be seen in Table~\ref{tab:traceview-q2-optimized}.
 
@@ -466,7 +466,7 @@ The result of the optimized execution of Query 2 and the recoding of its tracevi
   	\hline
 	\multirow{2}{*}{database}&\multicolumn{3}{c}{Getter version}&\multicolumn{3}{|c||}{Optimized version}&Improvement\\
 	\cline{2-8}
-	&cycles&calls&${cylce \over calls}$&cycles&calls&${cylce \over calls}$&${cylce \over calls}$\\
+	&cycles&calls&${cycle \over calls}$&cycles&calls&${cycle \over calls}$&${cycle \over calls}$\\
 	\hline
 	\hline
 	1300 Kb&42792&162&264&22773&162&140&46\%\\

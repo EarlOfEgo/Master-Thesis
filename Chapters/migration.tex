@@ -75,11 +75,11 @@ The code that represents the instructions which are executed on Dalvik VM or the
 To execute this instructions virtual machines having an interpreter which interprets all instructions and performs them.
 The difference to normal interpreted languages is, that the JVM or DVM interpreter do not need to check the syntax of the program.
 This has been already done by the Java compiler which compiles the Java source code into class files.
-Even if it is faster than other interpreted languages, it is still slower than code that is compiled into a machine language, which is executed directly on the hardware.
-This so called machine code is faster because there is no layer between the executions and the hardware, which could slow down the execution.~\cite{aycock2003brief}
+Even if it is faster than other interpreted languages, it is still slower than code that is compiled into a machine language and executed directly on the hardware.
+This so called machine code is faster because there is no layer between the executions and the hardware, which could slow down the execution.~\cite{aycock2003brief}\\
 There is a technique which can improve a virtual machine in performance aspects by adding a Just In Time (JIT) compiler to it.
 Generally it can be said, that a JIT compiler, used by a virtual machine, compiles heavy used code segments or very expensive calculations into the faster machine code.
-There is a great number of different types of JIT compilers and how they work, the two used by the JVM and the DVM are:
+There is a great number of different types of JIT compilers and how they work, the two used by the JVM or the DVM are:
 \begin{itemize}
 \item method-based
 \item trace-based
@@ -114,8 +114,7 @@ Depending on the different implementation of a JVM, it differs which type of JIT
 For this thesis the Oracle JVM HotSpot is used, which has a method-based JIT compiler as default.
 It is also possible to use another JIT mechanism in the HotSpot JVM triggered by parameters during the VM start.
 The method-based JIT works as mentioned above, it compiles the most called methods into machine code.~\cite{kotzmann2008design}
-Those methods are called hot spots, which are also responsible for the name of the virtual machine.
-\cite{paleczny2001java}
+Those methods are called hot spots, which are also responsible for the name of the virtual machine.~\cite{paleczny2001java}
 \\
 Although both virtual machines are using Java as programming language, Dalvik lacks of some libraries that are available at the JVM and vice versa.
 In Section~\ref{sec:migration:migration-of-basex-to-android} the used libraries of \textsc{BaseX} are analyzed and investigated which of them are supported by the DVM.\\
