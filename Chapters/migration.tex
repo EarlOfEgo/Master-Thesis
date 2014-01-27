@@ -116,6 +116,11 @@ It is also possible to use another JIT mechanism in the HotSpot JVM triggered by
 The method-based JIT works as mentioned above, it compiles the most called methods into machine code.~\cite{kotzmann2008design}
 Those methods are called hot spots, which are also responsible for the name of the virtual machine.~\cite{paleczny2001java}
 \\
+Both virtual machines are providing a garbage collector, which is responsible for the memory management of the byte code.
+Same as the principle of own instance of the Dalvik virtual machine per process, which is being explained in Section~\ref{sec:android-internals}, every process also has its on instance of a garbage collector on Android.
+It is a mark-and-sweep garbage collector that only collects the objects that are not referenced any more in the application heap.
+The shared heap, which is part of the Zygote process that is also described in Section~\ref{sec:android-internals}, has its own garbage collector.~\cite{maia2010evaluating}
+\\
 Although both virtual machines are using Java as programming language, Dalvik lacks of some libraries that are available at the JVM and vice versa.
 In Section~\ref{sec:migration:migration-of-basex-to-android} the used libraries of \textsc{BaseX} are analyzed and investigated which of them are supported by the DVM.\\
 A general statement about both virtual machines could not be made, because they differ in a lot of aspects.

@@ -337,7 +337,12 @@ With this information it is possible to calculate the average time spend in one 
 The most time consuming method is, shown in Table~\ref{tab:tob-five-cycle-call}, \textsf{VMDebug.startGC}.
 This function is called only one time and executes a long time in average.
 According to~\cite{vmdebug-startgc} this method is a fake method, it is implemented to display the execution of the garbage collector of the Dalvik virtual machine on the Traceview records.
-Therefore this method is being ignored, because there is no opportunity to optimize it, except changing the DVM code.
+Unlike most implementations of the Java virtual machine, it is not possible for the Dalvik VM to change the garbage collector mechanism.
+It is possible to increase the size of the process own heap, which indirectly affects the garbage collection, by slowing it down with bigger heap size.
+The available heap is hereby device dependent and increasing the size can cause crashes of the application, with out of memory exceptions.
+Since the Android version 2.3, which is the minimum version for the \textsc{BaseX} Android library, the garbage collector is concurrent and does not influence the executing thread.~\cite{dubroy2011memory}
+This is also the reason why it is executed only once and takes so long, it is started for one time and collects the unreferenced objects till the process is finished.
+Therefore this method is being ignored, because increasing the heap size is not an option and the garbage collector is not executed on the thread which benchmarks the \textsc{BaseX} code.
 
 \subsection*{Analyzing the \textsf{Compress.unpack} method}
 \label{sec:analyzing-the-compress.unpack-method}

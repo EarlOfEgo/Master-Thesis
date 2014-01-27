@@ -1,13 +1,10 @@
 \chapter{Overview}
 \label{cha:overview}
 In the following chapter an overview of the used components is given.
-It outlines the used technologies of the present thesis.
+It also outlines the used technologies of the present thesis.
 %It also describes the actual state of the art of XML database as well as on overview of available mobile operating system.
-Therefore an introduction in the native XML database \textsc{BaseX} and the mobile operating system Android is given.
+First an introduction in the native XML database \textsc{BaseX} is given and then the mobile operating system Android is introduced.
 At the end of the chapter it is outlined if there is any related work available and how this is important or impacting the present thesis.
-
-
-
 
 
 %\section{Overview of native XML Databases}
@@ -20,11 +17,28 @@ At the end of the chapter it is outlined if there is any related work available 
 
 \section{Introduction into \textsc{BaseX}}
 \label{sec:overview:introduction-into-basex}
+\textsc{BaseX} is an XML database that also offers the possibility to process XPath/XQuery.
 
 \section{Overview of Android}
 \label{sec:overview:overview-of-android}
+Android is an operating system developed by Google and first released in October 2008.~\cite{developers2011android}
+It is mostly open source and available in version 4.4.
 
 \section{Related Work}
 \label{sec:overview:related-work}
+Android offers a SQLite database which can be accessed from the application by using Java libraries.
+SQLite is a relational database system specially designed for embedded devices with a low requirement of resources.
+It provides beneath all relevant SQL commands also other mechanisms like views or triggers.~\cite{owens2006definitive}
+With its low hardware requirement and its a perfect relative database for the Android operating system.
+But it is also the only database available on Android.
+According to \cite{lamb2010berkleydb} there is an Android implementation of the BerkleyDB database, but it appears not very common, because this is the only reference found to this topic.
+Unlike SQLite is BerkleyDB not a relational database, but it is also aims to be deployed on embedded devices.
+Another difference between both databases is that SQLite is implemented in C and the Android version of BerkleyDB uses Java as programming language.
+Although not showing any test data or benchmark results, \cite{lamb2010berkleydb} claims this the reason that the BerkleyDB is faster than SQLite on a Android device.
+Despite this statement those databases are the only available ones for Android and with the BerkleyDB not natively covered by Android, there is no real alternative to SQLite if an Android application is in need of a database.\\
+XML BLA BLUB
+
+
+
 Zürich xml database and the try to make it available on android.
 libxml Linux stuff thing, I compiled it. runs on Android.
