@@ -26,19 +26,34 @@ It is mostly open source and available in version 4.4.
 
 \section{Related Work}
 \label{sec:overview:related-work}
-Android offers a SQLite database which can be accessed from the application by using Java libraries.
+Android offers an SQLite database which can be accessed from inside an application by using Java libraries.
 SQLite is a relational database system specially designed for embedded devices with a low requirement of resources.
 It provides beneath all relevant SQL commands also other mechanisms like views or triggers.~\cite{owens2006definitive}
-With its low hardware requirement and its a perfect relative database for the Android operating system.
-But it is also the only database available on Android.
+With its low hardware requirement it is a perfect relative database for the Android operating system.
+But it is also the only database available for Android application developer.
 According to \cite{lamb2010berkleydb} there is an Android implementation of the BerkleyDB database, but it appears not very common, because this is the only reference found to this topic.
-Unlike SQLite is BerkleyDB not a relational database, but it is also aims to be deployed on embedded devices.
+Unlike SQLite the BerkleyDB is not a relational database, but it also aims to be deployed on embedded devices.
 Another difference between both databases is that SQLite is implemented in C and the Android version of BerkleyDB uses Java as programming language.
-Although not showing any test data or benchmark results, \cite{lamb2010berkleydb} claims this the reason that the BerkleyDB is faster than SQLite on a Android device.
+Lamb~\cite{lamb2010berkleydb} claims this the reason that the BerkleyDB is three times faster than the SQLite database, because there is no need to translate the Java commands to the native C library.
 Despite this statement those databases are the only available ones for Android and with the BerkleyDB not natively covered by Android, there is no real alternative to SQLite if an Android application is in need of a database.\\
-XML BLA BLUB
 
+\textsc{BaseX} is not only a database it also provides a XQuery processor to query XML documents.
+Android offers the possibility to work with XML documents for its applications developers.
+Therefore the Document Object Model (DOM) package, as a library, is available.
+DOM is an application programming interface (API) for XML documents which have to be well-formed, as well as for HTML documents.~\cite{nicol2001document}
+As a result of this, it is possible to parse XML document into documents represented as objects inside an Android application and access the nodes and attributes inside of this document.
+Android also provides an alternative to DOM XML parsing, the Simple API for XML (SAX) package which offers, like the name suggests, classes to parse and process XML documents.
+Both XML processing mechanisms, provided by Android, have their advantages and disadvantages.
+It can be said that one advantage of DOM is that it is possible to access the documents after parsing them, because they are stored as objects inside the application heap.
+In contrast to this SAX creates events, or callbacks while reading an XML document.~\cite{roy2001xml}
+The price for the storing the objects inside the memory is the decrease of execution time and the increase of resource consumption.~\cite{chenextracting}
+Since Android API version 8 the XML Path Language (XPath) is available to query and process the content of XML documents.
+Even if there are two possible ways to parse and one to query and process XML documents on Android, there are not the FLOWR expressions which are provided by XQuery available.\\
+Besides \textsc{BaseX} there exists other XQuery processor implementations, MXquery~\footnote{\url{http://mxquery.org}} is one that also provides an Android library of its implementation.
+This implementation is presented on the Internet~\footnote{\url{https://sites.google.com/site/mxqueryandroid/}} and supports XQuery 3.
+There is no research to this implementation available for MXquery on Android and it seems that the development has stopped in 2011.\\
+This leads to the result that field of native XML databases, supporting the newest XQuery, implemented and used on Android is not rudimentary explored.
+This also applies to the available database systems usable on Android.
+Thinking about the amount of alternatives, only the BerklyDB Android implementation, to SQLite this is also a field that could be more opened up.
+Migrating \textsc{BaseX} to the Android platform offers hereby a new database system, and an XML query processor supporting the newest XQuery.
 
-
-Zürich xml database and the try to make it available on android.
-libxml Linux stuff thing, I compiled it. runs on Android.
