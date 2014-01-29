@@ -27,16 +27,20 @@ It is mostly open source and available in version 4.4.
 \section{Related Work}
 \label{sec:overview:related-work}
 Android offers an SQLite database which can be accessed from inside an application by using Java libraries.
-SQLite is a relational database system specially designed for embedded devices with a low requirement of resources.
+SQLite is a relational database system especially designed for embedded devices with a low requirement of resources.
 It provides beneath all relevant SQL commands also other mechanisms like views or triggers.~\cite{owens2006definitive}
 With its low hardware requirement it is a perfect relative database for the Android operating system.
-But it is also the only database available for Android application developer.
+But it is also the only database available for Android application developer, provided by the operating system.
 According to \cite{lamb2010berkleydb} there is an Android implementation of the BerkleyDB database, but it appears not very common, because this is the only reference found to this topic.
 Unlike SQLite the BerkleyDB is not a relational database, but it also aims to be deployed on embedded devices.
 Another difference between both databases is that SQLite is implemented in C and the Android version of BerkleyDB uses Java as programming language.
-Lamb~\cite{lamb2010berkleydb} claims this the reason that the BerkleyDB is three times faster than the SQLite database, because there is no need to translate the Java commands to the native C library.
-Despite this statement those databases are the only available ones for Android and with the BerkleyDB not natively covered by Android, there is no real alternative to SQLite if an Android application is in need of a database.\\
-
+Lamb~\cite{lamb2010berkleydb} claims this the reason that the BerkleyDB is three times faster than the SQLite database, because there is no need to translate the Java commands to the native C library, using the Java Native Interface (JNI).
+Another approach, for providing an alternative to SQLite, is the object-oriented database Perst~\footnote{\url{http://www.mcobject.com/android}}, which also offers an Android port.
+Similar to the BerkleyDB Android version Perst is also implemented using the programming language Java and it targets the embedded devices sector, too.
+According to the benchmarks of~\cite{perst-bench} Perst is up to sixteen times faster than the SQLite database.
+For an application developer this could be a considerable alternative to the native SQLite database.
+Despite this statement those three databases are the only available ones for Android and with the BerkleyDB and Perst not natively covered by Android, most applications are using the standard SQLite Android database for storing their data.
+Even if the three databases are all using different database models, an XML database is not available for Android, a port of \textsc{BaseX} to this platform would cover this gap and also provide another alternative to the available databases.\\
 \textsc{BaseX} is not only a database it also provides a XQuery processor to query XML documents.
 Android offers the possibility to work with XML documents for its applications developers.
 Therefore the Document Object Model (DOM) package, as a library, is available.
