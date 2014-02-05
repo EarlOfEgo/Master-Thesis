@@ -252,7 +252,7 @@ The result of the execution of the application using the Laptop can be seen in F
 	  set boxwidth 0.5 relative
 	  plot for [i=1:14] 'benchmarks/xmark-tablet-steps-transposed.csv' u ($0+1):i title ''.i.'00kb' with linespoints
 	\end{gnuplot}              
-	\caption{The results of the XMark benchmark queries executed on the Laptop.}
+	\caption{The results of the XMark benchmark queries executed on the Tablet.}
 	\label{fig:xmark-tablet}
 	\end{center}
 \end{figure}
@@ -544,37 +544,81 @@ In Section~\ref{sec:improving} the getter of the \textit{NSGlobal.uri} method ha
 \section{Improving the identified bottlenecks}
 \label{sec:improving}
 %In this section is shown how the found bottlenecks can be improved and the time consumption of some functionalities are made better.
-The first issue which was found by analyzing the execution times and the corresponding traceviews from Section~\ref{sec:identifying-the-bottlenecks} is the getter and setter part.
+One issue which was found, by analyzing the execution times and the corresponding traceviews from Section~\ref{sec:identifying-the-bottlenecks}, is the getter and setter part.
 As mentioned in Section~\ref{sec:analyzing-the-dbnode.uri-method} the use of direct field access instead of getter/setter methods improves the execution time by 30\%.
-This value is shown by~\cite{toninievlautatingandroid} and is the first improvement which is being done for the \textsc{BaseX} Android library.
-To implement this the byte array which is returned in the getter method has been made public and the corresponding getter has been replaced by a direct access inside the class that provides this variable.
-The result of the optimized execution of Query 2 and the recoding of its traceview can be seen in Table~\ref{tab:traceview-q2-optimized}.
+This value is shown by~\cite{toninievlautatingandroid} and is one change which is being done for the \textsc{BaseX} Android library.
+The recorded traceviews have shown that especially the \textsf{DBNode.uri} has a high execution time caused by the getter calls in the for-loop.
+This call accesses the \textsf{nm} byte array which is part of tuples of name and value pairs in the container class \textsf{Atts}.
+All calls to the getter and setter to the tuples have been replaced by direct field accesses in the whole \textsc{BaseX} Android library.\\
+Execution the XMark benchmark tests with this optimized version of \textsc{BaseX} on the tablet brought an improvement of up to 180\%, which is nearly three times faster as the normal version.
+Especially the time consumption for the execution of queries 2, 10 and 17 have been improved.
+An extensive use of the \textsf{DBNode.uri} method at this queries is responsible for this behavior.
+The average improvement of this change is about blub\%.
+Analyzing the traceviews of the improved version shows, that the average execution time of the \textsf{DBNode.uri} method has been nearly cut into half and it is not even close to the list of the top time consuming methods.
+The results of the whole execution can be seen in Appendix BLA.
+The replacement of the getter and setter calls at the desktop version of \textsf{BaseX} have no significant changes in the time consumption of the execution time.
+Responsible for the improvement on the Android platform is the, in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} mentioned, Just In Time compiler of the Dalvik virtual machine. 
+Even if the compiler copies the getter and setter methods to the corresponding place in the code, the JIT is not able to transform them into native code, therefore they have to be replaced by direct field accesses.
+Translating those accesses into native machine code is responsible for the boost of time improvement.
+Looking at Figure~\ref{fig:xmark-tablet-optimized} shows that there are no significant changes in the execution time of the queries.
+The Queries 8, 9 and 11 are still the slowest ones, but the overall time consumption could has been lowered.
 
-\begin {table}[htpb] 
+\begin{figure}[!ht]
   \begin{center}
-%\hspace*{-0.5cm}
-\begin {tabular} {|r|r|c|c|r|c|c||c|}
-  	\hline
-	\multirow{2}{*}{database}&\multicolumn{3}{c}{Getter version}&\multicolumn{3}{|c||}{Optimized version}&Improvement\\
-	\cline{2-8}
-	&cycles&calls&${cycle \over calls}$&cycles&calls&${cycle \over calls}$&${cycle \over calls}$\\
-	\hline
-	\hline
-	1300 Kb&42792&162&264&22773&162&140&46\%\\
-	\hline
-	1400 Kb&48189&173&278&23646&173&136&51\%\\
-	\hline
-\end {tabular}
-\caption {Traceview of \textsf{NSGlobal.uri} method recorded by executing Query 2 from the XMark benchmark suite.}
-\label {tab:traceview-q2-optimized}
-\end{center}
-\end {table}
-The table illustrates that the \textsf{NSGlobal.uri} method has been improved by up to 51\% by just using direct access instead of a getter method.
-Executing the XMark Query 2 on the 1300 Kb and 1400 Kb database gives an average time consumption of 65.03 ms for the smaller and 72.49 ms for the bigger database.
-Compared to the achieved values from Section~\ref{sec:the-results-of-the-benchmark-execution} which are 72.72 ms for the 1300 Kb and 117.78 ms for the 1400 Kb database, gives an improvement from 45 ms for the bigger database.
-Those results show that replacing one getter call inside a for-loop decreases the average time spend in the \textsf{NSGlobal.uri} method by up to 51\% and improves the execution time  for the whole query by up to 40\%.
-Compared to the achieved results by executing the same query on the Laptop test device the Android version is still slower, but the factor between them was decreased from 60\% to 40\%.
-The class that provides the getter/setter calls that have been replaced in the \textsf{NSGlobal.uri} method is used on different other places in the \textsc{BaseX} code.
-As a result of this fact, all getter and setter calls to this class have been replaced by direct field access in the whole \textsc{BaseX} Android library.\\
+  \begin{gnuplot}[terminal=pdf, terminaloptions=color, scale=1.1]
+          set title 'Tablet Steps using the Optimized Version'
+	  set datafile separator ','
+	  set xlabel 'Query'
+	  set ylabel 'Average time in ms(100 executions)'
+	  set xrange [0:21]
+	  set xtics 1,1,20
+	  set logscale y
+	  set grid ytics lt 0 lw 1 lc rgb '#bbbbbb'
+	  set grid xtics lt 0 lw 1 lc rgb '#bbbbbb'
+	  set key samplen 2 spacing .5 font ',8'
+	  show grid
+	  set style fill solid 0.8 border -1
+	  set boxwidth 0.5 relative
+	  plot for [i=1:14] 'benchmarks/xmark-tablet-steps-optimized-transposed.csv' u ($0+1):i title ''.i.'00kb' with linespoints
+	\end{gnuplot}              
+	\caption{The results of the XMark benchmark queries executed on the Tablet, using the optimized \textsc{BaseX} version.}
+	\label{fig:xmark-tablet-optimized}
+	\end{center}
+\end{figure}
 
+
+
+%To implement this the byte array which is returned in the getter method has been made public and the corresponding getter has been replaced by a direct access inside the class that provides this variable.
+%The result of the optimized execution of Query 2 and the recoding of its traceview can be seen in Table~\ref{tab:traceview-q2-optimized}.
+%
+%\begin {table}[htpb] 
+%  \begin{center}
+%%\hspace*{-0.5cm}
+%\begin {tabular} {|r|r|c|c|r|c|c||c|}
+%  	\hline
+%	\multirow{2}{*}{database}&\multicolumn{3}{c}{Getter version}&\multicolumn{3}{|c||}{Optimized version}&Improvement\\
+%	\cline{2-8}
+%	&cycles&calls&${cycle \over calls}$&cycles&calls&${cycle \over calls}$&${cycle \over calls}$\\
+%	\hline
+%	\hline
+%	1300 Kb&42792&162&264&22773&162&140&46\%\\
+%	\hline
+%	1400 Kb&48189&173&278&23646&173&136&51\%\\
+%	\hline
+%\end {tabular}
+%\caption {Traceview of \textsf{NSGlobal.uri} method recorded by executing Query 2 from the XMark benchmark suite.}
+%\label {tab:traceview-q2-optimized}
+%\end{center}
+%\end {table}
+%The table illustrates that the \textsf{NSGlobal.uri} method has been improved by up to 51\% by just using direct access instead of a getter method.
+%Executing the XMark Query 2 on the 1300 Kb and 1400 Kb database gives an average time consumption of 65.03 ms for the smaller and 72.49 ms for the bigger database.
+%Compared to the achieved values from Section~\ref{sec:the-results-of-the-benchmark-execution} which are 72.72 ms for the 1300 Kb and 117.78 ms for the 1400 Kb database, gives an improvement from 45 ms for the bigger database.
+%Those results show that replacing one getter call inside a for-loop decreases the average time spend in the \textsf{NSGlobal.uri} method by up to 51\% and improves the execution time  for the whole query by up to 40\%.
+%Compared to the achieved results by executing the same query on the Laptop test device the Android version is still slower, but the factor between them was decreased from 60\% to 40\%.
+%The class that provides the getter/setter calls that have been replaced in the \textsf{NSGlobal.uri} method is used on different other places in the \textsc{BaseX} code.
+%As a result of this fact, all getter and setter calls to this class have been replaced by direct field access in the whole \textsc{BaseX} Android library.\\
+%
+%Replacing all getter and setter calls with direct field accesses to the whole \textsf{NSGlobal} class will speed up the execution time of the benchmarks for around i don t know maybe a huge time
+%Doing the same changes for the desktop version does not provide any improvements for speeding up the execution time.
+%This realization also proves there are big differences between the two virtual machines.
 
