@@ -1,7 +1,30 @@
 \chapter{Summery}
 \label{cha:summery}
+In this chapter a conclusion about the present thesis and the achieved results and findings is given as well as an overview of possible future work.
 \section{Conclusion}
 \label{sec:summery:conclusion}
+The goal of migrating XML database \textsc{BaseX} to the Android platform has been achieved, as an implementation of an Android library as well as a client server solution.
+Only a few features, like the cryptographic function, have not been migrated to the Android platform in order to get a working solution.
+
+
+
+The performance of the database operations and the execution of the XMark benchmark queries have been identified and improved by adjusting the source code of \textsc{BaseX} to Android best practices.
+This adjustment also illustrates the big difference between the two platforms, even if it is not visible on the first view.
+It has also been shown how difficult it is two compare two different platforms, executed on different devices to each other.
+%The replacement of the getter and setter methods affected the execution of the Android version in a big factor and the desktop version meaningless, which underlines the statement of the big differences of the two platforms.
+The operations are still slow compared to the desktop version of \textsc{BaseX}, but this is mostly a hardware constraint, because of the lack of various resources on mobile devices.
+Even with this disadvantage the Android version of \textsc{BaseX} is the first available and working solution to execute the XQuery language, with its FLOWR expressions, on Android devices.
+It is also the first XML database that offers the possibility to be used in the Android operating system.
+I%It can also be said, that the used XMark benchmark suite is especially designed to measure the performance of an XML database.
+
+
+
+
+With the rapid distribution of Android and the devices which are using it as an operating system, it is just a matter of time when the first need of an XML database with XQuery support is needed.
+Also the development of Android and the always increasing available resources of Android devices path the way for the use of \textsc{BaseX}, in the aspect of performance.
+
+
+
 \section{Future work}
 \label{sec:summery:future-work}
 During the work of the present thesis Google released the new Android version 4.4, codename KitKat.

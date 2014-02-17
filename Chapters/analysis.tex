@@ -380,176 +380,27 @@ At this place the differences between the two platforms are playing an important
 Even if the JIT compiler inlines the getter/setter calls it can be up to 30\% faster if a direct field access is used instead of the getter/setter methods.~\cite{toninianalysis}\\
 In Section~\ref{sec:improving} the getter of the \textit{NSGlobal.uri} method has been replaced by direct field accesses and it is shown if it improves the execution time of Query 2 for the \textsc{BaseX} Android library.
 
+\subsection*{Analyzing the hardware usage}
+\label{sec:analyzing-the-hardware-usage}
+In Section~\ref{sec:evaluation-of-the-test-devices} it has been shown, that the Laptop computes five times faster, in average, as the Tablet.
+Additionally to this the write operation on the file system is up to 3 times slower on the Tablet compared to the Laptop and the read operation is around four times faster on the Laptop.
+Thinking about those factors could lead to the solution that most of the bigger execution time on the Tablet is achieved by the given hardware constraints.
+The created traceviews show also a often use of the \textsf{TableDiskAccess} class.
+This class offers methods to store the data on the disk or to read it, therefore it uses block-wise operations.
+The measured values of Section~\ref{sec:analyzing-the-hardware-usage} for the I/O operations on the test devices, illustrates that writing is three times faster on the Laptop than on the Tablet.
+And reading is even more than 4 times faster compared to the Tablet device, by using block wise operations.
+For the XMark benchmark test a write operation has not been executed, because the benchmarks only query the data and does not create new one which is stored permanently in the database.
+Therefore no traceview shows the usage of the \textsf{writeBlock} method for example, the analyzing of the write performance of the \textsc{BaseX} Android library is shown later in this section.\\
+In contrast to the write operation, the read operation is used very often.
+Even it is not part of the most time consuming methods in the traceviews it is still the factor of 4 which need to be considered, always when it is being executed.\\
+To measure the performance of the write operation an Android application has been created which creates databases and fills them with different data.
+The provided data has been created using the provided XMark tool to create random XML files, therefore files with the size of 1, 5 and 10MB have been generated.
+As well as testing the Android version of \textsc{BaseX} in its write ability the desktop version has also been tested with the same data.
+The results can be seen in Table BLABLUB.
 
-%Therefore only two queries will being analyzed.
-%Both on one side recorded with the database of the size of 1.3 Mb and on the other side the 1.4 Mb size database.
-%Query 2 is on of them, the reason to chose this is that the time consumption of this query increases the most executed on the two different databases.
-%Even if the size of the database differ just by 100 Kb the time utilization of the query raises 62\%.
-%The other query which is being recorded is Query 11, because it needs the most execution time on all databases.
-%Even if Query 11 is on both devices the most time consuming query, it will be also recorded by using Traceview, because it is also the query with the most time increase between the Laptop and the Tablet.
-%This query is also very interesting, because of the fact that it is one of those queries which are faster executed on a database with 1.4 Mb instead of one with the size of 1.3Mb.
-%\\
-%Although Traceview shows the time consumption of every method call the CPU occupation in percent is used to analyze the records, due to the additional time the recording takes.
-%\\
-%Table~\ref{tab:traceview-cycles} gives a first overview of the recorded trace-views and the different amount of execution cycles which both queries perform.
-%Looking at the total cycles it can be seen that the amount is higher at Query 11 measured with the smaller database compared to the one with the 1.4 Mb database.
-%\begin {table}[htpb] 
-%  \centering
-%\begin {tabular} {|r|r|r|r|r|}
-%  	\hline
-%	&\multicolumn{2}{c}{Query 2}&\multicolumn{2}{|c|}{Query 11}\\
-%	\hline
-%	Database size&1300 Kb&1400 Kb&1300 Kb&1400 Kb\\
-%	\hline
-%	Total Cycles&899810&945343&1802642&1799194\\
-%	\hline
-%\end {tabular}
-%\caption {The total cycles needed by every query.}
-%\label {tab:traceview-cycles}
-%\end {table}
-%\subsection*{Analyzing the trace-view of Query 2}
-%\label{sec:analyzing-the-trace-view-of-query-2}
-%The purpose of Query 2 is to benchmark the database with order constraints, therefore it returns all open auctions by their increase.
-%To achieve this, the query opens the database and iterates over every \textit{open\_auction} using a for loop.
-%Thus, the runtime complexity of this query is $\mathcal O(n)$.
-%The definition of the complexity $f \in \mathcal O(n)$ describes that the function $f$ grows linear with its input~\cite{knuth1976big}.
-%Counting the occurrence of the attribute \textit{open\_auction} in both databases gives an amount of 629 for the 1300 Kb file and 507 for the 1400 Kb.
-%The circumstance that the bigger file has less attributes of this type can not be affected, because XMark generates the content of the test files randomly.
-%The fact that the bigger database has less attributes of the type \textit{open\_auction} ought to make Query 2 faster in the smaller file, but the opposite is the case.
-%It can be said that the for loop has lesser iterations in the bigger file than in the other, so the result of this is that the part which is responsible for the time increase is not the for loop.
-%Looking at the result of the query it returns in the 1300 Kb database 144 hits and in the bigger one 155 hits.
-%This can be responsible for the rise of the time during the execution of the query on the two different databases.
-%\\
-%Nevertheless to make an explicit statement the recorded traces need to be examined.
-%%let $auction := doc("auction.xml") return
-%%for $b in $auction/site/open_auctions/open_auction
-%%return <increase>{$b/bidder[1]/increase/text(}</increase>
-%Table~\ref{tab:traceview-q2-methods} shows the top five time consuming methods, excluding their time spend in their children.
-%It also outlines the number of calls which every of those methods have received.
-%On the bigger database the time spend in every method is bigger than the one spend in the smaller database.
-%The column \textit{${cycle \over calls}$} shows the average time one call needs to be finished with the method.
-%It shows that they are all more or less the same, which is an indicator for the consumption that the increase of time rises with every call.
-%Running the query on the bigger database results in more calls for the most methods and therefore more time consumption in all.
-%\begin {table}[htpb] 
-%  \begin{center}
-%%\hspace*{-0.5cm}
-%\begin {tabular} {|r|r|c|c|r|c|c|}
-%  	\hline
-%	\multirow{2}{*}{Method}&\multicolumn{3}{c}{1300 Kb}&\multicolumn{3}{|c|}{1400 Kb}\\
-%	\cline{2-7}
-%	&cycles&calls&${cycle \over calls}$&cycles&calls&${cycle \over calls}$\\
-%	\hline
-%	\hline
-%%	query/util/
-%	NSGlobal.uri&42792&162&264&48189&173&278\\
-%	\hline
-%%	util/
-%	Token.eq&29485&10133&2&33005&10866&3\\
-%	\hline
-%%	query/value/node/
-%	DBNode.next&27262&1526&17&29419&1648&17\\
-%	\hline
-%%	util/
-%	Atts.name&21050&7290&2&22206&7785&2\\
-%	\hline
-%%	io/random/
-%	TableDiskAccess.read1&18987&2181&8&23600&2342&10\\
-%	\hline
-%\end {tabular}
-%\caption {The five most time consuming methods for Query 2.}
-%\label {tab:traceview-q2-methods}
-%\end{center}
-%\end {table}
-%Looking at the most time consuming method also shows that it has the least amount of calls and therefore the highest average time for a single call.
-%Compared to this function, the other top time consuming methods have a small amount of cycles per call.
-%The reason why they are expensive methods is that they are being called very often.
-%Calculating the average time which every call need to be executed gives 264 microseconds for the smaller database and 278 for the 1400 Kb database.
-%For this reason this method is very interesting, because it is, compared to the other top five time consuming methods, very slow.
-%Listing~\ref{lis:uri-code} shows the corresponding source code to the \textit{NSGlobal.uri} method.
-%\input{listings/uri-code}		
-%%An answer to this question could be that the amount of the iterations of the for loop is the highest value it can be, because nothing more happens in the loop and its complexity is $\mathcal O(n)$.
-%Looking at the source code of the \textit{uri} method shows that it only executes a for-loop and checks if the parameter \textsf{pref} is equal to the \textsf{NS.name} byte and if this the case the value is returned.
-%The method has a complexity of $\mathcal O(n)$ which results in the assumption that the for-loop is always executed in the worst case.
-%This would mean that every time the method is called the loop is fully iterate from the maximum size of the \textsf{NS} object till zero.
-%Considering the, in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} mentioned, Just In Time compiler from the Dalvik VM this part of code should be optimized by it.
-%Even if this part of the \textsc{BaseX} Android source code is compiled into native machine code it is still very slow, compared to the other expensive methods.
-%Besides the for-loop there are the \textsf{eq} and \textsf{NS.name} methods, which could produce the long execution time of this function.
-%The \textsf{eq} method compares the two commited byte arrays for equality, implemented by using a for-loop which iterates over the arrays and compares their bytes.
-%This for-loop is executed very often and there are no other method calls inside of it, so it is very obvious that this loop is compiled into machine code by the JIT optimization routine.\\
-%Investigating the \textsf{NS.name} method shows that this function is a simple getter method which returns the name from the index of the parameter.\\
-%At this place the differences between the two platforms are playing an important part, because it is best practices to use getter and setter for the normal Java environment, but it is expensive for the Android platform.~\cite{toninievlautatingandroid}
-%Even if the JIT compiler inlines the getter/setter calls it can be up to 30\% faster if a direct field access is used instead of the getter/setter methods.~\cite{toninianalysis}\\
-%In Section~\ref{sec:improving} the getter of the \textit{NSGlobal.uri} method has been replaced by direct field accesses and it is shown if it improves the execution time of Query 2 for the \textsc{BaseX} Android library.
-%
-%
-%\subsection*{Analyzing the trace-view of Query 11}
-%\label{sec:analyzing-the-trace-view-of-query-11}
-%As shown in Section~\ref{sec:the-results-of-the-benchmark-execution} Query 11 is the most time consuming of the benchmark queries.
-%It is also one of the queries that are faster executed on the biggest database than on the one with the size of 1300 Kb.\\
-%The purpose of this query is to test the ability of the database to deal with queries that are using joins and receive a large dataset.
-%Query 11 does this by iterating over every person and counting every item which is on sale and does not cost more than 0.02\% of the persons income.
-%To get the amount of items the query iterates over all items every time it changes the person, which gives a complexity of $\mathcal O(n*m)$.
-%Therefore, with an increasing amount of persons or items the execution time should also increase.
-%Counting the amount of person elements in the two biggest test databases gives an amount of 306 for the smaller one and 331 for the bigger one.
-%The amount of open actions is 144 for the 1300 Kb database and 155 for other one.
-%Multiplying those values with each other gives an amount of 44064 for the smaller database and 51305 for the bigger one.
-%The reasoning of this should be the execution of the query on the smaller database has to be faster than on the 1400 Kb one.
-%Although the reasoning of this should be that the execution of the query on the smaller databases has to be faster than one the bigger one, the opposite is the case.
-%Thus, the query on both database is being recorded using Traceview and the results have been analyzed.\\
-%The first result that the records show is the amount of total cycle, executed by the recorded code.
-%\begin{description}
-%  \item[1300 Kb database:] 1802642 cycles
-%  \item[1400 Kb database:] 1799194 cycles
-%\end{description}
-%Looking at those results gives a first hint why the execution on the bigger database is faster than on the other one.
-%Even if the amount of cycles does not differ much it is higher on the 1300 Kb database.
-%Hence the six most time consuming methods will be outline in Table~\ref{tab:traceview-q11-methods}.\\
-%\begin {table}[htpb] 
-%  \begin{center}
-%%\hspace*{-0.5cm}
-%\begin {tabular} {|r|r|c|c|r|c|c|}
-%  	\hline
-%	\multirow{2}{*}{Method}&\multicolumn{3}{c}{1300 Kb}&\multicolumn{3}{|c|}{1400 Kb}\\
-%	\cline{2-7}
-%	&cycles&calls&${cycle \over calls}$&cycles&calls&${cycle \over calls}$\\
-%	\hline
-%	\hline
-%%	query/value/node/
-%	DBNode\$4.next&98732&5270&18&106204&5683&18\\
-%	\hline
-%%	query/path/
-%	NameTest.eq&77086&4640&16&83171&5081&16\\
-%	\hline
-%%	query/path/
-%	IterStep\$1.next&64545&1694&38&68301&1457&46\\
-%	\hline
-%%	io/random/
-%	TableDiskAccess.read1&54695&6324&8&59700&6609&9\\
-%	\hline
-%%	io/random/
-%	TableDiskAccess.cursor&53156&16447&3&53330&17535&3\\
-%	\hline
-%\end {tabular}
-%\caption {The five most time consuming methods for Query 11.}
-%\label {tab:traceview-q11-methods}
-%\end{center}
-%\end {table}
-%
-%The only interesting value in Table~\ref{tab:traceview-q11-methods} is the \textit{next} method, because it has less calls in the bigger database.
-%And even if the calls are less in the 1400 Kb database, the time consumption is still higher than for the smaller database with more calls to the method.
-%This method has also the highest cycle call ratio, which makes it to the slowest method in the top five time consuming functions.
-%\input{listings/next-code}
-%The first thing that is conspicuous is the while-loop which iterates over a linked list of \textsf{ANode} objects and checks them for equality with the local field \textsf{test}.
-%An explanation for the lesser time consumption in the bigger database is that there are not so many \textsf{ANode} objects to iterate than in the one with size of 1300 Kb. 
-%The amount of calls of this method indicates that the Dalvik JIT compiler optimizes the method with compiling it into native code.
-%Looking at the body of the while-loop there are four methods that can cause the slow execution.
-%First the \textsf{checkStop} method which checks if a boolean value is false, it is obvious that this validation is not slow.
-%According to the traceview record it is the \textsf{preds} method that is responsible for more than 50\% of the time spend in the \textsf{next} function.
-%
-%%\section{Analyzing the resources consumptions}
-%%\label{sec:analysis:analyszing-the-resource-consumption}
-%%\subsection{Analyzing the consumed storage size}
-%%\label{sec:analysis:analyzing-the-consumed-storage-size}
+The results of the measured write operations illustrates that the Laptop is in average three times faster in writing operations than the Tablet device.
+This is the same factor achieved by the evaluation of the test devices in Section~\ref{sec:evaluation-of-the-test-devices} by using block writing operations.
+This realization leads to the consumption that this value is a hardware constraint and can not be optimized by changing the source code or any other software aspect.
 
 \section{Results of the improvement}
 \label{sec:improving}
@@ -573,8 +424,7 @@ Responsible for the improvement on the Android platform is the, in Section~\ref{
 Even if the compiler copies the getter and setter methods to the corresponding place in the code, the JIT is not able to transform them into native code, therefore they have to be replaced by direct field accesses.
 Translating those accesses into native machine code is responsible for the boost of time improvement.
 Looking at Figure~\ref{fig:xmark-tablet-optimized} shows that there are no significant changes in the execution time of the queries.
-The Queries 8, 9 and 11 are still the slowest ones, but the overall time consumption could has been lowered.\\
-TODO\dots write about laptop vergleich zwischen beiden also faktoren
+The Queries 8, 9 and 11 are still the slowest ones, but the overall time consumption could has been lowered.
 
 
 \begin{figure}[!ht]
@@ -600,9 +450,15 @@ TODO\dots write about laptop vergleich zwischen beiden also faktoren
   \end{center}
 \end{figure}
 
+Compared to the old execution time, the adjustment results in a big improvement.
+However, compared to the times achieved on the Laptop devices the benchmarks are still slow on the Tablet.
+It is hard to tell where the most time of the execution is spend and how this affects the performance of \textsc{BaseX} on the Android operating system.
+
+
 \section{Differences of the mobile and desktop version of \textsc{BaseX}}
 \label{sec:differences-of-the-two-basex-versions}
 Despite the listed differences in Sections ~\ref{sec:migration:creating-a-basex-android-library} and ~\ref{sec:migration:problems-during-the-migration} there are more distinctions between both versions.
 The differences can also be seen by identifying the traceviews of the \textsc{BaseX} desktop version.
+
 
 

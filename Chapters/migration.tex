@@ -354,12 +354,16 @@ This means executing \textsc{BaseX} on Android without adjusting the directory t
 \textsc{BaseX} receives the name and location of the home directory of the user by calling the Java function \textit{System.getProperty(``user.home'')}, which works well with the JVM.
 Using this function on Android gives an empty string and results in \textsc{BaseX} trying to save the database in the root directory, what is impossible, because of the Android right system explained in Section~\ref{sec:android-internals}.
 To avoid this behavior the above mentioned function need to be replaced.
+The path where the data has to be stored has to be a directory that only the application can access.
+Every application receives one directory with the given constraint from Android.
+This is where it is installed as well as where the application stores its data, additionally it is possible to read or write on external storage, but this is not protected by the operating system.
 The problem here is that \textsc{BaseX} should be a library project and it should be usable by every other Android project.
-So it is impossible to say how the directory is named and located where the databases need to be stored.
-An Android application receives its directory by the name of its main package and not by the name of the library main package.
+So it is impossible to say how the directory is named and located where the databases need to be stored before even knowing how the application which uses the \textsc{BaseX} library is called.
+The explanation for this is that an Android application receives its directory by the name of its main package and not by the name of the library main package, so that more than one application can use this library.
+This is a issue that has to be dealt with, which is illustrated and discussed in Section~\ref{sec:migration:problems-during-the-migration}.
 Hence, it is necessary to tell the library this location and use this instead of its own package name.
 To implement this a class has been created which is an entry point for the library and is the first instance when the \textsc{BaseX} Android library is used.
-This class creates an object of the library and needs the package name as an argument for the method that returns an instance of its object.
+This class creates an object of the library and needs the package name of the application as an argument for the method that returns an instance of its object.
 To create the object the Singleton pattern has been used~\cite{gamma2010entwurfsmuster}.
 The reason for this is that only one instance of the database can be created and used.\\
 This class is called \textit{\textsc{BaseX}Database} and creates a \textsc{BaseX} Context object by calling a constructor that has been added to the Context class.
@@ -379,36 +383,37 @@ There also the validation of the \textsc{BaseX} Android library is shown and the
 
 \subsection{Providing a \textsc{BaseX} Android server client solution}
 \label{sec:migration:providing-a-server-client-solution}
-The aspect that every application which uses \textsc{BaseX} as a database solution has its own database, that stores, provides and updates the data.
+At the moment every application which uses the \textsc{BaseX} Android library, has its own database that saves, provides and updates the data.
 One disadvantage of this solution is that other applications can not use the data inside a database of another application.
-The reason for this, as mentioned in Section~\ref{sec:android-internals}, is the sandbox principle of Android applications.
+The reason for this, as mentioned in Section~\ref{sec:android-internals}, is the sandbox principle of Android applications where applications can only access their own resources and not those from other applications.
 Speaking of a disadvantage could be false, because this also prevents unauthorized applications to read or modify the data of an application.
-Thinking of different applications that are using the same data shows that this would lead to redundant databases, which would increase the required storage size.\\
+Thinking of different applications that are using the same data shows that this could lead to redundant databases, which would increase the required storage size.\\
 Additionally to the stand alone version of \textsc{BaseX} it is possible to use it as a client server solution.
 An instance of a \textsc{BaseX} client connects to a server and sends its requests and queries to to a server, which executes them and sends them back to the client.
 The advantage of this solution is that the client does not have to do the execution of the database related operations.
-Another improvement is that the files, that store the data, are on the server and not on the client.
-Both advantages save the client storage space and execution resources, such as CPU and ram usage.
-A disadvantage is that the client can only operate if there is a server available, and therefore it needs a connection to the server to send requests and receive responses.\\
-With the migration of \textsc{BaseX} to Android, the client/server solution has also been migrated.
+Also the files which are containing the data, are stored and managed on the server and not on the client.
+Both shown advantages reducing resource consumptions at the client instance, it saves storage size as well as execution resources like CPU or RAM occupation.
+But there is also a disadvantage, namely the client can only operate if there is a server available, and therefore it needs a connection to the server to send requests and receive responses.\\
+As mentioned in Section~\ref{sec:overview:introduction-into-basex} \textsc{BaseX} also provides a client server solution, this has also been migrated to the Android platform.
 Hereby the focus does not lie on the execution of the server on an external device, like a server on the Internet.
 This is also possible and would bring a big saving of resources on the mobile device, but this would be similar to a web service which is not the focus of this thesis.
 The server client architecture of the Android \textsc{BaseX} version is to have one central database on one place and one instance of a server that handles all database operations.
 In contrast to the, in the section before created, Android library there is only one place on the device where the database files are being stored.
-If an application wants to use \textsc{BaseX} as a database it uses the client and sends its operations to the server, which is executed on the same device, and then receives the results.\\
-To achieve this Android provides Inter Process Communication(IPC) mechanisms which are offering the possibility to communicate with different applications.
+If an application wants to use \textsc{BaseX} as a database it uses the client and sends its operations to the server, which is executed on the same device, and then receives the results.
+To achieve this Android provides Inter Process Communication(IPC) mechanisms which are offering the possibility to communicate with different applications.\\
 However, the client server version of \textsc{BaseX} uses the network and the TCP protocol to do the communication between server and clients.
-This has also been used for the Android solution of the client server implementation.
-Additionally the server has been created as a service.
-A service in Android is a process which is executed in the background and is thus the last instance which is killed by Android process management.
-The reason to implement the server as an Android service is the process management of the operating system and the execution of it in the background.
-The constraint of available RAM forces the Android to kill not needed application and free their used spaces in the RAM.
+This technique has also been used for the Android solution of the client and server implementation.
+Additionally the server has been created as an Android service.
+An Android service is a process which is executed in the background and is thus the last instance which is killed by Android process management.
+The reason to implement the server as an Android service is the process management of the operating system and the execution of the service in the background of the device.
+The constraint of available RAM forces the Android to kill not needed application and free their used spaces in the RAM.~\cite{developers2011android}
 This can not be controlled, and the server has to be available all the time, so that an application can do its operation on it.
-The Android operating system tries to keep the service as long as possible alive, depending on different criteria and even it is being killed, for example by the user, it tries to restart it.~\cite{android-service}
+The Android operating system tries to keep the service as long as possible alive, depending on different criteria and even it is being killed, for example by the user, it tries to restart it.
 A service does not provide a graphical user interface and to communicate with it also IPCs are used, therefore an application has been written, to start and stop the server service.
-This application is also the sandbox where the server stores its data.
-The \textsc{BaseX} uses,as well as the desktop version, the network for the communication with the clients.
-Therefore the client application do not need to implement IPCs, they send their requests via the network to the server and also receive the responses through the network.
+This application is also the sandbox where the server stores its data, the application as well as the background service are executed in this sandbox.
+The data is stored in this sandbox, so no other application can access the data inside it, therefore the server is used.
+Therefore \textsc{BaseX} uses, as well as the desktop version, the network for the communication with the clients.
+Specifically the client application does not need to implement IPCs, they send their requests via the network to the server and also receive the responses through the network.
 A graphical illustration of the principle is shown in Figure~\ref{fig:server-client-android}.
 
 \begin{figure}[h]
@@ -419,8 +424,9 @@ A graphical illustration of the principle is shown in Figure~\ref{fig:server-cli
 \end{center}
 \end{figure}
 
-
-
+Every request and operation, which uses the \textsc{BaseX} server client model, happens on the device and thus there is no saving in execution resources, only in storage capability if different applications are using the same data.
+The implementation of the client server mechanism for Android has been done to illustrate that it is possible to have a server and client of \textsc{BaseX} running on one device.
+The implication of this section is that it is also possible to have an external server which provides the data and the execution of the operations, which saves the above mentioned resources at the client.
 
 
 \section{Problems during the migration}
