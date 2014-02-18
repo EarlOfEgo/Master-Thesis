@@ -3,19 +3,27 @@
 In this chapter a conclusion about the present thesis and the achieved results and findings is given as well as an overview of possible future work.
 \section{Conclusion}
 \label{sec:summery:conclusion}
-The goal of migrating XML database \textsc{BaseX} to the Android platform has been achieved, as an implementation of an Android library as well as a client server solution.
+The goal of migrating the XML database \textsc{BaseX} to the Android platform has been achieved, as an implementation of an Android library as well as a client server solution.
 Only a few features, like the cryptographic function, have not been migrated to the Android platform in order to get a working solution.
+The occurred issues and problems have could been all solved, some brought constraints with them.
+One of them is the Android version of the application which wants to use the \textsc{BaseX} library has to be higher than 2.3.
+As mentioned in the corresponding section there are only less than one percent of the distributed mobile devices using a version lower than 2.3.
+Another constraint is that also the name of the application has to be passed to the library in order to get it working without any troubles.
+As a conclusion of the migration it could be said that a positive result has been achieved, even with the mentioned constraints, because it could have been impossible to migrate \textsc{BaseX} to the Android platform for unknown circumstances.
 
 
 
-The performance of the database operations and the execution of the XMark benchmark queries have been identified and improved by adjusting the source code of \textsc{BaseX} to Android best practices.
+
+
+The performance of the database operations and the execution of the XMark benchmark queries have been identified and improved by adjusting the source code of \textsc{BaseX} with best practices for Android code.
 This adjustment also illustrates the big difference between the two platforms, even if it is not visible on the first view.
 It has also been shown how difficult it is two compare two different platforms, executed on different devices to each other.
+The only similarity is hereby the programming language and after this is compiled everything differs, beginning from the bytecode format to the execution of it inside a virtual machine.
 %The replacement of the getter and setter methods affected the execution of the Android version in a big factor and the desktop version meaningless, which underlines the statement of the big differences of the two platforms.
 The operations are still slow compared to the desktop version of \textsc{BaseX}, but this is mostly a hardware constraint, because of the lack of various resources on mobile devices.
 Even with this disadvantage the Android version of \textsc{BaseX} is the first available and working solution to execute the XQuery language, with its FLOWR expressions, on Android devices.
 It is also the first XML database that offers the possibility to be used in the Android operating system.
-I%It can also be said, that the used XMark benchmark suite is especially designed to measure the performance of an XML database.
+%It can also be said, that the used XMark benchmark suite is especially designed to measure the performance of an XML database.
 
 
 
@@ -25,13 +33,16 @@ Also the development of Android and the always increasing available resources of
 
 
 
+In general the main goal of proting \textsc{BaseX} to Android and improving it in the aspect of performance have been achieved\dots\dots\dots.whatever blablub
+
+
 \section{Future work}
 \label{sec:summery:future-work}
 During the work of the present thesis Google released the new Android version 4.4, codename KitKat.
 This version offers different improvements in contrast with the previous versions of Android.
-Besides the different features that are made to gain a new user experience Google also claims a performance increase with the release of KitKat and an optimization for devices with lower hardware specifications~\cite{google-kitkat}.
-In addition to the improvements that Google publishes with the new Android version, there has also been added another feature to the new version.
-This is not mentioned in the official Android KitKat website, because it is an early development state.
+Besides the different features that are made to gain a new user experience Google also claims a performance increase with the release of KitKat and an optimization for devices with lower hardware specifications, especially devices with available RAM less than 512 Mb.~\cite{google-kitkat}.
+In addition to the improvements that Google publishes with the new Android version, there has also been added another feature to the new version, which has not been advertised like the other included features.
+This feature is also not mentioned in the official Android KitKat website, because it is an early development state and not sophisticated yet.
 It is the Android Runtime (Art) which should replace the Dalvik virtual machine in the near future~\cite{android-art}.
 The difference between Art and the DVM is that ART is not a virtual machine, it is more a compiler that translates the code of an application into native machine language.
 It can be said that it applies the in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} explained Just in Time compiler to the whole application and not just for the most executed code parts.

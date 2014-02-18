@@ -434,20 +434,23 @@ The implication of this section is that it is also possible to have an external 
 There occurred several problems during the migration of \textsc{BaseX} to the Android operating system.
 The first problem which was discovered, was the in Section~\ref{sec:migration:analyzing-the-libraries-used-by-basex} mentioned lack of some included libraries, that are not supported by Android.
 To solve this issue they have been removed and their functionality has been deprecated.
-This has been done, because this specific functionalities are not required for a first \textsc{BaseX} Android version.
-This also applies for all graphical user interface components, that are not necessary for an Android library.\\
-Another problem was the location of the \textsc{BaseX} database directory.
-This need to be, as described in Section~\ref{sec:android-internals}, the \textit{/data/data/application-package-name} directory.
-The problem hereby is that one of the goals of the migration is that the database is a library, but the directory name depends from the application name and not from the library name.
+This has been done, because those specific functionalities are not required for a first runnable \textsc{BaseX} Android version.
+This also applies for all graphical user interface components, which have also been removed, because they are not necessary for an Android library.\\
+Another problem was the location of the \textsc{BaseX} database directory on the Android device.
+This need to be, as described in Section~\ref{sec:android-internals}, the \textit{/data/data/app\-lication-package-name} directory.
+The problem hereby is that one of the goals of the migration is that the database is a library and not a standalone application.
+In the Android operating system the name of the private directory of an application depends on the name of its main package.
+This is only available if there is an Android application, a library does not offer this possibility, so it is not possible for a library to get the name or location of its private directory.
 The only way to get the package name of the application, except for hard coding, is to get the application context and extract the name there.
-This bears another problem, though only applications have a context, libraries not. 
-A possible way, could be to pass the context to the library, but then the library holds the context which it does not need.
-It just needs the application context to receive the application name and nothing more.
-Holding an Android context massively slows down an Android application, so this is not the way how it was solved.
-The alternative is to pass a string holding the application name to the constructor of the library.
-And the library uses it to generate the needed directories.
+This bears another problem, though only applications have a context, libraries not, which also need to be considered. 
+A possible way, could be to pass the context to the library, but then the library holds the context which it does not need and it will maybe not freed from the garbage collector, due to the mark-and-sweep garbage collector mechanism, described in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines}.
+Also the library would only need the application context to receive the application name and by using this the name and location of the private directory.
+As above mentioned, holding an Android context massively slows down an Android application, so this is not the way how it has to be solved.
+The alternative is to pass a string holding the application name to the constructor of the library, because it only needs the name or the location of the data/data directory to access it.
 Therefore the context has been used before creating a library instance to receive the needed directory name and this is passed to the library through the constructor.
-This is also the way how it is done in the \textsc{BaseX} library, as it was described in Section~\ref{sec:migration:creating-a-basex-android-library}.\\
+This string is then used by the library to generate the needed directories, which can be done by the library, because it belongs to the application that uses it.
+The result of this is that the library is executed in the same sandbox like the application and it has the corresponding rights.
+%This is also the way how it is done in the \textsc{BaseX} library, as it was described in Section~\ref{sec:migration:creating-a-basex-android-library}.\\
 An issue with this solution is that the user directory which is used in \textsc{BaseX} is a static string value initialized by the start of \textsc{BaseX}.
 All static values used by \textsc{BaseX} are initialized at start-up in the static class \textit{Prop}.
 And right after the start \textsc{BaseX} uses this value from this class in several places in the code.
@@ -457,7 +460,8 @@ In the \textsc{BaseX} \textit{Context}\footnote{This is the \textit{BaseX} Conte
 This results in the cycle of constructor calls, that the constructor which is called initializes the static values before calling the next constructor in the chain.
 The corresponding Java code can be seen in Listing~\ref{lst:context-constructor}.
 The reason that the file separator is not determined by using the available system method \textit{System.getProperty(``line.separator'')} is that the separator is the same as in Linux.
-The separator is the normal slash and not a backslash like in Windows operating systems.
+Namely it is the normal slash ``/'' and not a backslash as it is implemented in Windows operating systems.
+
 \input{listings/context-constructor}
 
 Another issue which occurred during the migration, was that \textsc{BaseX} uses a lot of the Java string function \textit{isEmpty()}, which is not available at an Android API-level lower than 9.
@@ -467,5 +471,5 @@ According to the official Android homepage only 1.7\% of the devices that are cu
 The consequence of this would be that developers can only create applications that are executable on Android devices using an API-level higher than 9, when using the \textsc{BaseX} library.
 To assure that no application, that is build on Android version lower than 9, uses the \textsc{BaseX} library the Manifest file of the library has been adjusted.
 This is one of the cases where the Manifest file of a library is used to determine the minimum Android version.
-Other constraints specified inside this manifest file, like permissions for example, are being ignored, like it was mentioned in Section~\ref{sec:migration:the-android-project-structure}.
+Other constraints specified inside this Manifest file, like write permissions for example, are being ignored, as it was mentioned in Section~\ref{sec:migration:the-android-project-structure}.
 
