@@ -451,7 +451,49 @@ First the private one, which is only available for the application itself, and s
 This process management suspends processes which are not being executed to the background and if there is a lack of available RAM it starts to kill those processes till enough RAM is available.
 This can not be affected by the application itself, therefore it can not be measured how much RAM is in use by the actual executed application and which is occupied by other processes in the background.
 The same applies to the available CPU usage, depending on the decisions of the operating system the application receives CPU time or not.
-These constraints are also playing a role in classifying the performance of the \textsc{BaseX} Android library, because those are factors which can not be influenced.
+These constraints are also playing a role in classifying the performance of the \textsc{BaseX} Android library, because those are factors which can not be influenced.\\
+The Android Development Kit provides its application developer a tool that offers the possiblity to view log messages during the execution of an application.
+This tool is called Logcat and can be used with the Android Debug Bridge.
+The used garbage collector in the Davlik virtual machine always prints a message to the Logcat when it starts to free memory.
+This information can be used to get an overview how often the garbage collector is triggert and how much memory it frees.
+The information displayed are the reason for the garbage collection, the freed amount of memory, the heap stats and time needed for the garbage collection by itself.\\
+Depending on the available heap size fo the process this output varies in every execution, due to the memory management mechanism of Android.
+However, the Logcat output of the garbage collector for Query 5 and Query 11 has been recorded.
+Query 5 is the query with the least amount of time consumption and Query 11 is in contrast to this the most time consuming query.
+This fact is also reflect in the corresponding output of the Logcat information.
+Namely the garbage collector is called only one time by the execution of Query 5 on a 1 Mb database and freed an amount of 540 kb in total, pasing the execution for 6ms.
+In contrast to this minimal usage of the GC the messages shown by the Logcat during the execution of Query 11 are showing an amount of 25 of GC usage.
+The values summed up can be seen in Table~\ref{tab:gc-stats}.
+
+\begin{table}[htpb]
+	\centering
+	\begin{tabular}{|c|c|c|c|}
+		\hline
+		Query&GC executions&Freed memory&Time used\\
+		\hline
+		5&1&540 kb&6 ms\\
+		\hline
+		11&25&15173 kb&226 ms\\
+		\hline
+	\end{tabular}
+	\caption{Garbage collection statistics during the execution of Query 5 and 11.}
+	\label{tab:gc-stats}
+\end{table}
+
+This illustrates that the garbage collector of the DVM also slows down the execution of \textsc{BaseX} on Android.
+The last column of the table displays hereby the real time which the application is paused due to garbage collection.
+The garbage collector is executed on its own thread which is scheduled by the Android operating system and need an average time consumption of 40 ms on every execution.\\
+Usually the available RAM for every process is between 16 and 128 Mb, at the used Tablet device an executed application receives 48 Mb of RAM for its execution, which is compared to desktop systems very less.
+However, there is a way to increase this size manually for applications which are needing a bigger RAM size.
+This can be done in the Android Manifest file by adding \textit{android:lagreHeap="true"} and resulting in a total of 256 Mb RAM available for the \textsc{BaseX} application on the Tablet test device.
+The increasement to 256 Mb maximal heap size does not mean that the application has this amount as default available, it means that the application can request more heap if is running low on it and the operating system will grant it till the maximume barrier of 256 Mb is reached.
+Additionaly this option is only used for testing purpose, because it is just available for Android versions higher or equal to API level 11 and can not therefore be written in the Manifest file of the \textsc{BaseX} Android library.\\
+The result of the test is that the artificial increasing of the heap size has not effected the garbage collection of \textsc{BaseX} Android library, because only small objects are being allocated.
+The purpose of the option to increase the heap size is to load large objects into the heap, which would normaly run out of memory, for example big bitmaps.
+Although \textsc{BaseX} allocates a lot of memory, but it does not keep it, the garbage collector frees it due to the fact that the allocated objects are not be used any more.
+This is also a reason for the frequent occurance of the garbage collector by executing Query 11 from the XMark benchmark suite.
+
+
 
 
 
@@ -467,21 +509,22 @@ This value is shown by~\cite{toninievlautatingandroid} and is the change which h
 The recorded traceviews have shown that especially the \textsf{DBNode.uri} has a high execution time caused by the getter calls in the for-loop.
 This call accesses the \textsf{nm} byte array which is one part of tuples of name and value pairs in the container class \textsf{Atts}.
 All calls to the getter and setter to these tuples have been replaced by direct field accesses in the whole \textsc{BaseX} Android library.\\
-Execution of the XMark benchmark tests with this optimized version of \textsc{BaseX} on the tablet showed an improvement of up to 180\%, which is nearly three times faster as the normal version.
+Execution of the XMark benchmark tests with this optimized version of \textsc{BaseX} on the tablet showed an improvement of up to 200\%, which is nearly three times faster as the normal version.
 Especially the time consumption for the execution of queries 2, 10 and 17 have been improved.
 An extensive use of the \textsf{DBNode.uri} method at those queries is responsible for this behavior.
 The average improvement of this change is about 58.6\%.
 Analyzing the traceviews of the improved version shows, that the average execution time of the \textsf{DBNode.uri} method has been nearly cut into half and it is not even close to the list of the top time consuming methods.
-The results of the whole execution can be seen in Appendix~\ref{tab:xmark-tablet-optimized-appendice}.
+The results of the whole execution can be seen in Appendix~\ref{tab:xmark-tablet-optimized-appendice} and the improvements for every query in percent is illustrated in the Table~\ref{tab:improvements-percent}, which is also available in the Appendices chapter at the end of the present thesis.\\
 The replacement of the getter and setter calls at the desktop version of \textsc{BaseX} have no significant changes in the time consumption of the execution time.
+This was also tested on the Laptop device, which underlines the statement that this mechanism to speed up an application is only working at the Android version and is the result of the used JIT of the Dalvik virtual machine.
 The average improvement of 58.6\% is even higher than the 30\% mentioned before and achieved by~\cite{toninievlautatingandroid}.
 This shows, that the replacement of the getter/setters is a technique which need to be continued in the \textsc{BaseX} library project, as well in every other time consuming Android application.
-Responsible for the improvement on the Android platform is the, in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} mentioned, Just In Time compiler of the Dalvik virtual machine. 
+Responsible for the improvement on the Android platform is the, in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} and before mentioned, Just In Time compiler of the Dalvik virtual machine. 
 Even if the compiler copies the getter and setter methods to the corresponding place in the code, the JIT is not able to transform them into native code, therefore they have to be replaced by direct field accesses.
-Translating those accesses into native machine code is responsible for the boost of time improvement.
-Looking at Figure~\ref{fig:xmark-tablet-optimized} shows that there are no significant changes in the execution time of the queries.
+Using direct field access enables the JIT to translating those accesses into native machine code and this is responsible for the boost of time improvement.
+Looking at Figure~\ref{fig:xmark-tablet-optimized} shows that the curves are still the same shape, which indicates that the changes had an impact of the whole execution of the benchmark suite.
+The most time consuming queries in the benchmark tests of the unimproved version are still the most time consuming methods in the improved version and the same applies for the fast queries.
 The Queries 8, 9 and 11 are still the slowest ones, but the overall time consumption could has been lowered.
-
 
 \begin{figure}[!ht]
   \begin{center}
@@ -509,12 +552,28 @@ The Queries 8, 9 and 11 are still the slowest ones, but the overall time consump
 Compared to the old execution time, the adjustment results in a big improvement.
 However, compared to the times achieved on the Laptop devices the benchmarks are still slow on the Tablet.
 It is hard to tell where the most time of the execution is spend and how this affects the performance of \textsc{BaseX} on the Android operating system.
+In general the Android virtual machine Dalvic is designed to be a fast VM that executes its code in less instructions than an implementation of the JVM.
+The implication of this should be a faster execution of the \textsc{BaseX} code on the Dalvik VM than on the JVM.
+The lesser hardware capabilities of the Tablet are playing a big role in the execution of the benchmarks, especially the available RAM for the DVM, which has been shown in the section before.
+Therefore the best improvement would be more available hardware resources in order to speed up \textsc{BaseX} significantly.
+
 
 
 \section{Differences of the mobile and desktop version of \textsc{BaseX}}
 \label{sec:differences-of-the-two-basex-versions}
 Despite the listed differences in Sections ~\ref{sec:migration:creating-a-basex-android-library} and ~\ref{sec:migration:problems-during-the-migration} there are more distinctions between both versions.
+The Java Development Kit JDK offers a tool which is called Hprof.
+This is similar to the traceviews of Android and offers the possibility to record the execution of a specific class or method.
+Unfortunately there are some functionalities missing, that are provided by the traceview tool and sometimes Hprof is not accurate.~\cite{mytkowicz2010evaluating}
+However, Hprof provides the abilities be used to identify methods which are being executed the most.
+It does not provide the CPU occupation time in cycles, like traceview, but it displays it in overall percent and it also offers a list of the heap allocations made by the recorded program.~\cite{liang1999comprehensive}
+This information can be used to identify the top time consuming methods, which can then be compared with the most top time consuming methods of the \textsc{BaseX} Android version.
+The time spend in those methods and the amount of calls to those methods are not displayed, but it can be said that those methods are being compiled into native machine code by the Just In Time compiler of the Java Virtual Machine.
+As explained in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines}, the JVM uses a method based JIT, that compiles the so called hot spot methods, which are the ones displayed by Hprof. 
+
+
 The differences can also be seen by identifying the traceviews of the \textsc{BaseX} desktop version.
+\textbf{TODO}
 
 
 
