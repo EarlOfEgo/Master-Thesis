@@ -375,11 +375,12 @@ At this moment it is possible to use \textsc{BaseX} as an Android library and it
 To provide the \textsc{BaseX} operations the above mentioned class has been extended by additional methods which can be used for this purpose.
 All are implemented by using the above mentioned Context object, which means every operation is executed on this object.\\
 After this migration it is possible to use \textsc{BaseX} like it can be done on every usual PC.
-Except the cryptographic XQuery function, the \textsc{BaseX} Android library offers all functionalities like the normal \textsc{BaseX} version offers.
+Except the cryptographic XQuery function, the \textsc{BaseX} Android library offers all functionalities like the normal \textsc{BaseX} desktop version offers.
 The Android principle that every application works in its own sandbox is also being kept.
-With this solution every application has its own \textsc{BaseX} database in its own directory, an advantage could be that the database does not need to consider queries that are coming from another applications and their synchronizations.
-The advantages and disadvantages of this solution are outlined and investigated in Chapter~\ref{cha:analysis}.
-There also the validation of the \textsc{BaseX} Android library is shown and the performance analyzed.
+With this solution every application has its own \textsc{BaseX} database in its own directory, an advantage could be that the database does not need to consider queries that are coming from another applications and their synchronizations.\\
+However, in the next section an alternative solution to this is provided by implementing the client/server mechanism of \textsc{BaseX} in Android.
+The advantages and disadvantages of the library implementation are outlined and investigated in Chapter~\ref{cha:analysis}.
+For the validation and performance messuarment a test application of the \textsc{BaseX} Android library has been written and its execution performance analyzed.
 
 \subsection{Providing a \textsc{BaseX} Android server client solution}
 \label{sec:migration:providing-a-server-client-solution}
@@ -387,6 +388,8 @@ At the moment every application which uses the \textsc{BaseX} Android library, h
 One disadvantage of this solution is that other applications can not use the data inside a database of another application.
 The reason for this, as mentioned in Section~\ref{sec:android-internals}, is the sandbox principle of Android applications where applications can only access their own resources and not those from other applications.
 Speaking of a disadvantage could be false, because this also prevents unauthorized applications to read or modify the data of an application.
+However, Android provides a mechanism which offers the possibility to provide data from one application to another.
+This technique is called content provider and is used for system wide databases like the database that contains the contacts of the owner of an Android device.
 Thinking of different applications that are using the same data shows that this could lead to redundant databases, which would increase the required storage size.\\
 Additionally to the stand alone version of \textsc{BaseX} it is possible to use it as a client server solution.
 An instance of a \textsc{BaseX} client connects to a server and sends its requests and queries to to a server, which executes them and sends them back to the client.
@@ -427,6 +430,12 @@ A graphical illustration of the principle is shown in Figure~\ref{fig:server-cli
 Every request and operation, which uses the \textsc{BaseX} server client model, happens on the device and thus there is no saving in execution resources, only in storage capability if different applications are using the same data.
 The implementation of the client server mechanism for Android has been done to illustrate that it is possible to have a server and client of \textsc{BaseX} running on one device.
 The implication of this section is that it is also possible to have an external server which provides the data and the execution of the operations, which saves the above mentioned resources at the client.
+The only ways to provide application data to another application are the so called content providers of Android.
+The \textsc{BaseX} client/server implementation could also be seen as an alternative for the present Android content providers.\\
+\\
+Additionally the \textsc{BaseX} Android client as well as the library implementation are both implementing the same interface, so it is easy to replace one version with the other.
+This makes it easy to replace the library with the client solution if the resources have to be stored somewhere else, for example on an external server.
+
 
 
 \section{Problems during the migration}
