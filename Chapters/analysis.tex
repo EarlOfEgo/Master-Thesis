@@ -500,6 +500,50 @@ This is also a reason for the frequent occurance of the garbage collector by exe
 %This is the same factor achieved by the evaluation of the test devices in Section~\ref{sec:evaluation-of-the-test-devices} by using block writing operations.
 %This realization leads to the consumption that this value is a hardware constraint and can not be optimized by changing the source code or any other software aspect.
 
+\section{Differences of the mobile and desktop version of \textsc{BaseX}}
+\label{sec:differences-of-the-two-basex-versions}
+Despite the listed differences in Sections ~\ref{sec:migration:creating-a-basex-android-library} and ~\ref{sec:migration:problems-during-the-migration} there are more distinctions between both versions.
+The Java Development Kit JDK offers a tool which is called Hprof.
+This is similar to the traceviews of Android and offers the possibility to record the execution of a specific class or method.
+Unfortunately there are some functionalities missing, that are provided by the traceview tool and sometimes Hprof is not accurate.~\cite{mytkowicz2010evaluating}
+However, Hprof provides the abilities be used to identify methods which are being executed the most.
+It does not provide the CPU occupation time in cycles, like traceview, but it displays it in overall percent and it also offers a list of the heap allocations made by the recorded program.~\cite{liang1999comprehensive}
+This information can be used to identify the top time consuming methods, which can then be compared with the most top time consuming methods of the \textsc{BaseX} Android version.
+The time spend in those methods and the amount of calls to those methods are not displayed, but it can be said that those methods are being compiled into native machine code by the Just In Time compiler of the Java Virtual Machine.
+As explained in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines}, the JVM uses a method based JIT, that compiles the so called hot spot methods, which are the ones displayed by Hprof. 
+
+
+%The differences can also be seen by identifying the traceviews of the \textsc{BaseX} desktop version.
+Analyzing all Hprof dumps illustrates the additional differences between the two \textsc{BaseX} versions.
+None of the top five time consuming methods of the recorded traceviews from Section~\ref{sec:identifying-the-bottlenecks} are significant represented in the Hprof records.
+Remembering the fact that the \textsf{VMDebug.startGC} method is part of the Dalvik virtual machine, is responsible that it is not represented in any record of the Hprof runs.
+The second most time consuming method of the benchmarks of the Android version is the \textsf{Compress.unpack} method, also shown in Section~\ref{sec:identifying-the-bottlenecks}.
+This method is also represented as a big time consumer in the Hprof records of the desktop version.
+The \textsf{DBNode.uri} method was the third most time consuming method in the Android version before the improvement.
+In the desktop version of \textsc{BaseX} it is also listed in the recorded Hprof executions, but it is not one of the slow methods.
+This also illustrates the differences between the mobile and the desktop version, because at the not improved Android version this method is one of the bottlenecks.
+Looking at benchmarks of the desktop version this method is not significant slower than other methods.
+
+%Nevertheless, the second most time consuming method in the Android version of the benchmark tests, the \textsf{Compress.unpack} method, is also not represented in one of the Hprof records.
+%In fact no method of the class \textsf{Compress} is represented in the Hprof records for all XMark queries.
+
+%Compared to the desktop version this class often provides methods which are represented in the most time consuming methods in the Android version.\\
+%The \textsf{DBNode.uri} method was the third most time consuming method in the Android version before the improvement.
+%In the desktop version of \textsc{BaseX} it is also listed in the recorded Hprof executions, but it is not one of the slow methods.
+%This also illustrates the differences between the mobile and the desktop version, because at the not improved Android version this method is one of the bottlenecks.
+%Looking at benchmarks of the desktop version this method is not significant slower than other methods.
+%This circumstance is also a proof that the change for the improvement of the Android version has no effect on the desktop version of \textsc{BaseX} and illustrates again the difference between the two virtual machines and their JIT compilers.\\
+%Looking at the table in Section~\ref{sec:identifying-the-bottlenecks} gives the \textsf{IterStep\$1.next} method as fourth time consuming method in the Android version.
+%This method is also represented in the same test queries as a time consuming method.
+%In this aspect the two versions are similar to each other, both have a similar amount of calls to the method.
+%The times spend in this method can not be compared, because of the lack of information in the Hprof records.\\
+%The last of the top five time consuming methods of the not improved Android version is the \textsf{Token.norm} method.
+%This one does also not significantly occur in the Hprof records, but contrary to the \textsf{Compress.unpack} method it is listed in the records.\\
+%\\
+
+
+
+
 \section{Results of the improvement}
 \label{sec:improving}
 %In this section is shown how the found bottlenecks can be improved and the time consumption of some functionalities are made better.
@@ -526,28 +570,7 @@ Looking at Figure~\ref{fig:xmark-tablet-optimized} shows that the curves are sti
 The most time consuming queries in the benchmark tests of the unimproved version are still the most time consuming methods in the improved version and the same applies for the fast queries.
 The Queries 8, 9 and 11 are still the slowest ones, but the overall time consumption could has been lowered.
 
-\begin{figure}[!ht]
-  \begin{center}
-	\begin{gnuplot}[terminal=pdf, terminaloptions=color, scale=1.1]
-	          set title 'Tablet Steps using the Optimized Version'
-		  set datafile separator ','
-		  set xlabel 'Query'
-		  set ylabel 'Average time in ms(100 executions)'
-		  set xrange [0:21]
-		  set xtics 1,1,20
-		  set logscale y
-		  set grid ytics lt 0 lw 1 lc rgb '#bbbbbb'
-		  set grid xtics lt 0 lw 1 lc rgb '#bbbbbb'
-		  set key samplen 2 spacing .5 font ',8'
-		  show grid
-		  set style fill solid 0.8 border -1
-		  set boxwidth 0.5 relative
-		  plot for [i=1:14] 'benchmarks/xmark-tablet-steps-optimized-transposed.csv' u ($0+1):i title ''.i.'00kb' with linespoints
-	\end{gnuplot}              
-	\caption{The results of the XMark benchmark queries executed on the Tablet, using the optimized \textsc{BaseX} version.}
-	\label{fig:xmark-tablet-optimized}
-  \end{center}
-\end{figure}
+\input{Chapters/xmark-optimized}
 
 Compared to the old execution time, the adjustment results in a big improvement.
 However, compared to the times achieved on the Laptop devices the benchmarks are still slow on the Tablet.
@@ -557,23 +580,40 @@ The implication of this should be a faster execution of the \textsc{BaseX} code 
 The lesser hardware capabilities of the Tablet are playing a big role in the execution of the benchmarks, especially the available RAM for the DVM, which has been shown in the section before.
 Therefore the best improvement would be more available hardware resources in order to speed up \textsc{BaseX} significantly.
 
+\section{Defining the constraints of the \textsc{BaseX} Android version}
+\label{sec:defining-the-constraints}
 
 
-\section{Differences of the mobile and desktop version of \textsc{BaseX}}
-\label{sec:differences-of-the-two-basex-versions}
-Despite the listed differences in Sections ~\ref{sec:migration:creating-a-basex-android-library} and ~\ref{sec:migration:problems-during-the-migration} there are more distinctions between both versions.
-The Java Development Kit JDK offers a tool which is called Hprof.
-This is similar to the traceviews of Android and offers the possibility to record the execution of a specific class or method.
-Unfortunately there are some functionalities missing, that are provided by the traceview tool and sometimes Hprof is not accurate.~\cite{mytkowicz2010evaluating}
-However, Hprof provides the abilities be used to identify methods which are being executed the most.
-It does not provide the CPU occupation time in cycles, like traceview, but it displays it in overall percent and it also offers a list of the heap allocations made by the recorded program.~\cite{liang1999comprehensive}
-This information can be used to identify the top time consuming methods, which can then be compared with the most top time consuming methods of the \textsc{BaseX} Android version.
-The time spend in those methods and the amount of calls to those methods are not displayed, but it can be said that those methods are being compiled into native machine code by the Just In Time compiler of the Java Virtual Machine.
-As explained in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines}, the JVM uses a method based JIT, that compiles the so called hot spot methods, which are the ones displayed by Hprof. 
+\section{Comparison between \textsc{BaseX} and SQLite3}
+\label{sec:comparison-between-basex-and-sqlite}
+Even after an optimization of the \textsc{BaseX} Android version the execution of the XMark benchmark tests are still significant slower than the desktop version.
+It has been shown that the main part which is responsible for this behavior is the limited hardware resource available on mobile devices.
+Therefore the execution times of \textsc{BaseX} is being compared to the execution times of the SQLite3 database, which is part of Android, as described in Section~\ref{sec:overview:related-work}.
+SQLite3 is a relational database which uses SQL as its query language and not XQuery, which is used by \textsc{BaseX}.
+Thus, to benchmark both database systems and compare them to another the queries have to be similar as well as the used data.
+The used data for the benchmarking of both databases is the same and it is a set of contacts, including the name, city, post- and email address of a person.
+In the SQLite3 databases all this columns are represented as strings and all have to be filled, the same applies for the databases in \textsc{BaseX}.
+Eight different sizes of databases has been used for the benchmark test, depending on the amount of contacts.
+Starting from small to big the databases are containing 10, 50, 100, 500, 1000, 1500, 2500 and 5000 contacts.
+There are five different statements which have been used for the benchmark purpose.
+The SQL statements as well as their corresponding XQuery code can be seen in Appendix~\ref{statement1-sql}.
+They query and modify the given data while the time of their execution is measured; their exact functionality can be seen in the following list:
+\begin{enumerate}
+	\item Get all contacts ordered ascending by their name
+	\item Get all contacts having an email address ending with ``com''
+	\item Delete every contact having an email address ending with ``org''
+	\item Insert a new contact
+	\item Update the recent inserted contact
+\end{enumerate}
+The benchmarks have been executed using the Tablet device and the optimized \textsc{BaseX} Android library.
+The consumed time of every statement and different databases can be seen in Figure~\ref{fig:sqlite3-vs-basex}.
+
+\input{Chapters/sqlite-basex-gnuplot}
+
+The results of the benchmark illustrates that with the increase of data inside a database \textsc{BaseX} is having a better execution time than SQLite3.
+The results also show that SQLite3 has not tolerable times for some operations.
 
 
-The differences can also be seen by identifying the traceviews of the \textsc{BaseX} desktop version.
-\textbf{TODO}
 
 
 
