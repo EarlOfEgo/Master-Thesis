@@ -582,13 +582,16 @@ Therefore the best improvement would be more available hardware resources in ord
 
 \section{Defining the constraints of the \textsc{BaseX} Android version}
 \label{sec:defining-the-constraints}
+On mobile devices there are not as many hardware resources available as on desktop computers.
+Therefore in this section the constraints have been searched, which are the maximal boundary for using \textsc{BaseX} on a mobile environment.
+
 
 
 \section{Comparison between \textsc{BaseX} and SQLite3}
 \label{sec:comparison-between-basex-and-sqlite}
 Even after an optimization of the \textsc{BaseX} Android version the execution of the XMark benchmark tests are still significant slower than the desktop version.
 It has been shown that the main part which is responsible for this behavior is the limited hardware resource available on mobile devices.
-Therefore the execution times of \textsc{BaseX} is being compared to the execution times of the SQLite3 database, which is part of Android, as described in Section~\ref{sec:overview:related-work}.
+Therefore the execution times of \textsc{BaseX} is being compared to the execution times of the SQLite3 database, which is part of Android, as described in Section~\ref{sec:android-internals}.
 SQLite3 is a relational database which uses SQL as its query language and not XQuery, which is used by \textsc{BaseX}.
 Thus, to benchmark both database systems and compare them to another the queries have to be similar as well as the used data.
 The used data for the benchmarking of both databases is the same and it is a set of contacts, including the name, city, post- and email address of a person.
@@ -597,23 +600,77 @@ Eight different sizes of databases has been used for the benchmark test, dependi
 Starting from small to big the databases are containing 10, 50, 100, 500, 1000, 1500, 2500 and 5000 contacts.
 There are five different statements which have been used for the benchmark purpose.
 The SQL statements as well as their corresponding XQuery code can be seen in Appendix~\ref{statement1-sql}.
-They query and modify the given data while the time of their execution is measured; their exact functionality can be seen in the following list:
+They are divided into  two categories one is querying and one is modifying the given data.
+During the execution of the statements the time of their execution is measured and their exact functionality can be seen in the following list:
 \begin{enumerate}
 	\item Get all contacts ordered ascending by their name
 	\item Get all contacts having an email address ending with ``com''
+	\item Search for a specific name
 	\item Delete every contact having an email address ending with ``org''
 	\item Insert a new contact
 	\item Update the recent inserted contact
 \end{enumerate}
+The listed statements are not intensive statements which would be used to stress test the database, as it has been done in Section~\ref{sec:analysing-the-execution-performance} with the XMark benchmark queries.
 The benchmarks have been executed using the Tablet device and the optimized \textsc{BaseX} Android library.
-The consumed time of every statement and different databases can be seen in Figure~\ref{fig:sqlite3-vs-basex}.
-
-\input{Chapters/sqlite-basex-gnuplot}
-
-The results of the benchmark illustrates that with the increase of data inside a database \textsc{BaseX} is having a better execution time than SQLite3.
-The results also show that SQLite3 has not tolerable times for some operations.
+The consumed time of the query statements and different databases can be seen in Table~\ref{tab:sqlite3-vs-basex-results-1}, as well as the results achieved by the modifying statements in Table~\ref{tab:sqlite3-vs-basex-results-2}.
 
 
+\begin {table}[htpb] 
+  \centering
+\begin {tabular} {|r|r|r|r|r|r|r|}
+	\hline
+	&\multicolumn {2} {|c|} {Statement 1}&\multicolumn {2} {|c|} {Statement 2}&\multicolumn {2} {|c|} {Statement 3}\\
+	\hline
+	Contacts&SQLite3&BaseX&SQLite3&BaseX&SQLite3&BaseX\\
+	\hline
+	10&0.27&2.96&0.27&4.05&0.24&6.86\\
+	50&0.24&3.63&0.24&10.34&0.21&36.40\\
+	100&0.27&2.89&0.24&25.87&0.27&25.78\\
+	500&0.24&3.12&0.45&69.94&0.21&114.47\\
+	1000&0.26&3.23&0.54&182.76&0.27&316.04\\
+	1500&0.23&3.02&0.24&242.64&0.24&389.55\\
+	2500&0.30&2.83&0.57&401.33&0.30&722.68\\
+	5000&0.36&2.89&0.24&755.46&0.27&1485.41\\
+	\hline
 
+\end {tabular}
+\caption {Measured execution times for the query statements in milliseconds.}
+\label {tab:sqlite3-vs-basex-results-1}
+\end {table}
 
+\begin {table}[htpb] 
+  \centering
+\begin {tabular} {|r|r|r|r|r|r|r|}
+	\hline
+	&\multicolumn {2} {|c|} {Statement 4}&\multicolumn {2} {|c|} {Statement 5}&\multicolumn {2} {|c|} {Statement 6}\\
+	\hline
+	Contacts&SQLite3&BaseX&SQLite3&BaseX&SQLite3&BaseX\\
+	\hline
+	10&4.39&9.67&32.65&9.85&4.18&19.16\\
+	50&4.91&29.11&28.32&11.01&4.27&14.22\\
+	100&28.77&22.76&32.44&9.67&4.33&32.19\\
+	500&355.49&88.19&52.67&10.32&5.43&80.96\\
+	1000&728.27&178.00&41.17&14.23&5.92&111.81\\
+	1500&972.47&311.06&72.33&10.22&6.43&192.90\\
+	2500&1357.69&570.00&152.85&10.28&7.29&253.44\\
+	5000&2270.29&1016.99&364.71&15.96&10.65&594.90\\
+	\hline
+
+\end {tabular}
+\caption {Measured execution times for the modify statements in milliseconds.}
+\label {tab:sqlite3-vs-basex-results-2}
+\end {table}
+
+Looking at the results of the query statements in Table~\ref{tab:sqlite3-vs-basex-results-1} illustrates the speed advantage of SQLite3 compared to \textsc{BaseX}.
+The size of the database is not important for SQLite, while \textsc{BaseX} increases its execution time for statement 2 and 3 with the rising size of the database.
+Looking at statement 1 illustrates that both database systems have a constant execution time by just querying the whole data and ordering it.\\
+The results of Table~\ref{tab:sqlite3-vs-basex-results-2} shows that inserting and deleting of data is both faster in \textsc{BaseX} than in SQLite3.
+Statement 3, which updates a given date, is nearly constant in SQLite3 while it is also slower in \textsc{BaseX} with the increasing database size.\\
+Deleting all data with an org ending in their email is nearly twice as fast using \textsc{BaseX} instead of SQLite3.
+Inserting a new contact into the database is always constant using \textsc{BaseX}, while it increases with the size of the database using SQLite3.\\
+\\
+Those results illustrate that applications with a many queries should use SQLite3 and application with a huge insert and delete ratio should prefer \textsc{BaseX} as their database system.
+Especially applications for collecting data should use \textsc{BaseX}, because the more data is collected the bigger the size of the database will get.
+And the constant time of inserting data into the database is hereby a big plus.
+In contrast to this, applications with a big database and a lot of searches inside this database should use SQLite3, because even the search operation is constant at this database system.
 
