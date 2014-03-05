@@ -521,8 +521,17 @@ The second most time consuming method of the benchmarks of the Android version i
 This method is also represented as a big time consumer in the Hprof records of the desktop version.
 The \textsf{DBNode.uri} method was the third most time consuming method in the Android version before the improvement.
 In the desktop version of \textsc{BaseX} it is also listed in the recorded Hprof executions, but it is not one of the slow methods.
-This also illustrates the differences between the mobile and the desktop version, because at the not improved Android version this method is one of the bottlenecks.
-Looking at benchmarks of the desktop version this method is not significant slower than other methods.
+This also underlines the differences between the mobile and the desktop version, because at the not improved Android version this method is one of the bottlenecks.
+As mentioned in Section~\ref{sec:analyzing-the-dbnode.uri-method} the Just In Time compiler of the Dalvik virtual machine could be a reason for this behavior.
+In contrast to this the JIT of the Java virtual machine seems to translate the getter calls to native machine code, which can be an explanation why the \textsf{DBNode.uri} method is not in the top time consuming methods of the Hprof records.
+Except for this difference there are no significant differences in the traceviews of the \textsc{BaseX} Android and the desktop version.
+Additionally to this there is a small distinction in the two platforms, which is not listed in the most time consuming method.
+There are several input/output methods in the traceviews of the Android version which are not listed so high in the Hprof records.
+A possible explanation for this is the, in Section~\ref{sec:evaluation-of-the-test-devices} shown, faster I/O operation speed of the hardware of the Laptop device compared to the hardware of the Tablet.\\
+The analysis and comparison of the Hprof records and the Android traceviews are underlining the assumption that most of the bad execution performance achieved by the \textsc{BaseX} Android version is caused by the lack of hardware resources on the mobile device.
+
+
+
 
 %Nevertheless, the second most time consuming method in the Android version of the benchmark tests, the \textsf{Compress.unpack} method, is also not represented in one of the Hprof records.
 %In fact no method of the class \textsf{Compress} is represented in the Hprof records for all XMark queries.
@@ -580,12 +589,6 @@ The implication of this should be a faster execution of the \textsc{BaseX} code 
 The lesser hardware capabilities of the Tablet are playing a big role in the execution of the benchmarks, especially the available RAM for the DVM, which has been shown in the section before.
 Therefore the best improvement would be more available hardware resources in order to speed up \textsc{BaseX} significantly.
 
-\section{Defining the constraints of the \textsc{BaseX} Android version}
-\label{sec:defining-the-constraints}
-On mobile devices there are not as many hardware resources available as on desktop computers.
-Therefore in this section the constraints have been searched, which are the maximal boundary for using \textsc{BaseX} on a mobile environment.
-
-
 
 \section{Comparison between \textsc{BaseX} and SQLite3}
 \label{sec:comparison-between-basex-and-sqlite}
@@ -621,7 +624,7 @@ The consumed time of the query statements and different databases can be seen in
 	\hline
 	&\multicolumn {2} {|c|} {Statement 1}&\multicolumn {2} {|c|} {Statement 2}&\multicolumn {2} {|c|} {Statement 3}\\
 	\hline
-	Contacts&SQLite3&BaseX&SQLite3&BaseX&SQLite3&BaseX\\
+	Contacts&SQLite3&\textsc{BaseX}&SQLite3&\textsc{BaseX}&SQLite3&\textsc{BaseX}\\
 	\hline
 	10&0.27&2.96&0.27&4.05&0.24&6.86\\
 	50&0.24&3.63&0.24&10.34&0.21&36.40\\
@@ -644,7 +647,7 @@ The consumed time of the query statements and different databases can be seen in
 	\hline
 	&\multicolumn {2} {|c|} {Statement 4}&\multicolumn {2} {|c|} {Statement 5}&\multicolumn {2} {|c|} {Statement 6}\\
 	\hline
-	Contacts&SQLite3&BaseX&SQLite3&BaseX&SQLite3&BaseX\\
+	Contacts&SQLite3&\textsc{BaseX}&SQLite3&\textsc{BaseX}&SQLite3&\textsc{BaseX}\\
 	\hline
 	10&4.39&9.67&32.65&9.85&4.18&19.16\\
 	50&4.91&29.11&28.32&11.01&4.27&14.22\\
@@ -668,9 +671,67 @@ The results of Table~\ref{tab:sqlite3-vs-basex-results-2} shows that inserting a
 Statement 3, which updates a given date, is nearly constant in SQLite3 while it is also slower in \textsc{BaseX} with the increasing database size.\\
 Deleting all data with an org ending in their email is nearly twice as fast using \textsc{BaseX} instead of SQLite3.
 Inserting a new contact into the database is always constant using \textsc{BaseX}, while it increases with the size of the database using SQLite3.\\
+The fast query times are one advantage of SQLite3, the reason why this is achieved is that SQLite3 is specially implemented for mobile devices.
+It does not use a server client architecture and therefore every application has its own database.\cite{wei2012android}
+SQLite3 is a system library of Android, it is implemented in the C programming language and therefore needs no virtual machine for its execution, which makes it faster in the aspect of time consumption.
+Another reason for the fast execution of every query is the use of a buffer cache, which is used by SQLite3 and can not be disabled to measure the absolute performance of the database.~\cite{kim2012androbench}
+Making a query in SQLite3 on Android returns also a cursor object pointing to the first result and not the whole result. 
+To receive the whole result, as a string for example, this cursor is used to iterate through the results.
+For this comparison the same has been done with \textsc{BaseX}, an iterator object is the result of a query and not as usual a string containing the results.
+This saves the time and resources which would be used to build the results string.\\
 \\
-Those results illustrate that applications with a many queries should use SQLite3 and application with a huge insert and delete ratio should prefer \textsc{BaseX} as their database system.
-Especially applications for collecting data should use \textsc{BaseX}, because the more data is collected the bigger the size of the database will get.
-And the constant time of inserting data into the database is hereby a big plus.
-In contrast to this, applications with a big database and a lot of searches inside this database should use SQLite3, because even the search operation is constant at this database system.
+In the XMark benchmark tests the whole results, received by a query, have been strings.
+This fact is also partial responsible for the achieved execution times.
+As mentioned before, to get a result as a string the received cursor of a SQLite3 query has to be used to iterate over the result set.
+To get an overview how \textsc{BaseX} and SQLite3 handle the queries by returning the whole result as a string this has also been measured and the results can be seen in Table\ref{tab:sqlite3-vs-basex-results-3}.
+
+\begin {table}[htpb] 
+  \centering
+\begin {tabular} {|r|r|r|r|r|r|r|}
+	\hline
+	&\multicolumn {2} {|c|} {Statement 1}&\multicolumn {2} {|c|} {Statement 2}&\multicolumn {2} {|c|} {Statement 3}\\
+	\hline
+	Contacts&SQLite3&\textsc{BaseX}&SQLite3&\textsc{BaseX}&SQLite3&\textsc{BaseX}\\
+	\hline
+	10&3.90&45.10&1.31&56.94&1.43&25.32\\
+	50&41.44&49.22&2.13&27.40&1.37&35.49\\
+	100&108.33&108.85&4.63&52.52&1.52&50.47\\
+	500&1891.66&203.27&75.19&95.61&2.99&247.65\\
+	1000&7996.00&272.09&383.75&219.11&10.89&306.33\\
+	1500&17040.43&426.26&886.87&355.22&5.88&450.59\\
+	2500&56181.91&831.93&2540.80&566.83&17.7&703.73\\
+	5000&211718.96&1684.96&9407.74&1090.27&16.51&1316.77\\
+	\hline
+
+\end {tabular}
+\caption {Measured execution times for the query statements returning the result as a string in milliseconds.}
+\label {tab:sqlite3-vs-basex-results-3}
+\end {table}
+
+The results displayed in Table~\ref{tab:sqlite3-vs-basex-results-3} illustrate, depending on the size of the result, that \textsc{BaseX} achieves still a tolerable time with 1.6 seconds by querying 5000 datasets and receiving it as a string.
+In contrast to this SQLite3 is for the same operation around 200 times slower, which is the part of building the string by iterating over the result set.
+The table also displays the correlation between the required time and the size of the string.
+Query 1 returns all contacts, while query 3 only returns one record.
+
+
+Those results illustrate that applications with many queries should use SQLite3 and applications with a huge insert and delete ratio should prefer \textsc{BaseX} as their database system.
+At this conclusion it need to be considered how the results of query should be handled, if they be iterated later or if they should be displayed after the query as a string.
+For the last circumstance \textsc{BaseX} should be prefered, because querying and receiving the whole result as a string is still fast compared to SQLite3.
+
+%An example scenario could be applications for collecting a huge amount of data, because the more data is collected the bigger the size of the database will get.
+%And the constant time of inserting data into the database is hereby a big plus.
+%In contrast to this, applications with a big database and a lot of searches inside this database should use SQLite3, because even the search operation is constant at this database system.
+%
+
+\section{Defining the constraints of the \textsc{BaseX} Android version}
+\label{sec:defining-the-constraints}
+On mobile devices there are not as many hardware resources available as on desktop computers.
+Therefore in this section the constraints have been searched, which are representing the maximal boundaries for using the \textsc{BaseX} database in a mobile environment.
+The great variety of Android devices makes it nearly impossible to make a general statement about the constraints of \textsc{BaseX}.
+Thus, the Tablet device has been used to search for constraints, which results in the fact that found restrictions are not applying for other devices.\\
+To find the first constraint, which is the maximal size of a \textsc{BaseX} database, five different XML files have been created using the XMark tool.
+Their sizes are 100 MB, 500 MB, 1 GB, 1.5 GB and 2 GB.
+
+
+
 

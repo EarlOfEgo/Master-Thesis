@@ -1,6 +1,7 @@
 \chapter{Summery}
 \label{cha:summery}
 In this chapter a conclusion about the present thesis and the achieved results and findings is given as well as an overview of possible future work.
+As well as a recommendation at which circumstances \textsc{BaseX} can be used in the Android context instead of the standard Android database SQLite3.
 \section{Conclusion}
 \label{sec:summery:conclusion}
 The goal of migrating the XML database \textsc{BaseX} to the Android platform has been achieved, as an implementation of an Android library as well as a client server solution.
@@ -23,6 +24,14 @@ The only similarity is hereby the programming language and after this is compile
 The operations are still slow compared to the desktop version of \textsc{BaseX}, but this is mostly a hardware constraint, because of the lack of various resources on mobile devices.
 Even with this disadvantage the Android version of \textsc{BaseX} is the first available and working solution to execute the XQuery language, with its FLOWR expressions, on Android devices.
 It is also the first XML database that offers the possibility to be used in the Android operating system.
+
+
+The comparison of the Android database SQLite3 and \textsc{BaseX} has shown that there is a potential application area for \textsc{BaseX} on Android.
+Thinking about systems which are using Android as their operating system and are used for collecting a huge amount of data can use the \textsc{BaseX} Android version because of its constant time by inserting data into a database. 
+In contrast to this, it has also been shown that \textsc{BaseX} is no alternative to SQLite3 when having a big database with a lot of queries.
+Depending on how the queries should be processed, \textsc{BaseX} could also being used if the results need to be represented as string.
+The fast query times achieved by SQLite3 are hard to beat, even with increasing hardware.
+
 %It can also be said, that the used XMark benchmark suite is especially designed to measure the performance of an XML database.
 
 
