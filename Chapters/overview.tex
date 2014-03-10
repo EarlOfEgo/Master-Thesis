@@ -3,9 +3,8 @@
 In the following chapter an overview of the used components is given.
 It also outlines the used technologies of the present thesis.
 %It also describes the actual state of the art of XML database as well as on overview of available mobile operating system.
-First an introduction in the native XML database \textsc{BaseX} is given and then the mobile operating system Android is introduced.
+First a short introduction into the XML database \textsc{BaseX} is given and then the mobile operating system Android is introduced.
 At the end of the chapter it is outlined if there is any related work available and how this is important or impacting the present thesis.
-
 
 %\section{Overview of native XML Databases}
 %\label{sec:overview:overview-of-native-xml-databases}
@@ -17,47 +16,74 @@ At the end of the chapter it is outlined if there is any related work available 
 
 \section{Introduction into \textsc{BaseX}}
 \label{sec:overview:introduction-into-basex}
-\textsc{BaseX} is an XML database that also offers the possibility to process XPath/XQuery.
-BLABLU\dots..TODO
+\textsc{BaseX} is an XML database and an XQuery/XPath processor which has been originally developed at the University of Konstanz.
+It is developed as an open source project and it is currently available in version 7.8.
+\textsc{BaseX} offers many features, a graphical user interface and an XQuery editor, to name a just few.
+It is implemented using the programming language Java and is therefore platform independent, as well as there are many clients in different languages available.
+Since 2012 there is also the \textsc{BaseX} GmbH~\footnote{\url{http://basex.org}} company which is taking care of the further development and maintaining of it.\\
+\textsc{BaseX} provides a full XQuery 3 processor and the first full-text implementation for XML documents.~\cite{grun2009xquery}
+XQuery is a query, as well as a functional programming language for processing XML data.~\cite{boag2002xquery} 
+To query data XQuery provides the so called FLOWR expressions, which are containing of \textit{FOR, LET, ORDER BY, RETURN}.
+Those can be seen as complement to the SQL statements \textit{SELECT, FROM and WHERE}.\\
+The above mentioned XQuery Full-text extension, known as XQuery 1.0 and XPath 2.0 Full-Text (XQFT), is used to combine full-text queries with XQuery statements, it supports stemming, synonyms, case sensitivity and the considering of a stop words.~\cite{amer2006xquery}\\
+With its scalability and its rich feature set, \textsc{BaseX} is a state of the art XML database which is applied in many domains.
+
 
 \section{Overview of Android}
 \label{sec:overview:overview-of-android}
-Android is an operating system developed by Google and first released in October 2008.~\cite{developers2011android}
-It is mostly open source and available in version 4.4.
-BLABLUB\dots..TODO
+Android is an operating system developed by the Open Handset Alliance~\footnote{Corporation of 84 companies aiming to evolve open standards in the context of mobile computing.} and it was first released in October 2008.~\cite{developers2011android}
+It aims to be an operating system for mobile devices such as smartphones or tablet devices and it is designed to be used with a touchscreen.
+It is open source and currently available in the newest version 4.4.2, codename KitKat.
+Since its release, in 2008, it is being continuously further developed and with every new release it solves more of the appearing and well known challenges of mobile computing.~\cite{forman1994challenges}
+%For example, the new version supports devices with even lesser RAM than the version before this release.
+Android is based on a Linux kernel and offers everything what is expected of a state of the art operating system, for example drivers for sound as well as high quality 2D or 3D graphics.~\cite{burnette2009hello}
+One of Androids key features is its big variety of supported processors and hardware, since the release of the Android version 3.0 also tablet devices are officially supported.\\
+Additionally to this, it has been especially design for mobile devices with a small amount of available hardware resources, to match the requirements of mobile computing.~\cite{nosrati2012mobile}
+To achieve this, an advanced process management system has been implemented which handles every active application and all processes that are running in the background.
+With this process management, which is autonomic and can not be affected by an application or a background service, Android tries to provide as much hardware resources as possible to an active application.\\
+Android offers a lot of possibilities and available tools for application developers.
+Constitutive of the above mentioned Linux kernel of Android there are libraries which are providing access to the drivers and support other crucial mechanisms. 
+Those libraries, as well as a provided application framework, offers everything a developer needs to build applications for Android.
+This is one of the reasons why there are more than one million applications available in the Android store and why Android is also very attractive for developers.\\
+
+%As one of the main members of the Open Handset Alliance Google always tries to push Android in other contexts, for example as an operating system for TVs as well as operating system for their new Glass.
+
+
+
+
 \section{Related Work}
 \label{sec:overview:related-work}
-Android offers an SQLite database which can be accessed from inside an application by using Java libraries.
-SQLite is a relational database system especially designed for embedded devices with a low requirement of resources.
+Android offers an SQLite3 database which can be accessed from inside an application by using Java libraries.
+SQLite3 is a relational database system especially designed for embedded devices with a low requirement of resources.
 It provides beneath all relevant SQL commands also other mechanisms like views or triggers.~\cite{owens2006definitive}
-With its low hardware requirement it is a perfect relative database for the Android operating system.
-But it is also the only database available for Android application developer, provided by the operating system.
+With its low hardware requirement it is a perfect relational database system for the Android mobile operating system.
+But it is also the only database available for the Android application developers, which is officially provided by the operating system.
 According to \cite{lamb2010berkleydb} there is an Android implementation of the BerkleyDB database, but it appears not very common, because this is the only reference found to this topic.
-Unlike SQLite the BerkleyDB is not a relational database, but it also aims to be deployed on embedded devices.
-Another difference between both databases is that SQLite is implemented in C and the Android version of BerkleyDB uses Java as programming language.
-Lamb~\cite{lamb2010berkleydb} claims this the reason that the BerkleyDB is three times faster than the SQLite database, because there is no need to translate the Java commands to the native C library, using the Java Native Interface (JNI).
-Another approach, for providing an alternative to SQLite, is the object-oriented database Perst~\footnote{\url{http://www.mcobject.com/android}}, which also offers an Android port.
+Unlike SQLite3 the BerkleyDB is not a relational database, but it also aims to be deployed on embedded or mobile devices.
+Another difference between both databases is that SQLite3 is implemented in C and the Android version of BerkleyDB uses Java as programming language.
+Lamb~\cite{lamb2010berkleydb} claims this the reason that the BerkleyDB is three times faster than the SQLite3 database, because there is no need to translate the Java commands to the native C library, using the Java Native Interface (JNI).
+Another approach, for providing an alternative to SQLite3, is the object-oriented database Perst~\footnote{\url{http://www.mcobject.com/android}}, which also offers an Android port.
 Similar to the BerkleyDB Android version Perst is also implemented using the programming language Java and it targets the embedded devices sector, too.
-According to the benchmarks of~\cite{perst-bench} Perst is up to sixteen times faster than the SQLite database.
-For an application developer this could be a considerable alternative to the native SQLite database.
-Despite this statement those three databases are the only available ones for Android and with the BerkleyDB and Perst not natively covered by Android, most applications are using the standard SQLite Android database for storing their data.
+According to the benchmarks of~\cite{perst-bench} Perst is up to sixteen times faster than the SQLite3 database.
+For an application developer this could be a considerable alternative to the native SQLite3 database.
+Despite this statement those three databases are the only available ones for Android and with the BerkleyDB and Perst not natively covered by Android, most applications are using the standard SQLite3 Android database for storing their data.
 Even if the three databases are all using different database models, an XML database is not available for Android, a port of \textsc{BaseX} to this platform would cover this gap and also provide another alternative to the available databases.\\
 \textsc{BaseX} is not only a database it also provides a XQuery processor to query XML documents.
 Android offers the possibility to work with XML documents for its applications developers.
-Therefore the Document Object Model (DOM) package, as a library, is available.
+Therefore the Document Object Model (DOM) package, as a library inside the application framework, is available.
 DOM is an application programming interface (API) for XML documents which have to be well-formed, as well as for HTML documents.~\cite{nicol2001document}
-As a result of this, it is possible to parse XML document into documents represented as objects inside an Android application and access the nodes and attributes inside of this document.
+As a result of this, it is possible to parse XML documents into documents represented as objects inside an Android application and access the nodes and attributes inside of this document.
 Android also provides an alternative to DOM XML parsing, the Simple API for XML (SAX) package which offers, like the name suggests, classes to parse and process XML documents.
 Both XML processing mechanisms, provided by Android, have their advantages and disadvantages.
 It can be said that one advantage of DOM is that it is possible to access the documents after parsing them, because they are stored as objects inside the application heap.
 In contrast to this SAX creates events, or callbacks while reading an XML document.~\cite{roy2001xml}
 The price for the storing the objects inside the memory is the decrease of execution time and the increase of resource consumption.~\cite{chenextracting}
 Since Android API version 8 the XML Path Language (XPath) is available to query and process the content of XML documents.
-Even if there are two possible ways to parse and one to query and process XML documents on Android, there are not the FLOWR expressions which are provided by XQuery available.\\
+Even if there are two possible ways to parse and one to query and process XML documents on Android, there are not the FLOWR expressions, which are provided by XQuery, available.\\
 Besides \textsc{BaseX} there exists other XQuery processor implementations, MXquery~\footnote{\url{http://mxquery.org}} is one that also provides an Android library of its implementation.
 This implementation is presented on the Internet~\footnote{\url{https://sites.google.com/site/mxqueryandroid/}} and supports XQuery 3.
 There is no research to this implementation available for MXquery on Android and it seems that the development has stopped in 2011.\\
-This leads to the result that field of native XML databases, supporting the newest XQuery, implemented and used on Android is not rudimentary explored.
+This leads to the result that the field of native XML databases, supporting the newest XQuery 3 version, implemented and used on Android is not rudimentary explored.
 This also applies to the available database systems usable on Android.
 Thinking about the amount of alternatives, only the BerklyDB Android implementation, to SQLite this is also a field that could be more opened up.
 Migrating \textsc{BaseX} to the Android platform offers hereby a new database system, and an XML query processor supporting the newest XQuery.

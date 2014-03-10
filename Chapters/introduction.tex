@@ -5,7 +5,7 @@ Looking at the market share in the beginning of 2009 shows an amount of 2.8\% so
 Compared to this, five years later, more than 80\% of the sold smart phones are using Android as their operating system.
 This is only one aspect that illustrates the triumphal course Android has made the last few years.
 In addition to this the number of available applications for Android phones increase also and has reached more than a million in the third quarter of 2013.
-Google offers with its Android Play Store the possibility for every developer to easy distribute his application, and offers the possibility to reach millions of customers world wide.
+Google offers with its Android Play Store the possibility for every developer to easy distribute his application, and provides the possibility to reach millions of customers world wide.
 This opportunity is responsible for the amount of new applications which occur every day and recently reached the index of more than one million.
 The chance to reach a wide audience with its application is not the only reason for this high amount of available applications.
 The available developer tools and libraries for Android development are also responsible for its success, which are also being evolved in the last years.\\
@@ -14,36 +14,39 @@ XML can be describes as a format to store data in a text file using a markup lan
 It is used for exchanging, storing and defining data, as well as it is extended for other document formats.
 Therefore are also a lot of developer tools or libraries that use or provide the possibility to work with XML.
 One of it is the XML database engine \textsc{BaseX}.
-It is also an XQuery processor and offers features like 
-The present thesis aims to receive a working Android version of the XML database \textsc{BaseX}.
-
+It is also an XQuery processor and offers features like a full text search as well as a client server architecture.
+The present thesis aims to receive a working Android version of the XML database \textsc{BaseX} and analyzing the received result by benchmarking it, for example.
 
 
 \section{Motivation}
 \label{sec:introduction:motivation}
-Besides the fact that Android is becoming more popular with every sold smartphone or tablet PC, it is also getting more successful in other fields.
+Besides the fact that Android is becoming more popular with every sold smartphone or tablet device, it is also getting more successful in other fields.
 For example there exists research about its abilities to be an embedded systems operating system. ~\cite{lee2010evaluating}~\cite{maia2010evaluating}
-As well as an operating system for board computers in newer cars, to provide navigation, entertainment and status information.~\cite{macario2009vehicle}
+Just as well as an operating system for board computers in newer cars, to provide navigation, entertainment and status information to the driver.~\cite{macario2009vehicle}
 Looking at its triumphal procession in the last three years, it can be said that it will play an important role in the future as an operating system which can be used in a big variety.\\
 The same applies for the storage format XML, which has been become more important in the last years, since its release in 1998.
+XML is used to define graphical interfaces in Android and its storage ability is being more distributed every day.
 
 
 
-It is obvious that sooner or later an implementation of an XML database for Android is made, as well as an XQuery/XPath processor, which is also not available for the Android operating system, at the moment.
+It is obvious that sooner or later an implementation of an XML database for Android and a corresponding XQuery/XPath processor is made, which is also not available for the Android operating system, at the moment.
 In order to this the present thesis outlines a first approach to offer developers the ability to use an XML database and also an XQuery/XPath processor for their Android applications.
 
 
 
 \section{Overview}
 \label{sec:overview}
-In the present thesis outlines the migration of the native XML database \textsc{BaseX} to the Android operating system.
-Therefore, first an outline is given, about the database, the Android operating system and if there exist related work to the topic.
-This section also underlines that there is no native XML database available for Android, which emphasizes the purpose of the present thesis.
+The present thesis describes the migration of the native XML database \textsc{BaseX} to the Android operating system.
+Therefore, first an outline is given, about the database, the Android operating system and if there exists relating work to this topic.
+This section also underlines that there is no XML database available for Android, which emphasizes the purpose of the present thesis.
 In Chapter~\ref{sec:migration:porting-basex-to-android} the source and target platforms of \textsc{BaseX} has been analyzed as well as the internal dependencies which \textsc{BaseX} is using.
 After this the database has been migrated to the Android platform, a library has been created which provides the usual \textsc{BaseX} operations.
+In addition to the library the client server architecture of \textsc{BaseX} has been also implemented for the Android platform.
 At the end of the chapter the problems and issues, as well as their solutions, during the migration have been illustrated.
 In the next chapter the ported version of \textsc{BaseX} has been analyzed with different techniques and the bottlenecks have been identified.
 The Android library has been optimized by improving the found bottlenecks.
+It has been compared to the available SQLite3 database and a proposition has been made for what kind of use case which database system is the better choice.
+In the end of the this chapter the constraints of the \textsc{BaseX} Android version have been searched and explained.
 In the last chapter a summery is given as well as a conclusion and proposals for future work which could pick up where the thesis ends.
 
 

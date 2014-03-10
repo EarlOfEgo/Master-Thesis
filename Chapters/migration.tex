@@ -1,31 +1,33 @@
 \chapter{Porting \textsc{BaseX} to the Android platform}
 \label{sec:migration:porting-basex-to-android}
 In the present chapter it is shown how the \textsc{BaseX} database has been migrated to the Android platform.
-To achieve this goal the source and target platforms have been analyzed and all requirements were been determined.
-The main focus lies on the different software platforms and not the hardware specific aspects, due to the big variety of systems and devices which are running on both platforms. 
-Therefore the two virtual machines and their execution byte formats have been compared and also the specific Android internals have been explored.
+To achieve this goal the source and target platforms have been analyzed and all requirements have been determined.
+The main focus lies on the different software platforms and not the hardware specific aspects, due to the big variety of systems and devices which are able to execute both platforms. 
+Therefore the two virtual machines and their execution byte formats have been compared and also the specific Android internal mechanisms have been explored.
 In Section~\ref{sec:migration:problems-during-the-migration} it is illustrated which parts of the \textsc{BaseX} version have been changed and in which way to receive a working \textsc{BaseX} Android version.
-The last section describes the problems which occurred during the migration of the database to Android.
+The next section outlines the creation of a client server architecture using \textsc{BaseX} on the Android operating system.
+The last section of the present chapter describes the problems which occurred during the migration of the database to Android.
 
 \section{Analyzing the source and target platforms} 
 \label{sec:migration:analysing-the-source-and-target-platform}
-This section outlines the two different platforms and their analyzing.
-The main part of it concentrates on the software part, because both platforms are running on a huge amount of hardware devices.
+This section outlines the two different platforms and their specific properties by analyzing them.
+The main part of it concentrates on the software part, because both platforms can be executed on a huge amount of hardware devices.
 The term platform is hereby defined as on one side the Java Virtual Machine (JVM) and on the other side the Dalvik Virtual Machine (Dalvik VM, or DVM) in the Android environment.
 For a better identification the JVM is marked as the source and the DVM as the target platform.
+In later sections the Android operating system is also termed as target platform.
 \\
-The JVM and the DVM are both virtual machines (VM), but they vary in different ways.
-A virtual machine is a simulated computer, which can be a whole system with all parts a computer provides.
+The JVM and the DVM are both virtual machines (VM), but they vary in many different ways.
+To clarify the term virtual machine it has to be said that a VM is a simulated computer, which can be a whole system with all parts a normal computer provides and also needs to execute a program.
 Or it is an abstraction layer which provides the functionality to execute a program on every system that runs the virtual machine.
-Unlike compiled machine code a program for a virtual machine is platform independent, because it does not matter on which operating system it is executed, as long as the virtual machine is available.
+Unlike compiled machine code a program for a virtual machine is platform independent, because it does not matter on which operating system it is executed, as long as the virtual machine is available for the specific operating system.
 A disadvantage of this is the loss of speed, which is a result of the execution of the virtual machine and not only the program in general.~\cite{craig2006virtual}
 \\
 For both virtual machines the programming language Java is used, which is being compiled into code that the VMs understand and are able to execute.
 Although both platforms are virtual machines they differ in some crucial ways.
 One of the main difference is that the JVM is a stack based and the DVM is a register based virtual machine.
-Another distinctness of both machines is that the DVM is optimized to be executed on mobile devices, meaning that it is designed to use less memory and CPU usage than the JVM.
-Lesser hardware usage implies also lesser battery usage, which is also a factor which should be considered in the field of mobile development.
-Another difference which need to be considered is the host system, which is in the DVM case Android.
+Another distinctness of both machines is that the DVM is optimized to be executed on mobile devices, meaning that it is designed to use less memory and having a low CPU usage than the JVM.
+Lesser hardware usage implies also lesser battery usage, which is also a factor which should be considered in the field of mobile development.\\
+Another difference, which need to be considered, is the host system, which is in the DVM case only Android.
 And as opposed to this it could be Windows, Mac OS, or any Linux/Unix derivate as host system running a Java virtual machine. 
 This circumstance has to be considered if external sources will be used, like writing or reading a file, which is different in every operating system.
 
@@ -45,7 +47,7 @@ This can be demonstrated by comparing the instructions done by adding two intege
 The stack based virtual machine has to execute four machine instructions, while the register based VM can do the same operation in one instruction.
 The reason for this is that the stack based VM needs to pop the two values first before it can add and store them back on the stack.
 The instructions are \textit{'pop 1', 'pop 2', 'add 1 2', 'push result'}.\\
-Figure~\ref{fig:stack-based-addition} illustrates the executed instructions of an addition with a stack based virtual machine.
+Figure~\ref{fig:stack-based-addition} illustrates the instruction steps which need to be performed to execute an addition with a stack based virtual machine.
 \begin{figure}[h]
 \begin{center}
 \includegraphics[scale=0.65]{images/stack-based-addition.png} 
@@ -53,9 +55,9 @@ Figure~\ref{fig:stack-based-addition} illustrates the executed instructions of a
 \label{fig:stack-based-addition}
 \end{center}
 \end{figure}
-
+\newpage
 Compared to this, the register based virtual machine just needs one machine instruction to complete the same addition of two numbers.
-The required instruction is \textit{'ADD R1, R2, R3'}, which can be translated into add content of register 1 and register 2 and store it in register 3.
+The required instruction is \textit{'ADD R1, R2, R3'}, which can be translated into: add the contents of register 1 and register 2 and store the result in register 3.
 Figure~\ref{fig:register-based-addition} illustrates this by showing the add operation of the numbers one and two.
 \begin{figure}[h]
 \begin{center}
@@ -64,6 +66,7 @@ Figure~\ref{fig:register-based-addition} illustrates this by showing the add ope
 \label{fig:register-based-addition}
 \end{center}
 \end{figure}
+
 This minimal example shows how the register based virtual machine uses lesser machine instructions compared to the stack based.
 The disadvantage in this is that the register based machine has to store the addresses, meaning the corresponding registers, of the operands.
 Which is not necessary at a stack based machine, because of the stack pointer that always directs to the actual operand using the Last In First Out (LIFO) principal.
@@ -78,14 +81,14 @@ This has been already done by the Java compiler which compiles the Java source c
 Even if it is faster than other interpreted languages, it is still slower than code that is compiled into a machine language and executed directly on the hardware.
 This so called machine code is faster because there is no layer between the executions and the hardware, which could slow down the execution.~\cite{aycock2003brief}\\
 There is a technique which can improve a virtual machine in performance aspects by adding a Just In Time (JIT) compiler to it.
-Generally it can be said, that a JIT compiler, used by a virtual machine, compiles heavy used code segments or very expensive calculations into the faster machine code.
+In general it can be said, that a JIT compiler, used by a virtual machine, compiles heavy used code segments or very expensive calculations into the faster machine code.
 There is a great number of different types of JIT compilers and how they work, the two used by the JVM or the DVM are:
 \begin{itemize}
 \item method-based
 \item trace-based
 \end{itemize}
 The trace-based method works by looking at the most executed code fragments, especially loops, and compiles them into native machine code.\\
-The method-based JIT mechanism is to compile whole methods, which are often used and expensive in execution time, into native machine code.
+The method-based JIT mechanism, in contrast to the trace-based, compiles whole methods, which are often used and expensive in execution time, into native machine code.
 Since the release of the Android version 2.2, release name Froyo, the Dalvik VM has received a JIT compiler additionally to the interpreter mechanism.
 According to \cite{cheng2010jit} the implemented Dalivk JIT compiler can speed up the execution of intensive operations up to five times.
 The Dalvik VM uses the above mentioned mechanism of a trace-based JIT compiler mixed with the usual DVM interpreter.
@@ -93,13 +96,13 @@ The given advantage of the trace-based method is that not whole methods are bein
 Instead only the parts which are often executed are being compiled.
 This reduces the size of the code which needs to be compiled by the JIT and also omits the not so often executed methods parts like exception handling.
 It is needles to compile such parts in machine code to speed them up, because most of the execution time of the program they are not being called.
-It should also reduce the compile time for the JIT because of the selective compilation into machine code.\\
+It should also reduce the compile time for the JIT, because of the selective compilation into machine code.\\
 To realize this the Dalvik virtual machine has received an additional thread, which is responsible for the JIT compilation.
 Beneath this new thread there is the main thread, that includes the interpreter.
 This interpreter interprets the bytecode and records the traces and their occurrence.
 If the amount of the occurrence is higher than a predefined number, the trace is being stored into the trace queue.
 The new added thread, the JIT thread, compiles the traces from the queue and writes the machine code into the code cache.
-The main thread now is doing a lookup if the bytecode that needs to be executed is now available in the code cache.
+The main thread now is doing a lookup if the bytecode that needs to be executed is available in the code cache, at the moment.
 If this condition is met, it uses the machine code from the code cache instead interpreting the bytecode.\cite{oh2012evaluation}
 Picture~\ref{fig:dvm-threads} illustrates the principle of the two threads in the DVM.\\
 \begin{figure}[h]
@@ -109,7 +112,7 @@ Picture~\ref{fig:dvm-threads} illustrates the principle of the two threads in th
 \label{fig:dvm-threads}
 \end{center}
 \end{figure}
-
+\newpage
 Depending on the different implementation of a JVM, it differs which type of JIT compiler mechanism is used.
 For this thesis the Oracle JVM HotSpot is used, which has a method-based JIT compiler as default.
 It is also possible to use another JIT mechanism in the HotSpot JVM triggered by parameters during the VM start.
@@ -119,9 +122,9 @@ Those methods are called hot spots, which are also responsible for the name of t
 Both virtual machines are providing a garbage collector, which is responsible for the memory management of the byte code.
 Same as the principle of own instance of the Dalvik virtual machine per process, which is being explained in Section~\ref{sec:android-internals}, every process also has its on instance of a garbage collector on Android.
 It is a mark-and-sweep garbage collector that only collects the objects that are not referenced any more in the application heap.
-The shared heap, which is part of the Zygote process that is also described in Section~\ref{sec:android-internals}, has its own garbage collector.~\cite{maia2010evaluating}
+The shared heap, which is part of the Zygote process, and which is also described in Section~\ref{sec:android-internals}, has its own garbage collector.~\cite{maia2010evaluating}
 \\
-Although both virtual machines are using Java as programming language, Dalvik lacks of some libraries that are available at the JVM and vice versa.
+Although both virtual machines are using Java as programming language, Dalvik lacks of some libraries that are available for the JVM and vice versa.
 In Section~\ref{sec:migration:migration-of-basex-to-android} the used libraries of \textsc{BaseX} are analyzed and investigated which of them are supported by the DVM.\\
 A general statement about both virtual machines could not be made, because they differ in a lot of aspects.
 Especially that the DVM has been created for the mobile context and can only be ran on Android devices\footnote{There exist some community projects which are aiming to port the Dalvik VM to other platforms like Linux x86 for example: \url{http://www.android-x86.org/}}.
@@ -134,11 +137,11 @@ Both virtual machines differ in their format of the executable files.
 On one side there is the Java Archive File (JAR) for the JVM and the Davlik Executable (\textit{dex}) on the other side.
 The \textit{dex} is being packed into an Android Application package file (\textit{apk}) which can be executed by the Android operating system.
 A JAR file is an archive which includes the compressed class files, this class files are being build out of the Java source code by using the javac compiler.~\cite{pugh1999compressing} 
-An \textit{apk} file is also an archive file, but it not only includes the executable program, it also includes the meta information and resource files.
+An \textit{apk} file is also an archive file, but it does not only include the executable program, it also includes the meta information and resource files.
 Although an Android application is an \textit{apk} file only the format of the \textit{dex} file is outlined here, due to the fact that the DVM executes those files.
 A \textit{dex} file is created by using a tool which compiles Java class files into \textit{dex} files.
 This tool is called \textit{dx} and it is part of the Android software development kit.
-Picture~\ref{fig:create-apk} illustrates the flow of an \textit{apk} creation, which differs to the creation of a JAR file by creating \textit{dex} files out of the class files.\\
+Picture~\ref{fig:create-apk} illustrates the flow of an \textit{apk} creation, which differs to the creation of a JAR file by creating the \textit{dex} files out of the class files.\\
 \begin{figure}[h]
 \begin{center}
 \includegraphics[scale=0.55]{images/create-apk.png} 
@@ -172,8 +175,8 @@ Looking at Image~\ref{fig:jar-dex} demonstrates that every class which uses this
 In general it can be said that \textit{dex} files are smaller than their equivalent JAR files, because of the shared constant pool.~\cite{bornstein2008dalvik}
 An advantage of the creation chain of a \textit{dex} file is that it is theoretically possible to create a \textit{dex} file out of every jar archive.
 The problem hereby is that Android does not support all Java libraries that the JVM supports, but this can be done by using the above mentioned dx-tool. 
-As mentioned above, this \textit{dex} file is executed by the Dalvik virtual machine, but it is not the Android application.
-This application is the \textit{apk} that includes also UI related information and other resource files, like images or sound.
+As mentioned before, this \textit{dex} file is executed by the Dalvik virtual machine, but it is not the Android application.
+An Android application is the \textit{apk} that includes also user interface related information and other resource files, like images or sound.
 
 \subsection{\textsc{BaseX} internals}
 \label{sec:migration:basex-internals}
@@ -215,7 +218,7 @@ This is always expensive in time consumption and should be done as little as pos
 Image~\ref{fig:zygote-and-app} illustrates the principle that every application works in its own sandbox.\\
 \begin{figure}[h]
 \begin{center}
-\includegraphics[scale=0.65]{images/zygote-and-app.png} 
+\includegraphics[scale=0.75]{images/zygote-and-app.png} 
 \caption{Illustration of the Android application architecture}
 \label{fig:zygote-and-app}
 \end{center}

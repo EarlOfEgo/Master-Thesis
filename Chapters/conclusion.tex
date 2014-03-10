@@ -1,4 +1,4 @@
-\chapter{Summery}
+\chapter{Summary}
 \label{cha:summery}
 In this chapter a conclusion about the present thesis and the achieved results and findings is given as well as an overview of possible future work.
 As well as a recommendation at which circumstances \textsc{BaseX} can be used in the Android context instead of the standard Android database SQLite3.
@@ -6,8 +6,8 @@ As well as a recommendation at which circumstances \textsc{BaseX} can be used in
 \label{sec:summery:conclusion}
 The goal of migrating the XML database \textsc{BaseX} to the Android platform has been achieved, as an implementation of an Android library as well as a client server solution.
 Only a few features, like the cryptographic function, have not been migrated to the Android platform in order to get a working solution.
-The occurred issues and problems have could been all solved, some brought constraints with them.
-One of them is the Android version of the application which wants to use the \textsc{BaseX} library has to be higher than 2.3.
+The occurred issues and problems could have been solved, some brought constraints with them which are not restricting \textsc{BaseX} in its fundamental functioning.
+One of them is the minimal Android API version of the application, which wants to use the \textsc{BaseX} library, has to be higher than 2.3.
 As mentioned in the corresponding section there are only less than one percent of the distributed mobile devices using a version lower than 2.3.
 Another constraint is that also the name of the application has to be passed to the library in order to get it working without any troubles.
 As a conclusion of the migration it could be said that a positive result has been achieved, even with the mentioned constraints, because it could have been impossible to migrate \textsc{BaseX} to the Android platform for unknown circumstances.
@@ -18,10 +18,11 @@ As a conclusion of the migration it could be said that a positive result has bee
 
 The performance of the database operations and the execution of the XMark benchmark queries have been identified and improved by adjusting the source code of \textsc{BaseX} with best practices for Android code.
 This adjustment also illustrates the big difference between the two platforms, even if it is not visible on the first view.
-It has also been shown how difficult it is two compare two different platforms, executed on different devices to each other.
-The only similarity is hereby the programming language and after this is compiled everything differs, beginning from the bytecode format to the execution of it inside a virtual machine.
+It has also been shown how difficult it is two compare two different platforms, executed on different devices, to each other.
+The only similarity is hereby the programming language and after it is compiled everything differs, beginning from the bytecode format to the execution of it inside a virtual machine.
+Nevertheless it was possible to optimize the android version and make it up to three times faster for specific conditions.
 %The replacement of the getter and setter methods affected the execution of the Android version in a big factor and the desktop version meaningless, which underlines the statement of the big differences of the two platforms.
-The operations are still slow compared to the desktop version of \textsc{BaseX}, but this is mostly a hardware constraint, because of the lack of various resources on mobile devices.
+However, the operations are still slow compared to the desktop version of \textsc{BaseX}, but this is mostly a hardware constraint, because of the lack of various resources on mobile devices.
 Even with this disadvantage the Android version of \textsc{BaseX} is the first available and working solution to execute the XQuery language, with its FLOWR expressions, on Android devices.
 It is also the first XML database that offers the possibility to be used in the Android operating system.
 
@@ -42,8 +43,6 @@ Also the development of Android and the always increasing available resources of
 
 
 
-In general the main goal of proting \textsc{BaseX} to Android and improving it in the aspect of performance have been achieved\dots\dots\dots.whatever blablub
-
 
 \section{Future work}
 \label{sec:summery:future-work}
@@ -62,6 +61,6 @@ A lot about can not be said, because it is in a very early state and Google has 
 Future work could be to investigate the improvements ART brings and if there are adjustments in the \textsc{BaseX} Android library can be done to achieve better runtime values using ART.
 The improvements that has been done in Section~\ref{sec:improving} could be kept, because most of them are being done to optimize the JIT mechanism from Dalvik, which is the principle of ART.\\
 On the other side it could be the hardware aspect that can be investigated.
-Because of the lack of possibilities during the work on this thesis the \textsc{BaseX} Android library could only be tested on one device.
+Because of the lack of possibilities, during the work on the present thesis, the \textsc{BaseX} Android library could only be tested on one device.
 A lot of new devices with new hardware are released every year which all have different performance abilities.
 Future work could be the focusing on finding a good hardware specification which is the minimum requirement to achieve assumable execution times of the \textsc{BaseX} library.
