@@ -1,6 +1,6 @@
 \chapter{Outline}
 \label{cha:overview}
-In the following chapter an overview of the used components is given.
+In the present chapter an overview of the used components is given.
 It also outlines the used technologies of the present thesis.
 %It also describes the actual state of the art of XML database as well as on overview of available mobile operating system.
 First a short introduction into the XML database \textsc{BaseX} is given and then the mobile operating system Android is introduced.
@@ -16,18 +16,19 @@ At the end of the chapter it is outlined if there is any related work available 
 
 \section{Introduction into \textsc{BaseX}}
 \label{sec:overview:introduction-into-basex}
-\textsc{BaseX} is an XML database and an XQuery/XPath processor which has been originally developed at the University of Konstanz.
+\textsc{BaseX} is a native XML database and an XQuery/XPath processor which has been originally developed at the University of Konstanz.
+An XML database is a database which stores or processes its data in the XML format, by using the functional programming and query language XQuery.
 It is developed as an open source project and it is currently available in version 7.8.
 \textsc{BaseX} offers many features, a graphical user interface and an XQuery editor, to name a just few.
 It is implemented using the programming language Java and is therefore platform independent, as well as there are many clients in different languages available.
-Since 2012 there is also the \textsc{BaseX} GmbH~\footnote{\url{http://basex.org}} company which is taking care of the further development and maintaining of it.\\
+Since 2012 there is also the company \textsc{BaseX} GmbH~\footnote{\url{http://basex.org}} which is taking care of the further development and maintaining of it.\\
 \textsc{BaseX} provides a full XQuery 3 processor and the first full-text implementation for XML documents.~\cite{grun2009xquery}
 XQuery is a query, as well as a functional programming language for processing XML data.~\cite{boag2002xquery} 
 To query data XQuery provides the so called FLOWR expressions, which are containing of \textit{FOR, LET, ORDER BY, RETURN}.
 Those can be seen as complement to the SQL statements \textit{SELECT, FROM and WHERE}.\\
 The above mentioned XQuery Full-text extension, known as XQuery 1.0 and XPath 2.0 Full-Text (XQFT), is used to combine full-text queries with XQuery statements, it supports stemming, synonyms, case sensitivity and the considering of a stop words.~\cite{amer2006xquery}\\
 With its scalability and its rich feature set, \textsc{BaseX} is a state of the art XML database which is applied in many domains.
-
+\cite{grun2010storing}
 
 \section{Overview of Android}
 \label{sec:overview:overview-of-android}

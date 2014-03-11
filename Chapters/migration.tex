@@ -195,7 +195,7 @@ This information is also stored in the above mentioned \textit{Prop} class by us
 
 \subsection{Android internals}
 \label{sec:android-internals}
-As shown in the Sections~\ref{sec:migration:comparison-of-the-two-virtual-machines} and \ref{sec:comparison-of-the-two-bytecode-formats} the two virtual machines and the corresponding bytecode formats differ.
+As shown in the Sections~\ref{sec:migration:comparison-of-the-two-virtual-machines} and \ref{sec:comparison-of-the-two-bytecode-formats} the two virtual machines and their corresponding bytecode formats differ.
 However, Android has some other specialties about its internal processing.
 The Android operating system is a Linux based operating system aimed to run on mobile devices.
 Therefore it has been created as a Linux fork of the 2.6.*\footnote{Since Android version 4.* a Linux kernel 3.* is used} kernel and it is has been especially designed for the mobile context.
@@ -203,9 +203,9 @@ Which includes special focus for the resource consumption, because most mobile d
 As shown in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines} an Android application is executed on the Dalvik virtual machine.
 Here it need to be said that every application runs its own Dalvik instance, by forking the main Dalvik instance into an own Linux process.
 Here sets the Android policy in, that every application is independent from every other application and is executed in its own process, which is called sandbox.
-This also is applied for the location of all files the application uses.
-An application can be compared as an user in Linux, every application is its own user and has its own home directory.
-This directory can only be accessed by the owning application and can be found in the /data/data directory.
+This principle is also applied for the location of all files the application needs and uses.
+An application is similar in its rights and processing to a user in Linux, every application is its own user and has its own home directory.
+This directory can only be accessed by the owning application and is located in the /data/data system directory.
 This directory can include an own SQLite3 database, cache directory, shared preferences\footnote{Android framework that provides a mechanism to store primitive data types.} and every type of private data.
 The aspect of security is the reason for this solution as well as the stability of the application, considering the own Dalvik instance.
 This is called the \textit{principle of least privilege} which specifies that as less as possible privileges are given to the application.
@@ -223,11 +223,12 @@ Image~\ref{fig:zygote-and-app} illustrates the principle that every application 
 \label{fig:zygote-and-app}
 \end{center}
 \end{figure}
-The main Dalivk instance, which is the root parent for all forked virtual machines, is called Zygote and it is started by the boot up process.
-Zygote is designed to load and initialize the core library classes so that every forked instance do not have to do this.
+\newpage
+The main Dalivk instance, which is the root parent for all forked virtual machines, is called Zygote and it is started by the boot up process of Android.
+Zygote is designed to load and initialize the core library classes so that every forked instance does not have to do this.
 This is compared to starting a new virtual machine a speed improvement and saves memory, because not every VM instance have to has its own core libraries loaded.
 This can be done because the core libraries are all read only and shared by all Dalvik instances.\cite{ehringer2010dalvik}
-Another difference to the usual Linux operating system is that Android uses the Bionic libc which is a special from Google developed library for Android that has its own pthread implementation.
+Another difference to the usual Linux operating system is that Android uses the Bionic libc which is a special from Google developed library for Android, which has its own pthread implementation.
 This library is especially designed for the mobile context and the Android environment which improves the speed of forking the Dalvik virtual machine too.~\cite{brady2008android}
 
 \section{Migration of \textsc{BaseX} to Android}
@@ -237,7 +238,7 @@ Like it has been mentioned in Section~\ref{sec:migration:comparison-of-the-two-v
 \textsc{BaseX} is written in the Java programming language and aims to be executed on virtual machines that are implemented by using the JVM specifications.
 Therefore it is not possible to transform the \textsc{BaseX} jar file into a \textit{dex} file, using the dx-tool, and execute it on an Android device.
 On the other side the DVM offers class libraries that the JVM does not support or knows.
-These libraries do not intent to replace not supported Java class libraries, their purpose is to provide special Android related methods, for example logging or tracing of method calls as well as accessing hardware components, like sensors. 
+These libraries do not intent to replace not supported Java class libraries, their purpose is to provide special Android related methods, for example logging or tracing of method calls as well as accessing hardware components of a mobile device, sensors or the mobile network for example. 
 
 \subsection{Analyzing the libraries used by \textsc{BaseX}}
 \label{sec:migration:analyzing-the-libraries-used-by-basex}
@@ -254,7 +255,7 @@ Looking at the Android documentation the main packages that are not supported ar
   \item java.awt\footnote{except the subpackage java.awt.font that provides two classes: NumericShaper and TextAttribute.}
   \item javax.swing
 \end{itemize}
-All others are full or partially supported by the Dalvik VM.
+All others are full or partially supported by the Java language of the Dalvik VM.
 The reason why the packages awt and swing are not supported is that Android uses its own GUI libraries and framework.
 The Android provided GUI elements can either be written as Java code or can be defined in XML layout files.
 The framework offers everything that is needed to build an application with a graphical user interface.\\
@@ -281,7 +282,7 @@ These are XQuery functions which are:
   \item validate-signature(node)
 \end{itemize}
 To provide these five XQuery functions on Android, the \textit{javax.xml.crypto} package need to be migrated to Android too.
-Another possibility to support those functions would be using other cryptographic classes which are provided by Android.\\
+Another possibility to support these XQuery functions would be the using of other cryptographic classes which are provided by Android.\\
 All other subpackages are supported by the Android platform.
 For clarification not all methods that are provided by every used library are checked if they are available on Android, this would be to much effort, thinking about the amount of available classes.
 Nevertheless this could be figured out in Section~\ref{sec:migration:creating-a-basex-android-library} and Section~\ref{sec:migration:problems-during-the-migration} outlines the methods which are not supported by some Android versions.
@@ -294,11 +295,11 @@ There are three types of Android projects, they differ in their functionalities 
 The first is the type of project that needs to be created if an executable application is the goal of the development process.
 As a result of this an installable \textit{apk} file will be created by the build process.\\
 The seconds type of Android project is the so called Test project.
-This type of project aims to test executable Android projects by providing an Android testing framework with unit test, using the unit test framework Junit.
+This type of project aims to test executable Android projects by providing an Android testing framework with unit test, using the Java unit test framework Junit.
 Both projects have the same structure of folders and files.\\
 The third project type is the library project which goal it is to be a library that can be used by every other Android project.
 The difference to a normal Android project is that this project is not being build into an \textit{apk} file, it is being used by other Android projects which pull it in their \textit{apk} and build it with their code.
-Depending on the Android API level an Android library differs from a usual Java library that it is not compressed into a jar archive.
+Depending on the Android API level an Android library differs from a usual Java library, by the fact that the Android library is not compressed into a jar archive.
 This feature has been added in Android versions higher than API level 14, Android 4.0 codename Icecream Sandwich.
 For older versions, before this API level, the library files were pulled into the project and compiled into the corresponding \textit{dex} file.\\
 If a new Android application is developed it is not necessary to setup the right project structure by hand, therefore Android provides a Software Development Kit (SDK).
@@ -351,7 +352,7 @@ As a result of this the depending classes of the GUI have also been removed, tho
 Afterwards the not supported \textit{javax.xml.crypto} packages and the dependent class \textit{FNCrypto} have been removed.
 Therefore it not possible to use the cryptological XQuery function in this \textsc{BaseX} Android version.\\
 The result of removing all not supported packages, classes and libraries is that it is now possible to compile \textsc{BaseX} to an Android \textit{dex} file.
-Although it is not possible at this moment to execute \textsc{BaseX}, because of some constraints mentioned in Section~\ref{sec:android-internals} and not facing the fact that an Android library is not executable.
+Although it is not possible at this moment to execute \textsc{BaseX}, because of some constraints mentioned in Section~\ref{sec:android-internals} and not facing the fact that an Android library is not executable.\\
 In a usual Linux environment \textsc{BaseX} stores all its database files in a directory in the normal user directory.
 This means executing \textsc{BaseX} on Android without adjusting the directory to store the databases, would not work.
 \textsc{BaseX} receives the name and location of the home directory of the user by calling the Java function \textit{System.getProperty(``user.home'')}, which works well with the JVM.
@@ -359,16 +360,17 @@ Using this function on Android gives an empty string and results in \textsc{Base
 To avoid this behavior the above mentioned function need to be replaced.
 The path where the data has to be stored has to be a directory that only the application can access.
 Every application receives one directory with the given constraint from Android.
-This is where it is installed as well as where the application stores its data, additionally it is possible to read or write on external storage, but this is not protected by the operating system.
-The problem here is that \textsc{BaseX} should be a library project and it should be usable by every other Android project.
-So it is impossible to say how the directory is named and located where the databases need to be stored before even knowing how the application which uses the \textsc{BaseX} library is called.
+This is where it is installed as well as where the application stores its data.
+Additionally to this it is possible for an application to read or write on external storage, but this is not protected by the operating system which means that every application can access and modify those files.\\
+The problem by using the private application directory is that \textsc{BaseX} should be a library project and it should be usable by every other Android project.
+So it is impossible to say how the directory is named and to locate where the database files have to be stored before even knowing how the application, which uses the \textsc{BaseX} library, is called.
 The explanation for this is that an Android application receives its directory by the name of its main package and not by the name of the library main package, so that more than one application can use this library.
 This is a issue that has to be dealt with, which is illustrated and discussed in Section~\ref{sec:migration:problems-during-the-migration}.
 Hence, it is necessary to tell the library this location and use this instead of its own package name.
 To implement this a class has been created which is an entry point for the library and is the first instance when the \textsc{BaseX} Android library is used.
 This class creates an object of the library and needs the package name of the application as an argument for the method that returns an instance of its object.
 To create the object the Singleton pattern has been used~\cite{gamma2010entwurfsmuster}.
-The reason for this is that only one instance of the database can be created and used.\\
+The reason for this is that only one instance of the database can be created and used inside one application.\\
 This class is called \textit{\textsc{BaseX}Database} and creates a \textsc{BaseX} Context object by calling a constructor that has been added to the Context class.
 The newly created Context constructor checks if the given directory is available and if it is possible to read and write to this directory.
 Is it the first time the constructor of the class is used, it creates a directory which is called \textit{BaseXData}.
@@ -377,13 +379,13 @@ This directory is only accessible from this application~\footnote{Assuming the a
 At this moment it is possible to use \textsc{BaseX} as an Android library and it would create the needed \textsc{BaseX} directory.\\
 To provide the \textsc{BaseX} operations the above mentioned class has been extended by additional methods which can be used for this purpose.
 All are implemented by using the above mentioned Context object, which means every operation is executed on this object.\\
-After this migration it is possible to use \textsc{BaseX} like it can be done on every usual PC.
+After this migration it is possible to use \textsc{BaseX} as it can be done on every usual PC which provides an implementation of the JVM.
 Except the cryptographic XQuery function, the \textsc{BaseX} Android library offers all functionalities like the normal \textsc{BaseX} desktop version offers.
 The Android principle that every application works in its own sandbox is also being kept.
 With this solution every application has its own \textsc{BaseX} database in its own directory, an advantage could be that the database does not need to consider queries that are coming from another applications and their synchronizations.\\
 However, in the next section an alternative solution to this is provided by implementing the client/server mechanism of \textsc{BaseX} in Android.
 The advantages and disadvantages of the library implementation are outlined and investigated in Chapter~\ref{cha:analysis}.
-For the validation and performance messuarment a test application of the \textsc{BaseX} Android library has been written and its execution performance analyzed.
+For the validation and performance messuarment a test application of the \textsc{BaseX} Android library has been written and its execution performance analyzed, illustrated in Section~\ref{sec:analysing-the-execution-performance}.
 
 \subsection{Providing a \textsc{BaseX} Android server client solution}
 \label{sec:migration:providing-a-server-client-solution}
@@ -393,32 +395,34 @@ The reason for this, as mentioned in Section~\ref{sec:android-internals}, is the
 Speaking of a disadvantage could be false, because this also prevents unauthorized applications to read or modify the data of an application.
 However, Android provides a mechanism which offers the possibility to provide data from one application to another.
 This technique is called content provider and is used for system wide databases like the database that contains the contacts of the owner of an Android device.
-Thinking of different applications that are using the same data shows that this could lead to redundant databases, which would increase the required storage size.\\
+Thinking of different applications that are using the same data shows that this could lead to redundant databases, which would increase the required storage size.
+In addition to this, every time the data changes on one point it has to be adjusted at every other point too.
+For example, when every application has its own database storing the contacts and a new contact is added, all those databases need to updated.\\
 Additionally to the stand alone version of \textsc{BaseX} it is possible to use it as a client server solution.
-An instance of a \textsc{BaseX} client connects to a server and sends its requests and queries to to a server, which executes them and sends them back to the client.
+An instance of a \textsc{BaseX} client connects to a server and sends its requests and queries to a server, which executes them and sends them back to the client.
 The advantage of this solution is that the client does not have to do the execution of the database related operations.
 Also the files which are containing the data, are stored and managed on the server and not on the client.
 Both shown advantages reducing resource consumptions at the client instance, it saves storage size as well as execution resources like CPU or RAM occupation.
 But there is also a disadvantage, namely the client can only operate if there is a server available, and therefore it needs a connection to the server to send requests and receive responses.\\
 As mentioned in Section~\ref{sec:overview:introduction-into-basex} \textsc{BaseX} also provides a client server solution, this has also been migrated to the Android platform.
-Hereby the focus does not lie on the execution of the server on an external device, like a server on the Internet.
-This is also possible and would bring a big saving of resources on the mobile device, but this would be similar to a web service which is not the focus of this thesis.
+Hereby the focus does not lie on the execution of the server on an external device, like a server on the Internet for example.
+Although this is also possible and would bring a big saving of resources on the mobile device, but this would be similar to a web service which is not the focus of this thesis.
 The server client architecture of the Android \textsc{BaseX} version is to have one central database on one place and one instance of a server that handles all database operations.
 In contrast to the, in the section before created, Android library there is only one place on the device where the database files are being stored.
 If an application wants to use \textsc{BaseX} as a database it uses the client and sends its operations to the server, which is executed on the same device, and then receives the results.
-To achieve this Android provides Inter Process Communication(IPC) mechanisms which are offering the possibility to communicate with different applications.\\
+To achieve this Android provides Inter Process Communication (IPC) mechanisms which are offering the possibility to communicate with different applications.\\
 However, the client server version of \textsc{BaseX} uses the network and the TCP protocol to do the communication between server and clients.
 This technique has also been used for the Android solution of the client and server implementation.
 Additionally the server has been created as an Android service.
 An Android service is a process which is executed in the background and is thus the last instance which is killed by Android process management.
 The reason to implement the server as an Android service is the process management of the operating system and the execution of the service in the background of the device.
-The constraint of available RAM forces the Android to kill not needed application and free their used spaces in the RAM.~\cite{developers2011android}
+The constraint of available RAM forces the Android process management to kill the not needed application and free their used spaces in the RAM.~\cite{developers2011android}
 This can not be controlled, and the server has to be available all the time, so that an application can do its operation on it.
 The Android operating system tries to keep the service as long as possible alive, depending on different criteria and even it is being killed, for example by the user, it tries to restart it.
 A service does not provide a graphical user interface and to communicate with it also IPCs are used, therefore an application has been written, to start and stop the server service.
 This application is also the sandbox where the server stores its data, the application as well as the background service are executed in this sandbox.
 The data is stored in this sandbox, so no other application can access the data inside it, therefore the server is used.
-Therefore \textsc{BaseX} uses, as well as the desktop version, the network for the communication with the clients.
+To achieve this goal \textsc{BaseX} uses, as well as the desktop version, the network for the communication with the clients.
 Specifically the client application does not need to implement IPCs, they send their requests via the network to the server and also receive the responses through the network.
 A graphical illustration of the principle is shown in Figure~\ref{fig:server-client-android}.
 
@@ -478,7 +482,7 @@ Namely it is the normal slash ``/'' and not a backslash as it is implemented in 
 
 Another issue which occurred during the migration, was that \textsc{BaseX} uses a lot of the Java string function \textit{isEmpty()}, which is not available at an Android API-level lower than 9.
 The same applies for the \textit{copyOf()} method in the \textit{java.util.Arrays} Java package.
-This was solved by not supporting API-level lower than 9 with the created \textsc{BaseX} library.
+This was solved by not supporting API-levels lower than 9 with the created \textsc{BaseX} library.
 According to the official Android homepage only 1.7\% of the devices that are currently in circulation have an API-level lower than 9.\footnote{\url{http://developer.android.com/about/dashboards/index.html}}
 The consequence of this would be that developers can only create applications that are executable on Android devices using an API-level higher than 9, when using the \textsc{BaseX} library.
 To assure that no application, that is build on Android version lower than 9, uses the \textsc{BaseX} library the Manifest file of the library has been adjusted.

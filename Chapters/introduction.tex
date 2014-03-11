@@ -15,22 +15,28 @@ It is used for exchanging, storing and defining data, as well as it is extended 
 Therefore are also a lot of developer tools or libraries that use or provide the possibility to work with XML.
 One of it is the XML database engine \textsc{BaseX}.
 It is also an XQuery processor and offers features like a full text search as well as a client server architecture.
-The present thesis aims to receive a working Android version of the XML database \textsc{BaseX} and analyzing the received result by benchmarking it, for example.
+The present thesis aims to receive a working Android version of the XML database \textsc{BaseX} and analyzing the received result by benchmarking it and comparing it to an other database system, for example.
 
-
+\newpage
 \section{Motivation}
 \label{sec:introduction:motivation}
+Smartphones and other mobile devices are gaining more popularity with every day and every sold device.
+There are various operating systems for such devices, but none of them is so successful as Android in the last few month.
 Besides the fact that Android is becoming more popular with every sold smartphone or tablet device, it is also getting more successful in other fields.
-For example there exists research about its abilities to be an embedded systems operating system. ~\cite{lee2010evaluating}~\cite{maia2010evaluating}
-Just as well as an operating system for board computers in newer cars, to provide navigation, entertainment and status information to the driver.~\cite{macario2009vehicle}
-Looking at its triumphal procession in the last three years, it can be said that it will play an important role in the future as an operating system which can be used in a big variety.\\
+For example there exists research about its abilities to be an operating system for embedded systems.~\cite{lee2010evaluating}~\cite{maia2010evaluating}
+Just as well as there exists research about Android as an operating system for board computers in newer cars, to provide navigation, entertainment and status information to the driver.~\cite{macario2009vehicle}
+Looking at its triumphal procession in the last three years, it can be said that it will play an important role in the future as an operating system which can be used in a big variety and not only smartphones.\\
 The same applies for the storage format XML, which has been become more important in the last years, since its release in 1998.
 XML is used to define graphical interfaces in Android and its storage ability is being more distributed every day.
+One possible explanation for its success is the fact that it is possible to adjust XML to receive other dialects of it using the XML syntax, how has been done for many other formats.
+As mentioned before XML is used for storing data and resulting to this XML database have been developed, which are using XML as their format to store the data and representing it.
+Similar to the query language, of relational database systems, SQL there has also been a language developed to query XML files, which is also been used in XML database and which is called XQuery.
 
 
 
-It is obvious that sooner or later an implementation of an XML database for Android and a corresponding XQuery/XPath processor is made, which is also not available for the Android operating system, at the moment.
-In order to this the present thesis outlines a first approach to offer developers the ability to use an XML database and also an XQuery/XPath processor for their Android applications.
+
+Resulting of the mentioned facts, it is obvious that sooner or later an implementation of an XML database for Android and a corresponding XQuery/XPath processor is made, which is also not available for the Android operating system, at the moment.
+In order to this, the present thesis outlines a first approach to offer developers the ability to use an XML database and also an XQuery/XPath processor for their Android applications.
 
 
 
@@ -38,7 +44,7 @@ In order to this the present thesis outlines a first approach to offer developer
 \label{sec:overview}
 The present thesis describes the migration of the native XML database \textsc{BaseX} to the Android operating system.
 Therefore, first an outline is given, about the database, the Android operating system and if there exists relating work to this topic.
-This section also underlines that there is no XML database available for Android, which emphasizes the purpose of the present thesis.
+The same section also underlines that there is no XML database available for Android, which emphasizes the purpose of the present thesis and its resulting implementation.
 In Chapter~\ref{sec:migration:porting-basex-to-android} the source and target platforms of \textsc{BaseX} has been analyzed as well as the internal dependencies which \textsc{BaseX} is using.
 After this the database has been migrated to the Android platform, a library has been created which provides the usual \textsc{BaseX} operations.
 In addition to the library the client server architecture of \textsc{BaseX} has been also implemented for the Android platform.
