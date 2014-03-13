@@ -434,7 +434,8 @@ The results of the measured write operations illustrates that the Laptop is in a
 To narrow down, why this big factor occurs by creating a database on the Tablet, the Traceviews for the create database operation has also been recorded.
 The Traceviews has been recorded using all three file sizes, but they all have the same ordering of top time consuming methods and they differ only in their execution times and calls.
 Therefore the 1 Mb example has been used for analyzing the recorded Traceview.\\
-Looking at the top five most time consuming methods in the Traceview of the create operations gives that all of them are read operations, and not as expected write operations.
+Looking at the top five most time consuming methods in the Traceview of the create operations gives that all of them are read and not write operations.
+The reason for this is that \textsc{BaseX} uses the most time in a create process to parse the XML file, due to flat table representation.~\cite{grun2010storing}
 
 \begin{table}[htpb]
 	\centering

@@ -1,0 +1,140 @@
+\chapter{The query and modify statements}
+\label{app:the-query-and-modify-statements}
+\lstset{language=SQL,
+   basicstyle=\footnotesize,
+   keywordstyle=\color{blue!80!black!100},
+   identifierstyle=,
+   commentstyle=\color{green!50!black!100},
+   stringstyle=\ttfamily,
+   breaklines=true,
+   numbers=left,
+   tabsize=2,
+   numberstyle=\footnotesize,
+   frame=single,
+   backgroundcolor=\color{blue!3},
+}
+\begin{lstlisting} 	[captionpos=b, captionpos=b, caption={Statement 1 as SQL statement}, label=statement1-sql]
+SELECT * FROM contacts ORDERED BY name;
+\end{lstlisting} 
+
+\begin{lstlisting}[captionpos=b, caption={Statement 1 as XQuery code}, label=statement1-xquery] 
+for $x in .//contact/name order by $x return $x/..
+\end{lstlisting} 
+
+\lstset{language=SQL,
+   basicstyle=\footnotesize,
+   keywordstyle=\color{blue!80!black!100},
+   identifierstyle=,
+   commentstyle=\color{green!50!black!100},
+   stringstyle=\ttfamily,
+   breaklines=true,
+   numbers=left,
+   tabsize=2,
+   numberstyle=\footnotesize,
+   frame=single,
+   backgroundcolor=\color{blue!3},
+}
+\begin{lstlisting} 	[captionpos=b, captionpos=b, caption={Statement 2 as SQL statement}, label=statement2-sql]
+SELECT * FROM contacts WHERE email LIKE '%com';
+\end{lstlisting} 
+
+\begin{lstlisting}[captionpos=b, caption={Statement 2 as XQuery code}, label=statement2-xquery] 
+.//contact[ends-with(email, 'com')]
+\end{lstlisting} 
+
+\lstset{language=SQL,
+   basicstyle=\footnotesize,
+   keywordstyle=\color{blue!80!black!100},
+   identifierstyle=,
+   commentstyle=\color{green!50!black!100},
+   stringstyle=\ttfamily,
+   breaklines=true,
+   numbers=left,
+   tabsize=2,
+   numberstyle=\footnotesize,
+   frame=single,
+   backgroundcolor=\color{blue!3},
+}
+\begin{lstlisting} 	[captionpos=b, captionpos=b, caption={Statement 3 as SQL statement}, label=statement3-sql]
+SELECT * FROM contacts WHERE name LIKE '%Meier%';
+\end{lstlisting} 
+
+\begin{lstlisting}[captionpos=b, caption={Statement 3 as XQuery code}, label=statement3-xquery] 
+.//contact/name[text() contains text {'Meier'}] /..
+\end{lstlisting} 
+
+
+\lstset{language=SQL,
+   basicstyle=\footnotesize,
+   keywordstyle=\color{blue!80!black!100},
+   identifierstyle=,
+   commentstyle=\color{green!50!black!100},
+   stringstyle=\ttfamily,
+   breaklines=true,
+   numbers=left,
+   tabsize=2,
+   numberstyle=\footnotesize,
+   frame=single,
+   backgroundcolor=\color{blue!3},
+}
+\begin{lstlisting} 	[captionpos=b, captionpos=b, caption={Statement 4 as SQL statement}, label=statement4-sql]
+DELETE FROM contacts WHERE email LIKE '%org';
+\end{lstlisting} 
+
+\begin{lstlisting}[captionpos=b, caption={Statement 4 as XQuery code}, label=statement4-xquery] 
+delete node .//contact[ends-with(email, 'org')]
+\end{lstlisting} 
+
+
+
+
+
+\lstset{language=SQL,
+   basicstyle=\footnotesize,
+   keywordstyle=\color{blue!80!black!100},
+   identifierstyle=,
+   commentstyle=\color{green!50!black!100},
+   stringstyle=\ttfamily,
+   breaklines=true,
+   numbers=left,
+   tabsize=2,
+   numberstyle=\footnotesize,
+   frame=single,
+   backgroundcolor=\color{blue!3},
+}
+\begin{lstlisting} 	[captionpos=b, captionpos=b, caption={Statement 5 as SQL statement}, label=statement5-sql]
+INSERT INTO contacts (name, city, address, email) values ("Mueller", "Konstanz", "Brauneggerstr 62", "mueller@htwg.de");
+\end{lstlisting} 
+
+\begin{lstlisting}[captionpos=b, caption={Statement 5 as XQuery code}, label=statement5-xquery] 
+let $insert :=
+<contact>
+	<name>Mueller</name>
+	<city>Konstanz</city>
+	<address>Brauneggerstr 62</address>
+	<email>mueller@htwg.de</email>
+</contact>
+return
+insert node $insert into /DocumentElement
+\end{lstlisting} 
+
+\lstset{language=SQL,
+   basicstyle=\footnotesize,
+   keywordstyle=\color{blue!80!black!100},
+   identifierstyle=,
+   commentstyle=\color{green!50!black!100},
+   stringstyle=\ttfamily,
+   breaklines=true,
+   numbers=left,
+   tabsize=2,
+   numberstyle=\footnotesize,
+   frame=single,
+   backgroundcolor=\color{blue!3},
+}
+\begin{lstlisting} 	[captionpos=b, captionpos=b, caption={Statement 6 as SQL statement}, label=statement6-sql]
+update contacts set name = "Meier" where name = "Mueller";
+\end{lstlisting} 
+
+\begin{lstlisting}[captionpos=b, caption={Statement 6 as XQuery code}, label=statement6-xquery] 
+replace value of node .//contact[name = 'Mueller']/name with 'Meier'
+\end{lstlisting} 
