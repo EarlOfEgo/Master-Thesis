@@ -103,6 +103,10 @@
 \widowpenalty10000
 \displaywidowpenalty=10000
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%KEIN Ba sex
+\selectlanguage{english}
+\hyphenation{BaseX}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%APPENDIX
 \usepackage[toc,page]{appendix}
 
@@ -116,8 +120,8 @@ The present thesis outlines the migration of the XML database \textsc{BaseX} to 
 All necessary steps to build \textsc{BaseX} on Android are described and the process of creating an Android library which offers all needed \textsc{BaseX} functionalities is shown.
 After having created the working Android library of \textsc{BaseX}, the performance of the database has been analyzed and improved.
 For this purpose, different benchmarks on various devices have been used to identify the bottlenecks of the mobile \textsc{BaseX} version.
-After identifying these problems, it is shown which of them are depending on a platform constraint and which can be improved by changing the software.
-The performance differences between \textsc{BaseX} and the standard Android database SQLite3 is also illustrated and which of both should be prefered for a specific domain.
+After identifying these problems, it is shown which of them are depending on a specific platform constraint and which can be improved by changing the software.
+The performance differences between \textsc{BaseX} and the default Android database SQLite3 are also illustrated and which of these should be prefered for a specific domain.
 
 }
 \newcommand{\ausgabedatum}{28.09.2013}
@@ -125,7 +129,7 @@ The performance differences between \textsc{BaseX} and the standard Android data
 \newcommand{\autor}{Stephan Hagios}
 \newcommand{\autorStrasse}{Zasiusstra\ss e 17}
 \newcommand{\autorPLZ}{78462}
-\newcommand{\autorOrt}{Konstanz}
+\newcommand{\autorOrt}{ Konstanz}
 \newcommand{\autorGeburtsort}{Freiburg, im Breisgau}
 \newcommand{\autorGeburtsdatum}{03.07.1985 }
 \newcommand{\prueferA}{Prof. Dr. Oliver Eck}
@@ -181,13 +185,13 @@ The performance differences between \textsc{BaseX} and the standard Android data
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%makeindex thesis.nlo -s nomencl.ist -o thesis.nls
 \abbrev{dex}{Dalvik Executable}
-%\abbrev{XML}{e\markup{x}tensible \markup{m}arkup \markup{l}anguage}
+\abbrev{XML}{e\markup{x}tensible \markup{m}arkup \markup{l}anguage}
 \abbrev{VM}{Virtual Machine}
 \abbrev{JIT}{Just In Time}
 \abbrev{DVM}{Dalvik Virtual Machine}
 \abbrev{JVM}{Java Virtual Machine}
 \abbrev{APK}{Android Application Package}
-\abbrev{IPC}{Interprocess Communication}
+\abbrev{IPC}{Inter-process Communication}
 \abbrev{SDK}{Software Development Kit}
 \abbrev{GUI}{Graphical User Interface}
 \abbrev{XML}{Extensible Markup Language}
