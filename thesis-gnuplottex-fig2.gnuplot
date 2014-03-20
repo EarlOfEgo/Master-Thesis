@@ -3,7 +3,7 @@ set output 'thesis-gnuplottex-fig2.pdf'
           set title 'Tablet Steps'
   set datafile separator ','
   set xlabel 'Query'
-  set ylabel 'Average time in ms(100 executions)'
+  set ylabel 'Average time in ms (100 executions)'
   set xrange [0:21]
   set xtics 1,1,20
   set logscale y

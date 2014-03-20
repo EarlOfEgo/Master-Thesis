@@ -4,7 +4,7 @@
 	          set title 'Tablet Steps using the Optimized Version'
 		  set datafile separator ','
 		  set xlabel 'Query'
-		  set ylabel 'Average time in ms(100 executions)'
+		  set ylabel 'Average time in ms (100 executions)'
 		  set xrange [0:21]
 		  set xtics 1,1,20
 		  set logscale y
@@ -16,7 +16,7 @@
 		  set boxwidth 0.5 relative
 		  plot for [i=1:14] 'benchmarks/xmark-tablet-steps-optimized-transposed.csv' u ($0+1):i title ''.i.'00kb' with linespoints
 	\end{gnuplot}              
-	\caption{The results of the XMark benchmark queries executed on the Tablet, using the optimized \textsc{BaseX} version.}
+	\caption{The results of the XMark benchmark queries executed on the tablet PC, using the optimized \textsc{BaseX} version.}
 	\label{fig:xmark-tablet-optimized}
   \end{center}
 \end{figure}
