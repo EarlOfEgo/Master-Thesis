@@ -42,7 +42,7 @@ They differ in many kinds which an application developer not sees but need to co
 \\
 One of the most important differences is that the JVM is a stack and the DVM is a register based virtual machine.
 This difference helps the DVM to execute the same code in lesser operations than the JVM.
-This means that the DVM need lesser CPU cycles than the JVM, which is an improvement that is necessary due to of the lack of CPU and memory resources in mobile devices and the aspect of battery usage.
+This means that the DVM need lesser CPU cycles than the JVM, which is an improvement that is necessary due to the lack of CPU and memory resources in mobile devices and the aspect of battery usage.
 This can be demonstrated by comparing the instructions done by adding two integers in both virtual machines.
 The stack based virtual machine has to execute four machine instructions, while the register based VM is able to do the same operation in one single instruction.
 The reason for this is that the stack based VM needs to pop the two values first before it can add and store them back on the stack.
@@ -164,11 +164,11 @@ These constants consist of:
   \item[methods\_ids] Sorted list of all methods used by the \textit{dex} file
 \end{description}
 Considering an interface which is used very often in a project can outline what advantage is given with the use of one shared constant pool.
-Looking at Image~\ref{fig:jar-dex} demonstrates that every class which uses this interface has to have its own reference within its own constant pool.
+Looking at Image~\ref{fig:jar-dex} demonstrates that every class which uses this interface has to have a reference within its own constant pool only and not the whole constant pool as itself.
 \begin{figure}[h]
 \begin{center}
 \includegraphics[scale=0.41]{images/jar-dex.png} 
-\caption{The difference between a jar and a \textit{dex} file. Source:~\cite{enck2011study}}
+\caption{The difference between a jar and a \textit{dex} file. Source:\cite{enck2011study}}
 \label{fig:jar-dex}
 \end{center}
 \end{figure}
@@ -275,7 +275,7 @@ The result of this investigation shows that \textsf{javax.xml} is supported, but
 Even if all packages and classes of \textsf{javax.xml.crypto} are part of the Java standard edition they are not available for Android development.
 All classes inside this packages are only used by one single \textsc{BaseX} package, which is called \textsf{org.basex.query.\-util.crypto}.
 This package is used to implement the XQuery cryptographic module that provides functionalities to en- and decrypt, sign and validate signed XML data.
-The only class that makes uses of this package is the \textsf{FNCrypto} class.
+The only class that makes use of this package is the \textsf{FNCrypto} class.
 This class is used to provide the cryptographic module functionalities in XQuery.
 These are XQuery functions which consist of:
 \begin{itemize}
@@ -294,7 +294,7 @@ Nevertheless this will be figured out in Section~\ref{sec:migration:creating-a-b
 
 \subsection{The Android Project Structure}
 \label{sec:migration:the-android-project-structure}
-For developing Android applications an Android project need to be set up initially.
+For developing Android applications an Android project needs to be set up initially.
 An Android project is a structure of special folders and predefined files, like code, resource and build files.
 There are three types of Android projects, which are differing in their functionalities and intentions.\\
 The first is the type of project that needs to be created if an executable application is the goal of the development process.
@@ -342,7 +342,7 @@ If a project has been successfully created there are seven given folders, shown 
 \label {tab:android-project-folders}
 \end {table}
 
-The files that will be generated while creating an Android project consists of four build files that each hold information used by the build system to create the \textit{dex} files and the \textit{apk} archive.
+The files that will be generated while creating an Android project consists of four build files that each holds information used by the build system to create the \textit{dex} files and the \textit{apk} archive.
 Another file that is being created is the so called \textit{AndroidManifest.xml}.
 This XML file is important for the application and the Android operating system.
 It is used to specify the API level, the application name and other specific information related to the application.
@@ -403,17 +403,17 @@ For the validation and performance measurement a test application of the \textsc
 
 \subsection{Providing a \textsc{BaseX} Android Client/Server Solution}
 \label{sec:migration:providing-a-server-client-solution}
-At this moment every application which uses the \textsc{BaseX} Android library, has its own database that creates, read, update and reads the data.
+At this moment every application which uses the \textsc{BaseX} Android library, has its own database which is able to create, read, update and delete the data.
 One disadvantage of that type of solution is that other applications are not able to use the data inside a database of another application.
 The reason for this, as mentioned in Section~\ref{sec:android-internals}, is the sandbox principle of Android applications where applications can only access their own resources and not those from other applications.
 Speaking of a disadvantage could be misleading in this context, because this circumstance also prevents unauthorized applications to read or modify the data of another application.
 However, Android provides a mechanism which offers the possibility to provide data from one application to another.
-This technique is called content provider and is used for system wide databases like the database that contains the contacts of the owner of an Android device.
+This technique is called Content Provider and is used for system wide databases like the database that contains the contacts of the owner of an Android device.
 Thinking of different applications that are using the same data shows that this could lead to redundant databases, which would increase the required storage size.
 In addition to this, every time the data changes on one point it has to be synchronized with every other database which stores the same data, too.
 For example, if every application has its own database storing the contacts and a new contact is added, all those databases need to updated.\\
-Additionally to the stand alone version of \textsc{BaseX} it is possible to use it as a client server solution.
-An instance of a \textsc{BaseX} client connects to a server and sends its requests and queries to a server, which executes them and sends them back to the client.
+Additionally to the stand alone version of \textsc{BaseX} it is possible to use it as a client/server solution.
+An instance of a \textsc{BaseX} client connects to a server and sends its requests and queries to it, which executes them and sends them back to the client.
 The advantage of this solution is that the client does not have to do the execution of the database related operations.
 Also the files which are containing the data, are stored and managed on the server and not on the client.
 Both shown advantages are reducing resource consumptions at the client instance.
@@ -477,11 +477,11 @@ This is only available if there is an Android application.
 A library does not offer this type of information, so it is not possible for a library to get the name or location of its private directory.
 The only way to get the package name of the application, except of hard coding it into the source code, is to get the application context and extract the name from there.
 This bears another problem, though only applications have a context, libraries do not, which also need to be considered. 
-A possible way, could be to pass the context to the library, but then the library holds the context which it does not usually need and it will maybe not freed from the garbage collector, due to the mark-and-sweep garbage collector strategy, as described in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines}.
+A possible way, could be to pass the context to the library, but then the library holds the context which it does not usually need and it will maybe not be freed from the garbage collector, due to the mark-and-sweep garbage collector strategy, as described in Section~\ref{sec:migration:comparison-of-the-two-virtual-machines}.
 Also the library would only need the application context to receive the application name and by using this information the name and location of the private directory.
 As mentioned above, holding an Android context massively slows down an Android application, so this is not the way how the problem should be solved.
 The alternative is to pass a string holding the application name to the constructor of the library, because it only needs the name or the location of the \textit{data/data} directory to access it.
-Therefore the context has been used before creating a library instance to receive the needed directory name, so that it can passed right to the library through the constructor.
+Therefore the context has been used before creating a library instance to receive the needed directory name, so that it can be passed right to the library through the constructor.
 The string, containing the directory name, then is used by the library to generate the needed directories.
 This can be done by the library, because it directly belongs to the application that uses it.
 As a result of this the library is executed in the same sandbox like the application and it has the corresponding rights.

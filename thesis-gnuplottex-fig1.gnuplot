@@ -13,4 +13,4 @@ set output 'thesis-gnuplottex-fig1.pdf'
   show grid
   set style fill solid 0.8 border -1
   set boxwidth 0.5 relative
-  plot for [i=1:14] 'benchmarks/basex-steps-laptop-transposed.csv' u ($0+1):i title ''.i.'00kb' with linespoints
+  plot for [i=1:14] 'benchmarks/basex-steps-laptop-transposed.csv' u ($0+1):i title ''.i.'00KB' with linespoints

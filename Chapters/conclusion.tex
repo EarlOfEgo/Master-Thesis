@@ -4,8 +4,8 @@ In this chapter a conclusion about the present thesis and the achieved results a
 Additionally a recommendation is proposed on which circumstances \textsc{BaseX} can be used in the Android context instead of the standard Android database SQLite3.
 \section{Conclusion}
 \label{sec:summery:conclusion}
-The goal of migrating the XML database \textsc{BaseX} to the Android platform has been achieved, as an implementation of an Android library as well as a client/server solution.
-Only a few features, the cryptographic XQuery function for example, could have not been migrated to the Android platform in order to get a working solution.
+The goal of migrating the XML database \textsc{BaseX} to the Android platform has been achieved, as an implementation of an Android library as well as a \mbox{client/server} solution.
+Only a few features, the cryptographic XQuery function for example, could not have been migrated to the Android platform in order to get a working solution.
 The occurred issues and problems could have been solved, some brought constraints with them which are not restricting \textsc{BaseX} in its fundamental functioning.
 One of them is the minimal Android API version of the application, that uses the \textsc{BaseX} library, has to be higher than 2.3.
 As mentioned in the corresponding section there are only less than one percent of the distributed mobile devices using a version lower than 2.3.
@@ -63,7 +63,7 @@ This also is the disadvantage of ART, it can take a lot of time to compile the w
 Nevertheless the speed improvement ART should bring is, compared to the one time consumption the compile step brings, better than executing the application within Dalvik, because there is no additional virtual machine with an interpreter to execute.
 A lot about the new runtime can not be said, because it is in a very early state and Google has not provided many information about it.
 Future work could be to investigate the improvements ART brings and if there are adjustments in the \textsc{BaseX} Android library can be done to achieve better runtime values while using ART.
-The improvements that has been done in Section~\ref{sec:improving} could be kept, because most of them have been done to optimize the JIT mechanism from Dalvik, which is the core principle of ART.
+The improvements that have been done in Section~\ref{sec:improving} could be kept, because most of them have been done to optimize the JIT mechanism from Dalvik, which is the core principle of ART.
 But this also needs to be tested and investigated in the future.\\
 On the other side it could be the hardware aspect that can be investigated.
 Because of the lack of possibilities during the work on this thesis the \textsc{BaseX} Android library could only be tested on one device.

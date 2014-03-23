@@ -1,4 +1,4 @@
-\chapter{Analysis of the ported \textsc{BaseX} Android version}
+\chapter{Analysis of the Ported \textsc{BaseX} Android Version}
 \label{cha:analysis}
 The present chapter outlines how the migrated \textsc{BaseX} Android database has been analyzed.
 The focus at this part concentrates on the evaluation and the performance of the library and its ability to be a possible database for mobile devices.
@@ -10,7 +10,7 @@ Therefore an XML benchmark set, which is especially designed to test the perform
 In aspects of performance, \textsc{BaseX} has been compared to the default Android database SQLite3 and a predication, which database system should be preferred for a specified use case, has been made.
 At the end of this chapter the constraints, in terms of maximal database sizes, of the Android version of \textsc{BaseX} used in the Android operating system has been inquired.
 
-\section{Evaluation of the test devices}
+\section{Evaluation of the Test Devices}
 \label{sec:evaluation-of-the-test-devices}
 For the measurement of the performance and the evaluation two different devices have been used.
 First, for benchmarking and evaluating the \textsc{BaseX} mobile version an Android Tablet PC Samsung Galaxy Tab 2 10.1 has been utilized.
@@ -56,7 +56,7 @@ It tests sequential output, sequential input, random seeks, sequential create an
 The sequential output represents the write speed of the system and Bonnie++ uses three different methods to measure this value.
 First it writes one character after another by using the \textsf{putc()} systemcall. 
 After this operation it writes whole blocks with the size of 8192 bytes by using the \textsf{write()} systemcall and than calling the \textsf{close()} systemcall.
-The last test in this category is the rewrite test and differs from the write test in the fact, that the file is not closed after writing.
+The last test in this category is the rewrite test which differs from the write test in the fact, that the file is not closed after writing.
 Therefore one block write comply with 8192 \textsf{putc} calls and is way more effective and faster than writing single characters.
 As a next test the random seek operations per seconds were measured, which means how often the read/write position can be changed.
 It also measures the latency which represents the rotation speed of the disk, but this is obsolete because both systems using flash storage.
@@ -80,8 +80,9 @@ Analyzing Table~\ref{tab:bonnie-results-create} and having a look at the factors
 The sequential write per character is 40 times faster on the laptop than on the tablet PC.
 Considering this, it is clear to avoid writing by character instead by block.
 Writing by using the block mechanism is just three times slower than on the tablet device.
-The sequential reading of a single character is at the tablet just 1.52 times slower than the at the notebook.
-Though the factor of the block reading is quite higher than the character reading factor it is sure to use the block reading because it is much faster than character reading.
+The sequential reading of a single character is at the tablet just 1.52 times slower than at the notebook.
+Though the factor of the block reading is quite higher than the character reading factor.
+It is clear to say that block reading is much faster than character reading.
 But by using block reading the factor needs also to be considered in the \textsc{BaseX} benchmarks later in chapter~\ref{sec:analysing-the-execution-performance}.
 \\
 Looking at Table~\ref{tab:bonnie-results-create} it can be seen that the sequential/random creation, reading and deleting is very slow on the Android device compared to the laptop.
@@ -103,7 +104,7 @@ The results of these tests can be seen in Table~\ref{tab:cpu-results}.
 Except the Fibonacci test it can be said that the CPU of the laptop is about five times faster than the one of the tablet device, respectively calculates and executes instructions five times faster.
 This is like the different I/O parameters a factor which could not be improved and has to be considered in the \textsc{BaseX} benchmarks as well.
 In general it can be said, that every operation, which is mainly CPU intensive, is executed five times faster on the laptop than on the tablet device.
-The same applies to IO operations, depending on the type of the operation the laptop is up to  4 times faster than the tablet device.
+The same applies to I/O operations, depending on the type of the operation the laptop is up to  4 times faster than the tablet device.
 These evaluations are used for measuring the performance of the two \textsc{BaseX} versions and how to cope with the results achieved by two different platforms on two different devices.
 
 %\newpage
@@ -112,7 +113,7 @@ These evaluations are used for measuring the performance of the two \textsc{Base
 To investigate the performance of the Android version of \textsc{BaseX} the benchmark suite \textit{XMark} has been used.
 \textit{XMark} creates random XML files and provides a set of twenty predefined queries which can be used to measure the execution performance of an \textit{XQuery} implementation.
 It offers the possibility to choose the size of the randomly created XML files, so that the test queries can be executed on different file sizes.
-Therefore it is also being used to search for the maximum supported database size of an \textsc{BaseX} database on Android in Section~\ref{sec:defining-the-constraints}.
+Therefore it is also being used to search for the maximum supported database size of a \textsc{BaseX} database on Android in Section~\ref{sec:defining-the-constraints}.
 All benchmark tests have been executed using the \textsc{BaseX} Android library and not the client/server solution.
 Additionally the Android benchmarks have all been executed inside the main thread of an application, which is usually not the case because all database operations should be handled inside a separate thread.
 The reason for this is to avoid unpredictable interrupts which could possibly hinder the benchmark thread. 
@@ -137,7 +138,7 @@ The structure of the randomly generated XML files can be seen in Figure~\ref{fig
 \newpage
 The size of the XML files can be chosen during the generation process of XMark.
 For testing \textsc{BaseX} 15 different files have been generated.
-The smallest with a size of 100 Kb, followed by files with a size increasing by 100 KB steps.
+The smallest with a size of 100 KB, followed by files with a size increasing by 100 KB steps.
 Hence, the biggest generated file has a size of 1.4 MB.\\
 The textual explanation of the different types of queries can be seen in Table~\ref{tab:xmark-queries}.
 \begin {table}[htpb] 
@@ -244,7 +245,7 @@ The result of the execution of the application using the laptop can be seen in F
 	  show grid
 	  set style fill solid 0.8 border -1
 	  set boxwidth 0.5 relative
-	  plot for [i=1:14] 'benchmarks/basex-steps-laptop-transposed.csv' u ($0+1):i title ''.i.'00kb' with linespoints
+	  plot for [i=1:14] 'benchmarks/basex-steps-laptop-transposed.csv' u ($0+1):i title ''.i.'00KB' with linespoints
 	\end{gnuplot}              
 	\caption{The results of the XMark benchmark queries executed on the laptop device.}
 	\label{fig:xmark-laptop}
@@ -267,7 +268,7 @@ The result of the execution of the application using the laptop can be seen in F
 	  show grid
 	  set style fill solid 0.8 border -1
 	  set boxwidth 0.5 relative
-	  plot for [i=1:14] 'benchmarks/xmark-tablet-steps-transposed.csv' u ($0+1):i title ''.i.'00kb' with linespoints
+	  plot for [i=1:14] 'benchmarks/xmark-tablet-steps-transposed.csv' u ($0+1):i title ''.i.'00KB' with linespoints
 	\end{gnuplot}              
 	\caption{The results of the XMark benchmark queries executed on the tablet device.}
 	\label{fig:xmark-tablet}
@@ -347,7 +348,7 @@ It consumes an average of 1121 cycles per call, which is very slow compared to t
 The purpose of this method, inside \textsc{BaseX}, is to decompress the given byte array.
 During its execution it iterates over the given byte array and decompresses all characters.
 \\
-The \textsf{IterStep\$1.next} method is part of an iterator and each time iterates to the next node.
+The \textsf{IterStep\$1.next} method is part of an iterator and each time it iterates to the next node.
 Depending on the amount of nodes, the time spend in this method and the corresponding calls to it can in- or decrease.
 This results in the conclusion that this method could also not be optimized for the Android operating system.
 \\
@@ -371,7 +372,7 @@ Even if this part of the \textsc{BaseX} Android source code is compiled into nat
 Besides the for-loop there are the \textsf{eq} and \textsf{NS.name} methods, which also could produce the long execution time of this function.
 The \textsf{eq} method compares the two committed byte arrays for equality, implemented by using a for-loop which iterates over the arrays and compares their bytes.
 This for-loop is executed very often and there are no other method calls inside of it, so it is very obvious that this loop is compiled into machine code by the JIT optimization routine.\\
-The investigation of the \textsf{NS.name} method shows that this function is a just simple getter method which returns the name from the index of the parameter.\\
+The investigation of the \textsf{NS.name} method shows that this function is just a simple getter method which returns the name from the index of the parameter.\\
 At this place the differences between the two platforms are playing an important part, because it is a best practice to use getter and setter for the normal Java environment, but it is expensive for the Android platform~\cite{toninievlautatingandroid}.
 Even if the JIT compiler inlines the getter/setter calls it can be up to 30\% faster if a direct field access is used instead of the getter/setter methods~\cite{toninianalysis}.\\
 In Section~\ref{sec:improving} the getter of the \textit{NSGlobal.uri} method has been replaced by direct field accesses and it is shown that it improves the execution time of Query 2 for the \textsc{BaseX} Android library.
@@ -402,11 +403,11 @@ The results can be seen in Table~\ref{tab:average-times-create-db}.
 		\hline
 		File size&Laptop&Tablet&Factor\\
 		\hline
-		1 Mb&168.54 ms&3389.55 ms&20.11\\
+		1 MB&168.54 ms&3389.55 ms&20.11\\
 		\hline
-		5 Mb&737.88 ms&17418.61 ms&23.60\\
+		5 MB&737.88 ms&17418.61 ms&23.60\\
 		\hline
-		10 Mb&1543.37 ms&36246.68 ms&23.48\\
+		10 MB&1543.37 ms&36246.68 ms&23.48\\
 		\hline
 	\end{tabular}
 	\caption{The average times of the create database operation, for 50 runs.}
@@ -416,7 +417,7 @@ The results can be seen in Table~\ref{tab:average-times-create-db}.
 The results of the measured write operations illustrate that the laptop in average is about twenty times faster in writing operations than the tablet device.
 To narrow it down, why this big factor occurs while creating a database on the tablet PC, the Traceviews for the create database operation have also been recorded.
 The Traceviews have been recorded using all three file sizes, but they all have the same ordering of top time consuming methods and they differ only in their execution times and calls.
-Therefore the 1 Mb example has been used for analyzing the recorded Traceview.\\
+Therefore the 1 MB example has been used for analyzing the recorded Traceview.\\
 Looking at the top five most time consuming methods inside the Traceview of the create operations shows that all of them are read and not write operations.
 The reason for this is that \textsc{BaseX} spends the most of the time inside a create process to parse a given XML file, due to flat table representation~\cite{grun2010storing}.
 
@@ -462,7 +463,7 @@ Depending on the available heap size of the process this output varies for every
 However, the Logcat output of the garbage collector for Query 5 and Query 11 has been recorded.
 Query 5 is the query with the least amount of time consumption and Query 11 is in contrast to this the most time consuming query.
 This fact is also reflected in the corresponding output of the Logcat information.
-Namely the garbage collector is called only one time by the execution of Query 5 on a 1 Mb database and freed an amount of 540 KB in total, pausing the execution for 6ms.
+Namely the garbage collector is called only one time by the execution of Query 5 on a 1 MB database and freed an amount of 540 KB in total, pausing the execution for 6~ms.
 In contrast to this minimal usage of the GC the messages shown by the Logcat during the execution of Query 11 are showing an amount of 25 of GC usage.
 The values summed up can be seen in Table~\ref{tab:gc-stats}.
 
@@ -472,9 +473,9 @@ The values summed up can be seen in Table~\ref{tab:gc-stats}.
 		\hline
 		Query&GC executions&Freed memory&Time used\\
 		\hline
-		5&1&540 kb&6 ms\\
+		5&1&540 KB&6 ms\\
 		\hline
-		11&25&15173 kb&226 ms\\
+		11&25&15173 KB&226 ms\\
 		\hline
 	\end{tabular}
 	\caption{Garbage collection statistics during the execution of Query 5 and 11.}
@@ -487,7 +488,7 @@ The garbage collector is executed within its own thread which is scheduled by th
 Usually the available RAM for every process is between 16 and 128 MB.
 At the used tablet device an executed application receives 48 MB of RAM for its execution, which compared to typical desktop systems is very low.
 However, there is a way to increase this size manually for applications which are needing a bigger RAM size.
-This can be done in the Android Manifest file by adding \textit{android:largeHeap="true"} and resulting in a total of 256 Mb RAM available for the \textsc{BaseX} application on the Tablet test device.
+This can be done in the Android Manifest file by adding \textit{android:largeHeap="true"} and resulting in a total of 256 MB RAM available for the \textsc{BaseX} application on the Tablet test device.
 The increase to a maximum of 256 MB of available heap size does not mean that the application has this amount as default available.
 Actually it means that the application can request more heap if it is running low on it and the operating system will grant it until the maximum capacity of 256 MB is reached.
 Additionally this option is only used for testing purpose, because it is just available for Android versions higher or equal than API level 11 and therefore cannot be written from within the Manifest file of the \textsc{BaseX} Android library.\\
@@ -609,7 +610,7 @@ The corresponding XML structure used in \textsc{BaseX} in Listing~\ref{basex-xml
 \begin{figure}[h]
 \begin{center}
 \includegraphics[scale=0.65]{images/sqlite-tables.png} 
-\caption{The structure of the used table inside SQLite3.}
+\caption{The structure of the table used inside SQLite3.}
 \label{fig:sqlite-tables-contacts}
 \end{center}
 \end{figure}
